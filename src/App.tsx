@@ -7,9 +7,6 @@ import exporting from 'highcharts/modules/exporting';
 import highchartsMore from 'highcharts/highcharts-more';
 exporting(Highcharts);
 highchartsMore(Highcharts);
-// Load Highcharts modules
-// require('highcharts/modules/exporting')(Highcharts);
-// require('highcharts/highcharts-more')(Highcharts);
 
 function App() {
   // const [hoverData, setHoverData] = useState(null);
@@ -19,7 +16,7 @@ function App() {
       height: '100%',
     },
     title: {
-      text: 'TOP Contributors to Cycle Time MTM Decrease',
+      text: "What's in my mind?",
     },
     tooltip: {
       useHTML: true,
@@ -28,7 +25,7 @@ function App() {
     plotOptions: {
       packedbubble: {
         minSize: '30%',
-        maxSize: '80%',
+        maxSize: '100%',
         //zMin: 0,
         //zMax: 1000,
         layoutAlgorithm: {
@@ -37,11 +34,11 @@ function App() {
         },
         dataLabels: {
           enabled: true,
-          format: '{series.name}',
+          format: '{point.name}',
           filter: {
             property: 'y',
-            operator: '>',
-            value: 250,
+            operator: '<',
+            value: 99,
           },
           style: {
             color: 'black',
@@ -53,60 +50,62 @@ function App() {
     },
     series: [
       {
-        name: 'ASEAN',
+        name: '车',
         data: [
           {
-            name: 'ASEAN',
-            value: -88.2,
+            name: '买车',
+            value: 21,
+          },
+          {
+            name: '学车',
+            value: 13,
           },
         ],
       },
       {
-        name: 'KOR ',
+        name: '学法语',
         data: [
           {
-            name: 'KOR',
-            value: -605.2,
+            name: '学法语',
+            value: 21,
           },
         ],
       },
       {
-        name: 'CHN ',
+        name: '找女朋友',
         data: [
           {
-            name: 'CHN',
-            value: -427233.7,
+            name: '找女朋友',
+            value: 33,
           },
         ],
       },
       {
-        name: 'ISA ',
+        name: '学习 ',
         data: [
           {
-            name: 'ISA',
-            value: -355.39,
-          },
-        ],
-      },
-      {
-        name: 'ANZ ',
-        data: [
-          {
-            name: 'ANZ ',
-            value: -3331.4,
-          },
-        ],
-      },
-      {
-        name: 'JP ',
-        data: [
-          {
-            name: 'JP1',
-            value: -22470857.0,
+            name: 'Docker',
+            value: 1,
           },
           {
-            name: 'JP2',
-            value: -21470857.0,
+            name: 'K8S',
+            value: 2,
+          },
+          {
+            name: 'Pytorch',
+            value: 8,
+          },
+          {
+            name: '微积分',
+            value: 13,
+          },
+          {
+            name: '线性代数',
+            value: 13,
+          },
+          {
+            name: 'Graph',
+            value: 8,
           },
         ],
       },
@@ -115,14 +114,12 @@ function App() {
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
   return (
     <div className='App'>
-      <h2>What's in my Mind?</h2>
       <HighchartsReact
         highcharts={Highcharts}
         constructorType={'chart'}
         options={chartOptions}
         ref={chartComponentRef}
       />
-      {/* <button onClick={()}>Export</button> */}
     </div>
   );
 }
