@@ -5,8 +5,13 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import exporting from 'highcharts/modules/exporting';
 import highchartsMore from 'highcharts/highcharts-more';
+
 exporting(Highcharts);
 highchartsMore(Highcharts);
+
+const apiKey = import.meta.env.VITE_APIKEY;
+const token = import.meta.env.VITE_TOKEN;
+const boardId = import.meta.env.VITE_BOARD;
 
 type Card = { id: string; name: string; closed: boolean };
 type Column = { id: string; name: string; cards: Card[] }[] | null;
@@ -22,42 +27,41 @@ const c = {
   lightOrange: '#feb56a',
   lightGreen: '#91e8e1',
 };
-const pallete = [c.blue, c.lightOrange, c.orange, c.purple, c.tiffany];
+const pallete = [c.lightGreen, c.darkPurple, c.iron, c.purple, c.blue];
 
 function App() {
   const [board, setBoard] = useState<Column>(null);
-  useEffect(() => {
-    const fetchData = async () => {
-      const apiKey = import.meta.env.VITE_APIKEY;
-      const token = import.meta.env.VITE_TOKEN;
-      const boardId = import.meta.env.VITE_BOARD;
+  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
 
-      try {
-        fetch(
-          `https://api.trello.com/1/boards/${boardId}/lists?cards=all&key=${apiKey}&token=${token}`
-        )
-          .then((res) => res.json())
-          .then((res) => {
-            setBoard(res);
-          });
-      } catch (error) {
-        console.error('Error fetching Trello board data:', error);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      fetch(
+        `https://api.trello.com/1/boards/${boardId}/lists?cards=all&key=${apiKey}&token=${token}`
+      )
+        .then((res) => res.json())
+        .then((res) => {
+          setBoard(res);
+        });
+    } catch (error) {
+      console.error('Error fetching Trello board data:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
   const series = board
-    ?.filter((col) => col.name != 'Done')
+    ?.filter((keepColumn) => keepColumn.name != 'Done')
     .map((col, idx) => ({
       name: col.name,
       data: col.cards
         .filter((card) => card.closed == false)
         .map((card) => ({
           name: card.name,
-          value: board.length - idx,
-          color: pallete[idx],
+          value: Math.floor(Math.random() * 10),
         })),
+      color: pallete[idx],
     }));
 
   const chartOptions = {
@@ -98,15 +102,14 @@ function App() {
         },
       },
     },
-    series,
   };
-  const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+
   return (
     <div className='App'>
       <HighchartsReact
         highcharts={Highcharts}
         constructorType={'chart'}
-        options={chartOptions}
+        options={{ ...chartOptions, series }}
         containerProps={{ style: { width: '800px' } }}
         ref={chartComponentRef}
       />
