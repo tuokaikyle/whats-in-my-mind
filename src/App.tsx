@@ -14,7 +14,15 @@ const token = import.meta.env.VITE_TOKEN;
 const boardId = import.meta.env.VITE_BOARD;
 
 type Card = { id: string; name: string; closed: boolean };
-type Column = { id: string; name: string; cards: Card[] }[] | null;
+type Column = { id: string; name: string; cards: Card[] }[];
+type Bubble = { name: string; value: number; events: { click: any } } | null;
+type Series =
+  | {
+      name: string;
+      data: Bubble[];
+      color: string;
+    }[]
+  | null;
 const c = {
   blue: '#2caffe',
   darkPurple: '#544fc5',
@@ -30,8 +38,41 @@ const c = {
 const pallete = [c.lightGreen, c.darkPurple, c.iron, c.purple, c.blue];
 
 function App() {
-  const [board, setBoard] = useState<Column>(null);
+  const [series, setSeries] = useState<Series>(null);
   const chartComponentRef = useRef<HighchartsReact.RefObject>(null);
+  const [clickedBubble, setClickedBubble] = useState<Bubble>(null);
+
+  const handleBubbleClick = (event: any) => {
+    setClickedBubble(event.point.options);
+  };
+
+  useEffect(() => {
+    series &&
+      setSeries(
+        series.map((s) => ({
+          ...s,
+          data: s.data.filter((b) => b?.name !== clickedBubble?.name),
+        }))
+      );
+  }, [clickedBubble]);
+
+  const buildSeries = (board: Column): Series => {
+    return board
+      ?.filter((keepColumn) => keepColumn.name != 'Done')
+      .map((col, idx) => ({
+        name: col.name,
+        data: col.cards
+          .filter((card) => card.closed == false)
+          .map((card) => ({
+            name: card.name,
+            value: Math.floor(Math.random() * 10),
+            events: {
+              click: handleBubbleClick,
+            },
+          })),
+        color: pallete[idx],
+      }));
+  };
 
   const fetchData = async () => {
     try {
@@ -40,7 +81,7 @@ function App() {
       )
         .then((res) => res.json())
         .then((res) => {
-          setBoard(res);
+          setSeries(buildSeries(res));
         });
     } catch (error) {
       console.error('Error fetching Trello board data:', error);
@@ -50,19 +91,6 @@ function App() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const series = board
-    ?.filter((keepColumn) => keepColumn.name != 'Done')
-    .map((col, idx) => ({
-      name: col.name,
-      data: col.cards
-        .filter((card) => card.closed == false)
-        .map((card) => ({
-          name: card.name,
-          value: Math.floor(Math.random() * 10),
-        })),
-      color: pallete[idx],
-    }));
 
   const chartOptions = {
     chart: {
