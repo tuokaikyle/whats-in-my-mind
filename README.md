@@ -1,5 +1,26 @@
 # OverchargedList
 
+思考：不要用mongodb atlas cli，不管用。 
+```bash
+bun create better-t-stack@latest OverchargedList --frontend tanstack-router --backend hono --runtime bun --api trpc --auth better-auth --payments none --database postgres --orm drizzle --db-setup neon --package-manager bun --no-git --web-deploy none --server-deploy none --install --addons biome turborepo --examples todo
+```
+不要git init
+
+github repo
+fine token - 90 days, work, content read and write
+
+.env setup 
+db:push
+
+todo：
+
+添加better auth ui
+
+添加shadcn ui
+
+添加为mongodb
+
+
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, TRPC, and more.
 
 ## Features
@@ -45,11 +66,6 @@ bun run dev
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
 The API is running at [http://localhost:3000](http://localhost:3000).
-
-
-
-
-
 
 
 ## Project Structure
