@@ -1,0 +1,30 @@
+{
+  "name": "@OverchargedList/api",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "type": "module",
+  "scripts": {},
+  "devDependencies": {
+    "@OverchargedList/config": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@trpc/server": "catalog:",
+    "@trpc/client": "catalog:",
+    "hono": "catalog:",
+    "drizzle-orm": "catalog:",
+    "@types/pg": "^8.15.6",
+    "dotenv": "catalog:",
+    "zod": "catalog:",
+    "@OverchargedList/auth": "workspace:*",
+    "@OverchargedList/db": "workspace:*"
+  }
+}
