@@ -10,7 +10,7 @@ function RouteComponent() {
 
   return (
     <main className='container items-center flex flex-col mx-auto my-auto p-4 md:p-6'>
-      <AuthView path={path} />
+      <AuthView path={path} socialLayout={'horizontal'} />
     </main>
   );
 }
