@@ -11,10 +11,13 @@ db:push
 todo：
 
 - [x] 添加better auth ui
-- [ ] 添加shadcn ui
+- [x] 添加shadcn ui
 - [ ] 添加为mongodb?
 - [] user name fox? better auth sign up form no user name
 - [] todo belongs to one user
+- [] run lint check
+- [] remove all unused imports and code
+- [] dynamic breadcrumb
 
 which neon account?
 github

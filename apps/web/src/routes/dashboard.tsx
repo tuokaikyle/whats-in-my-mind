@@ -24,7 +24,7 @@ function RouteComponent() {
   const privateData = useQuery(trpc.privateData.queryOptions());
 
   return (
-    <div>
+    <div className='mx-auto w-full max-w-md'>
       <h1>Dashboard</h1>
       <p>Welcome {session.data?.user.name}</p>
       <p>API: {privateData.data?.message}</p>

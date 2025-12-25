@@ -4,6 +4,7 @@ import * as React from 'react';
 import {
   BookOpen,
   Bot,
+  Code,
   Command,
   Frame,
   LifeBuoy,
@@ -15,9 +16,7 @@ import {
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
-import { NavProjects } from '@/components/nav-projects';
 import { NavSecondary } from '@/components/nav-secondary';
-import { NavUser } from '@/components/nav-user';
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +28,7 @@ import {
 } from '@/components/ui/sidebar';
 import { ModeToggle } from './mode-toggle';
 import { UserButton } from '@daveyplate/better-auth-ui';
+import { useMatchRoute } from '@tanstack/react-router';
 
 export const sidebarData = {
   user: {
@@ -47,13 +47,16 @@ export const sidebarData = {
       title: 'Dashboard',
       url: '/dashboard',
       icon: SquareTerminal,
-      isActive: true,
     },
     {
       title: 'Todos',
       url: '/todos',
       icon: SquareTerminal,
-      isActive: true,
+    },
+    {
+      title: 'Notes',
+      url: '/notes',
+      icon: SquareTerminal,
       items: [
         {
           title: 'Jan',
@@ -68,9 +71,9 @@ export const sidebarData = {
   ],
   navSecondary: [
     {
-      title: 'Support',
-      url: '#',
-      icon: LifeBuoy,
+      title: 'Github',
+      url: 'https://github.com/tuokaikyle/OverchargedList',
+      icon: Code,
     },
     {
       title: 'Feedback',
@@ -81,6 +84,13 @@ export const sidebarData = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const matchRoute = useMatchRoute();
+
+  const navMainWithActive = sidebarData.navMain.map((item) => ({
+    ...item,
+    isActive: !!matchRoute({ to: item.url }),
+  }));
+
   return (
     <Sidebar variant='inset' {...props}>
       <SidebarHeader>
@@ -93,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-medium'>Acme Inc</span>
-                  <span className='truncate text-xs'>Enterprise</span>
+                  <span className='truncate text-xs'>Fullstack template</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -101,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={sidebarData.navMain} />
+        <NavMain items={navMainWithActive} />
         <NavSecondary items={sidebarData.navSecondary} className='mt-auto' />
       </SidebarContent>
       <SidebarFooter>

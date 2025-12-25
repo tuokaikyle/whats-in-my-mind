@@ -1,4 +1,3 @@
-import Header from '@/components/header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import type { trpc } from '@/utils/trpc';
@@ -11,7 +10,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import '../index.css';
-import Sidebar from '@/components/sidebar';
+import Layout from '@/components/layout';
 
 export interface RouterAppContext {
   trpc: typeof trpc;
@@ -50,9 +49,7 @@ function RootComponent() {
         storageKey='vite-ui-theme'
       >
         <div className='grid grid-rows-[auto_1fr] h-svh'>
-          {/* <Header /> */}
-          {/* <Outlet /> */}
-          <Sidebar />
+          <Layout />
         </div>
         <Toaster richColors />
       </ThemeProvider>
