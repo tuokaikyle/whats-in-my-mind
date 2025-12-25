@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import '../index.css';
+import Sidebar from '@/components/sidebar';
 
 export interface RouterAppContext {
   trpc: typeof trpc;
@@ -49,12 +50,13 @@ function RootComponent() {
         storageKey='vite-ui-theme'
       >
         <div className='grid grid-rows-[auto_1fr] h-svh'>
-          <Header />
-          <Outlet />
+          {/* <Header /> */}
+          {/* <Outlet /> */}
+          <Sidebar />
         </div>
         <Toaster richColors />
       </ThemeProvider>
-      <TanStackRouterDevtools position='bottom-left' />
+      <TanStackRouterDevtools position='bottom-right' />
       <ReactQueryDevtools position='bottom' buttonPosition='bottom-right' />
     </>
   );
