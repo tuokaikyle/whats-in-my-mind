@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CristoPathRouteImport } from './routes/cristo/$path'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
 const TodosRoute = TodosRouteImport.update({
@@ -30,11 +29,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CristoPathRoute = CristoPathRouteImport.update({
-  id: '/cristo/$path',
-  path: '/cristo/$path',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthPathRoute = AuthPathRouteImport.update({
   id: '/auth/$path',
   path: '/auth/$path',
@@ -46,14 +40,12 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/auth/$path': typeof AuthPathRoute
-  '/cristo/$path': typeof CristoPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/auth/$path': typeof AuthPathRoute
-  '/cristo/$path': typeof CristoPathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -61,20 +53,13 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/auth/$path': typeof AuthPathRoute
-  '/cristo/$path': typeof CristoPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/todos' | '/auth/$path' | '/cristo/$path'
+  fullPaths: '/' | '/dashboard' | '/todos' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/todos' | '/auth/$path' | '/cristo/$path'
-  id:
-    | '__root__'
-    | '/'
-    | '/dashboard'
-    | '/todos'
-    | '/auth/$path'
-    | '/cristo/$path'
+  to: '/' | '/dashboard' | '/todos' | '/auth/$path'
+  id: '__root__' | '/' | '/dashboard' | '/todos' | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -82,7 +67,6 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   TodosRoute: typeof TodosRoute
   AuthPathRoute: typeof AuthPathRoute
-  CristoPathRoute: typeof CristoPathRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -108,13 +92,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/cristo/$path': {
-      id: '/cristo/$path'
-      path: '/cristo/$path'
-      fullPath: '/cristo/$path'
-      preLoaderRoute: typeof CristoPathRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/$path': {
       id: '/auth/$path'
       path: '/auth/$path'
@@ -130,7 +107,6 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   TodosRoute: TodosRoute,
   AuthPathRoute: AuthPathRoute,
-  CristoPathRoute: CristoPathRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

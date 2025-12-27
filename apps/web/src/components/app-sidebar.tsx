@@ -16,49 +16,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-const cristo = [
-  {
-    cid: 1,
-    chapterName: "Marseille.--L'arrivée.",
-  },
-  {
-    cid: 2,
-    chapterName: 'Le père et le fils.',
-  },
-  {
-    cid: 3,
-    chapterName: 'Les Catalans.',
-  },
-  {
-    cid: 4,
-    chapterName: 'Complot.',
-  },
-  {
-    cid: 5,
-    chapterName: 'Le repas des fiançailles.',
-  },
-  {
-    cid: 6,
-    chapterName: 'Le substitut du procureur du roi.',
-  },
-  {
-    cid: 7,
-    chapterName: "L'interrogatoire.",
-  },
-  {
-    cid: 8,
-    chapterName: "Le château d'If.",
-  },
-  {
-    cid: 9,
-    chapterName: 'Le soir des fiançailles.',
-  },
-  {
-    cid: 10,
-    chapterName: 'Le petit cabinet des Tuileries.',
-  },
-];
-
 export const sidebarData = {
   user: {
     name: 'shadcn',
@@ -81,15 +38,6 @@ export const sidebarData = {
       title: 'Todos',
       url: '/todos',
       icon: SquareTerminal,
-    },
-    {
-      title: 'Cristo',
-      url: '/cristo',
-      icon: SquareTerminal,
-      items: cristo.map((chapter, index) => ({
-        title: `${index + 1}. ${chapter.chapterName}`,
-        url: `/cristo/${chapter.cid}`,
-      })),
     },
   ],
   navSecondary: [
