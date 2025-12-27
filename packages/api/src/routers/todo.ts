@@ -1,34 +1,49 @@
-import { db } from "@OverchargedList/db";
+import { db, and, eq } from "@OverchargedList/db";
 import { todo } from "@OverchargedList/db/schema/todo";
-import { eq } from "drizzle-orm";
 import z from "zod";
-import { publicProcedure, router } from "../index";
+import { protectedProcedure, router } from "../index";
 
 export const todoRouter = router({
-	getAll: publicProcedure.query(async () => {
-		return await db.select().from(todo);
+	getAll: protectedProcedure.query(async ({ ctx }) => {
+		return await db
+			.select()
+			.from(todo)
+			.where(eq(todo.userId, ctx.session.user.id));
 	}),
 
-	create: publicProcedure
+	create: protectedProcedure
 		.input(z.object({ text: z.string().min(1) }))
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			return await db.insert(todo).values({
 				text: input.text,
+				userId: ctx.session.user.id,
 			});
 		}),
 
-	toggle: publicProcedure
+	toggle: protectedProcedure
 		.input(z.object({ id: z.number(), completed: z.boolean() }))
-		.mutation(async ({ input }) => {
+		.mutation(async ({ input, ctx }) => {
 			return await db
 				.update(todo)
 				.set({ completed: input.completed })
-				.where(eq(todo.id, input.id));
+				.where(
+					and(
+						eq(todo.id, input.id),
+						eq(todo.userId, ctx.session.user.id),
+					),
+				);
 		}),
 
-	delete: publicProcedure
+	delete: protectedProcedure
 		.input(z.object({ id: z.number() }))
-		.mutation(async ({ input }) => {
-			return await db.delete(todo).where(eq(todo.id, input.id));
+		.mutation(async ({ input, ctx }) => {
+			return await db
+				.delete(todo)
+				.where(
+					and(
+						eq(todo.id, input.id),
+						eq(todo.userId, ctx.session.user.id),
+					),
+				);
 		}),
 });

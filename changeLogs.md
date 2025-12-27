@@ -18,6 +18,7 @@ todo：
 - [] run lint check
 - [] remove all unused imports and code
 - [] dynamic breadcrumb
+- [] error component
 
 which neon account?
 github
@@ -33,3 +34,8 @@ facebook business review, unpublished,
 
 lint:
 quoteStyle
+
+
+todo belongs to one user:
+need to review;
+初次登陆报错
