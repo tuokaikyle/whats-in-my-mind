@@ -15,11 +15,11 @@ todo：
 - [ ] 添加为 mongodb?
 - [x] user name fox? better auth sign up form no user name
 - [x] todo belongs to one user
-- [] run lint check
+- [ ] run lint check
 - [x] remove all unused imports and code
 - [x] dynamic breadcrumb
-- [] error component
-- [] 邮件验证
+- [ ] error component
+- [ ] 邮件验证
 
 which neon account?
 github
