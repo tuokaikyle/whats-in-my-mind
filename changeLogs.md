@@ -13,12 +13,13 @@ todo：
 - [x] 添加 better auth ui
 - [x] 添加 shadcn ui
 - [ ] 添加为 mongodb?
-- [] user name fox? better auth sign up form no user name
-- [] todo belongs to one user
+- [x] user name fox? better auth sign up form no user name
+- [x] todo belongs to one user
 - [] run lint check
-- [] remove all unused imports and code
-- [] dynamic breadcrumb
+- [x] remove all unused imports and code
+- [x] dynamic breadcrumb
 - [] error component
+- [] 邮件验证
 
 which neon account?
 github
@@ -26,6 +27,7 @@ github
 which user?
 tuokai_kyle@foxmail.com
 867367934@qq.com ps antd-v4-starter
+867367934_1@qq.com
 
 1. Social sign up id not set up yet
 2. Forgot password not yet
@@ -34,7 +36,6 @@ facebook business review, unpublished,
 
 lint:
 quoteStyle
-
 
 todo belongs to one user:
 need to review;
