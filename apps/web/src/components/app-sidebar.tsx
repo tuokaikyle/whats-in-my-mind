@@ -43,7 +43,7 @@ export const sidebarData = {
   navSecondary: [
     {
       title: 'Github',
-      url: 'https://github.com/tuokaikyle/OverchargedList',
+      url: 'https://github.com/tuokaikyle',
       icon: Code,
     },
     {
