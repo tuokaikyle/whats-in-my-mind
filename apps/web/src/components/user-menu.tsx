@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { authClient } from '@/lib/auth-client';
+import { queryClient } from '@/utils/trpc';
 
 import { Button } from './ui/button';
 import { Skeleton } from './ui/skeleton';
@@ -46,6 +47,8 @@ export default function UserMenu() {
               authClient.signOut({
                 fetchOptions: {
                   onSuccess: () => {
+                    // Clear all cached queries to prevent showing other users' data
+                    queryClient.clear();
                     navigate({
                       to: '/',
                     });
