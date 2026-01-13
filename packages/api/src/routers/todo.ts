@@ -1,35 +1,47 @@
-import { db } from '@whats-in-my-mind/db';
-import { todo } from '@whats-in-my-mind/db/schema/todo';
-import { eq } from 'drizzle-orm';
+import { and, db, eq, todo } from '@whats-in-my-mind/db';
 import z from 'zod';
 
-import { publicProcedure, router } from '../index';
+import { protectedProcedure, router } from '../index';
 
 export const todoRouter = router({
-  getAll: publicProcedure.query(async () => {
-    return await db.select().from(todo);
+  getAll: protectedProcedure.query(async ({ ctx }) => {
+    return await db
+      .select()
+      .from(todo)
+      .where(eq(todo.userId, ctx.session.user.id));
   }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(z.object({ text: z.string().min(1) }))
-    .mutation(async ({ input }) => {
-      return await db.insert(todo).values({
-        text: input.text,
-      });
+    .mutation(async ({ input, ctx }) => {
+      const [newTodo] = await db
+        .insert(todo)
+        .values({
+          text: input.text,
+          userId: ctx.session.user.id,
+        })
+        .returning();
+      return newTodo;
     }),
 
-  toggle: publicProcedure
+  toggle: protectedProcedure
     .input(z.object({ id: z.number(), completed: z.boolean() }))
-    .mutation(async ({ input }) => {
-      return await db
+    .mutation(async ({ input, ctx }) => {
+      const [updatedTodo] = await db
         .update(todo)
         .set({ completed: input.completed })
-        .where(eq(todo.id, input.id));
+        .where(and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)))
+        .returning();
+      return updatedTodo;
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input }) => {
-      return await db.delete(todo).where(eq(todo.id, input.id));
+    .mutation(async ({ input, ctx }) => {
+      const [deletedTodo] = await db
+        .delete(todo)
+        .where(and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)))
+        .returning();
+      return deletedTodo;
     }),
 });

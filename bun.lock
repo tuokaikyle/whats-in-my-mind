@@ -93,6 +93,7 @@
         "@whats-in-my-mind/env": "workspace:*",
         "dotenv": "catalog:",
         "drizzle-orm": "catalog:",
+        "hono": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
@@ -157,6 +158,7 @@
     "better-auth": "^1.4.9",
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.45.1",
+    "hono": "^4.8.2",
     "typescript": "^5",
     "zod": "^4.1.13",
   },
