@@ -30,6 +30,9 @@ export const Route = createFileRoute('/todos')({
 
 function TodosRoute() {
   const [newTodoText, setNewTodoText] = useState('');
+  const [newTodoCategory, setNewTodoCategory] = useState('');
+  const [newTodoImportance, setNewTodoImportance] = useState('');
+  const [newTodoProgress, setNewTodoProgress] = useState('');
 
   const todos = useQuery(trpc.todo.getAll.queryOptions());
   const createMutation = useMutation(
@@ -37,6 +40,9 @@ function TodosRoute() {
       onSuccess: () => {
         todos.refetch();
         setNewTodoText('');
+        setNewTodoCategory('');
+        setNewTodoImportance('');
+        setNewTodoProgress('');
       },
     }),
   );
@@ -58,7 +64,14 @@ function TodosRoute() {
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodoText.trim()) {
-      createMutation.mutate({ text: newTodoText });
+      createMutation.mutate({
+        text: newTodoText,
+        category: newTodoCategory.trim() ? newTodoCategory.trim() : undefined,
+        importance:
+          newTodoImportance.trim() === '' ? undefined : Number(newTodoImportance),
+        progress:
+          newTodoProgress.trim() === '' ? undefined : Number(newTodoProgress),
+      });
     }
   };
 
@@ -80,24 +93,49 @@ function TodosRoute() {
         <CardContent>
           <form
             onSubmit={handleAddTodo}
-            className="mb-6 flex items-center space-x-2"
+            className="mb-6 grid grid-cols-1 gap-2"
           >
-            <Input
-              value={newTodoText}
-              onChange={(e) => setNewTodoText(e.target.value)}
-              placeholder="Add a new task..."
-              disabled={createMutation.isPending}
-            />
-            <Button
-              type="submit"
-              disabled={createMutation.isPending || !newTodoText.trim()}
-            >
-              {createMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                'Add'
-              )}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Input
+                value={newTodoText}
+                onChange={(e) => setNewTodoText(e.target.value)}
+                placeholder="Add a new task..."
+                disabled={createMutation.isPending}
+              />
+              <Button
+                type="submit"
+                disabled={createMutation.isPending || !newTodoText.trim()}
+              >
+                {createMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  'Add'
+                )}
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <Input
+                value={newTodoCategory}
+                onChange={(e) => setNewTodoCategory(e.target.value)}
+                placeholder="Category (optional)"
+                disabled={createMutation.isPending}
+              />
+              <Input
+                value={newTodoImportance}
+                onChange={(e) => setNewTodoImportance(e.target.value)}
+                placeholder="Importance (optional)"
+                inputMode="numeric"
+                disabled={createMutation.isPending}
+              />
+              <Input
+                value={newTodoProgress}
+                onChange={(e) => setNewTodoProgress(e.target.value)}
+                placeholder="Progress (optional)"
+                inputMode="numeric"
+                disabled={createMutation.isPending}
+              />
+            </div>
           </form>
 
           {todos.isLoading ? (
@@ -127,6 +165,15 @@ function TodosRoute() {
                     >
                       {todo.text}
                     </label>
+                    <div className="text-muted-foreground text-xs">
+                      {todo.category ? `Category: ${todo.category}` : ''}
+                      {typeof todo.importance === 'number'
+                        ? `${todo.category ? ' • ' : ''}Importance: ${todo.importance}`
+                        : ''}
+                      {typeof todo.progress === 'number'
+                        ? `${todo.category || typeof todo.importance === 'number' ? ' • ' : ''}Progress: ${todo.progress}`
+                        : ''}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"

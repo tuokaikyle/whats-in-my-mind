@@ -12,12 +12,22 @@ export const todoRouter = router({
   }),
 
   create: protectedProcedure
-    .input(z.object({ text: z.string().min(1) }))
+    .input(
+      z.object({
+        text: z.string().min(1),
+        category: z.string().min(1).optional(),
+        importance: z.number().optional(),
+        progress: z.number().optional(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       const [newTodo] = await db
         .insert(todo)
         .values({
           text: input.text,
+          category: input.category,
+          importance: input.importance,
+          progress: input.progress,
           userId: ctx.session.user.id,
         })
         .returning();
