@@ -1,0 +1,3 @@
+{
+  "extends": "@whats-in-my-mind/config/tsconfig.base.json"
+}

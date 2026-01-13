@@ -1,0 +1,24 @@
+{
+  "name": "@whats-in-my-mind/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@whats-in-my-mind/db": "workspace:*",
+    "@whats-in-my-mind/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@whats-in-my-mind/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
