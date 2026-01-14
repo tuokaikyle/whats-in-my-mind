@@ -13,6 +13,7 @@ import { Toaster } from '@/components/ui/sonner';
 import type { trpc } from '@/utils/trpc';
 
 import '../index.css';
+import { Providers } from '@/providers';
 
 export interface RouterAppContext {
   trpc: typeof trpc;
@@ -44,18 +45,20 @@ function RootComponent() {
   return (
     <>
       <HeadContent />
+      <Providers>
       <ThemeProvider
         attribute="class"
         defaultTheme="dark"
         disableTransitionOnChange
         storageKey="vite-ui-theme"
-      >
+        >
         <div className="grid h-svh grid-rows-[auto_1fr]">
           <Header />
           <Outlet />
         </div>
         <Toaster richColors />
       </ThemeProvider>
+        </Providers>
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
     </>
