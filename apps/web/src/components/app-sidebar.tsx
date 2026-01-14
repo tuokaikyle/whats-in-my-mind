@@ -6,6 +6,7 @@ import {
   Settings,
   ChevronUp,
   User2,
+  Command,
 } from 'lucide-react';
 
 import {
@@ -15,6 +16,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -30,6 +32,7 @@ import { ModeToggle } from './mode-toggle';
 import { authClient } from '@/lib/auth-client';
 import { useNavigate } from '@tanstack/react-router';
 import { queryClient } from '@/utils/trpc';
+import { UserButton } from '@daveyplate/better-auth-ui';
 
 const menuItems = [
   {
@@ -55,10 +58,24 @@ export function AppSidebar() {
   const { data: session } = authClient.useSession();
 
   return (
-    <Sidebar>
+    <Sidebar> <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Command className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">Acme Inc</span>
+                  <span className="truncate text-xs">Enterprise</span>
+                </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>whats-in-my-mind</SidebarGroupLabel>
+       
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
@@ -82,36 +99,10 @@ export function AppSidebar() {
               <ModeToggle />
             </div>
           </SidebarMenuItem>
-          {session && (
+
             <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger render={<SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground" />}>
-                  <User2 />
-                  <span>{session.user.name}</span>
-                  <ChevronUp className="ml-auto" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="top"
-                  className="w-[--radix-popper-anchor-width]"
-                >
-                  <DropdownMenuItem
-                    onClick={() => {
-                      authClient.signOut({
-                        fetchOptions: {
-                          onSuccess: () => {
-                            queryClient.clear();
-                            navigate({ to: '/' });
-                          },
-                        },
-                      });
-                    }}
-                  >
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserButton />
             </SidebarMenuItem>
-          )}
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
