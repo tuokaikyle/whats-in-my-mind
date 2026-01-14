@@ -10,7 +10,8 @@ export const Route = createFileRoute('/dashboard')({
     const session = await authClient.getSession();
     if (!session.data) {
       redirect({
-        to: '/login',
+        to: '/auth/$authView',
+        params: { authView: 'sign-in' },
         throw: true,
       });
     }
