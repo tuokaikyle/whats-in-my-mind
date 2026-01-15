@@ -1,38 +1,17 @@
-import { Link } from '@tanstack/react-router';
-import {
-  Home,
-  LayoutDashboard,
-  ListTodo,
-  Settings,
-  ChevronUp,
-  User2,
-  Command,
-} from 'lucide-react';
-
+import { UserButton } from '@daveyplate/better-auth-ui';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { Command, Home, LayoutDashboard, ListTodo } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/components/ui/sidebar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { ModeToggle } from './mode-toggle';
-import { authClient } from '@/lib/auth-client';
-import { useNavigate } from '@tanstack/react-router';
-import { queryClient } from '@/utils/trpc';
-import { UserButton } from '@daveyplate/better-auth-ui';
 
 const menuItems = [
   {
@@ -53,36 +32,39 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
-  const { open } = useSidebar();
-  const navigate = useNavigate();
-  const { data: session } = authClient.useSession();
-
   return (
-    <Sidebar> <SidebarHeader>
+    <Sidebar>
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
+            <SidebarMenuButton
+              size="lg"
+              render={<a href="#" />}
+              className="rounded-md"
+            >
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <Command className="size-4" />
+              </div>
+              <div className="flex flex-col gap-0.5 leading-none">
+                <span className="font-medium">Documentation</span>
+                <span className="">v1.0.0</span>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-       
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton render={<Link to={item.url} />}>
+                  <SidebarMenuButton
+                    className="rounded-md"
+                    render={<Link to={item.url} />}
+                  >
                     <item.icon />
-                    <span>{item.title}</span>
+                    {item.title}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -94,15 +76,13 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center justify-between px-2">
-              {open && <span className="text-sm">Theme</span>}
-              <ModeToggle />
-            </div>
+            <UserButton
+              size="default"
+              side="right"
+              sideOffset={16}
+              className="w-full bg-primary-foreground text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            />
           </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <UserButton />
-            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
