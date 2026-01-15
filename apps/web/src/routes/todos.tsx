@@ -69,7 +69,9 @@ function TodosRoute() {
         text: newTodoText,
         category: newTodoCategory.trim() ? newTodoCategory.trim() : undefined,
         importance:
-          newTodoImportance.trim() === '' ? undefined : Number(newTodoImportance),
+          newTodoImportance.trim() === ''
+            ? undefined
+            : Number(newTodoImportance),
         progress:
           newTodoProgress.trim() === '' ? undefined : Number(newTodoProgress),
       });
