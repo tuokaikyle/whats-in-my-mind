@@ -1,5 +1,6 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { useEffect, useRef } from 'react';
 import { Command, Home, LayoutDashboard, ListTodo } from 'lucide-react';
 import {
   Sidebar,
@@ -12,6 +13,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { queryClient } from '@/utils/trpc';
+import { authClient } from '@/lib/auth-client';
 
 const menuItems = [
   {
@@ -32,6 +35,19 @@ const menuItems = [
 ];
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+  const { data: session } = authClient.useSession();
+  const prevSession = useRef(session);
+
+  // When the session transitions from a user -> null, clear cached data to avoid showing prior user info
+  useEffect(() => {
+    if (prevSession.current && !session) {
+      queryClient.clear();
+      navigate({ to: '/' });
+    }
+    prevSession.current = session;
+  }, [navigate, session]);
+
   return (
     <Sidebar>
       <SidebarHeader>
