@@ -1,7 +1,7 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
-import { Command, Home, LayoutDashboard, ListTodo } from 'lucide-react';
+import { Command, Home, ListTodo } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -21,11 +21,6 @@ const menuItems = [
     title: 'Home',
     url: '/',
     icon: Home,
-  },
-  {
-    title: 'Dashboard',
-    url: '/dashboard',
-    icon: LayoutDashboard,
   },
   {
     title: 'Todos',
@@ -88,7 +83,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>

@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthAuthViewRouteImport } from './routes/auth/$authView'
 import { Route as AccountAccountViewRouteImport } from './routes/account/$accountView'
@@ -18,11 +17,6 @@ import { Route as AccountAccountViewRouteImport } from './routes/account/$accoun
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
   path: '/todos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -43,14 +37,12 @@ const AccountAccountViewRoute = AccountAccountViewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/account/$accountView': typeof AccountAccountViewRoute
   '/auth/$authView': typeof AuthAuthViewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/account/$accountView': typeof AccountAccountViewRoute
   '/auth/$authView': typeof AuthAuthViewRoute
@@ -58,38 +50,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
   '/todos': typeof TodosRoute
   '/account/$accountView': typeof AccountAccountViewRoute
   '/auth/$authView': typeof AuthAuthViewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/dashboard'
-    | '/todos'
-    | '/account/$accountView'
-    | '/auth/$authView'
+  fullPaths: '/' | '/todos' | '/account/$accountView' | '/auth/$authView'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/dashboard'
-    | '/todos'
-    | '/account/$accountView'
-    | '/auth/$authView'
-  id:
-    | '__root__'
-    | '/'
-    | '/dashboard'
-    | '/todos'
-    | '/account/$accountView'
-    | '/auth/$authView'
+  to: '/' | '/todos' | '/account/$accountView' | '/auth/$authView'
+  id: '__root__' | '/' | '/todos' | '/account/$accountView' | '/auth/$authView'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
   TodosRoute: typeof TodosRoute
   AccountAccountViewRoute: typeof AccountAccountViewRoute
   AuthAuthViewRoute: typeof AuthAuthViewRoute
@@ -102,13 +76,6 @@ declare module '@tanstack/react-router' {
       path: '/todos'
       fullPath: '/todos'
       preLoaderRoute: typeof TodosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -137,7 +104,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DashboardRoute: DashboardRoute,
   TodosRoute: TodosRoute,
   AccountAccountViewRoute: AccountAccountViewRoute,
   AuthAuthViewRoute: AuthAuthViewRoute,
