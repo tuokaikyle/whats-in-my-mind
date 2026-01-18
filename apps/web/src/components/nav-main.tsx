@@ -6,6 +6,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
+  SidebarContent,
   SidebarGroup,
   SidebarMenu,
   SidebarMenuAction,
@@ -22,63 +23,36 @@ export function NavMain({
   items: {
     title: string;
     url: string;
-    icon: LucideIcon;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
+      isActive?: boolean;
     }[];
   }[];
 }) {
   return (
     <SidebarGroup>
-      {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => (
-          <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <Link
-                  to={item.url}
-                  activeProps={{
-                    className: 'bg-accent text-accent-foreground',
-                  }}
-                  activeOptions={{ exact: true }}
-                >
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-              {item.items?.length ? (
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuAction className="data-[state=open]:rotate-90">
-                      <ChevronRight />
-                      <span className="sr-only">Toggle</span>
-                    </SidebarMenuAction>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <Link
-                              to={subItem.url}
-                              activeProps={{
-                                className: 'bg-accent text-accent-foreground',
-                              }}
-                              activeOptions={{ exact: true }}
-                            >
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : null}
-            </SidebarMenuItem>
-          </Collapsible>
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton asChild>
+              <a href={item.url} className='font-medium'>
+                {item.title}
+              </a>
+            </SidebarMenuButton>
+            {item.items?.length ? (
+              <SidebarMenuSub>
+                {item.items.map((item) => (
+                  <SidebarMenuSubItem key={item.title}>
+                    <SidebarMenuSubButton asChild isActive={item.isActive}>
+                      <a href={item.url}>{item.title}</a>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))}
+              </SidebarMenuSub>
+            ) : null}
+          </SidebarMenuItem>
         ))}
       </SidebarMenu>
     </SidebarGroup>
