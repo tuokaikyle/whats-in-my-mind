@@ -1,14 +1,14 @@
-import { neon, neonConfig } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import ws from "ws";
+import { neon, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import ws from 'ws';
 
 neonConfig.webSocketConstructor = ws;
 
 // To work in edge environments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch
 // neonConfig.poolQueryViaFetch = true
 
-const sql = neon(process.env.DATABASE_URL || "");
+const sql = neon(process.env.DATABASE_URL || '');
 export const db = drizzle(sql);
 
 // Re-export common drizzle-orm functions to ensure same instance
-export { and, eq, or, not, sql, desc, asc } from "drizzle-orm";
+export { and, asc, desc, eq, not, or, sql } from 'drizzle-orm';

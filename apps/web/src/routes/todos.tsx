@@ -12,8 +12,8 @@ import {
 } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { trpc } from '@/utils/trpc';
 import { authClient } from '@/lib/auth-client';
+import { trpc } from '@/utils/trpc';
 
 export const Route = createFileRoute('/todos')({
   component: TodosRoute,
@@ -40,21 +40,21 @@ function TodosRoute() {
         todos.refetch();
         setNewTodoText('');
       },
-    })
+    }),
   );
   const toggleMutation = useMutation(
     trpc.todo.toggle.mutationOptions({
       onSuccess: () => {
         todos.refetch();
       },
-    })
+    }),
   );
   const deleteMutation = useMutation(
     trpc.todo.delete.mutationOptions({
       onSuccess: () => {
         todos.refetch();
       },
-    })
+    }),
   );
 
   const handleAddTodo = (e: React.FormEvent) => {
@@ -73,7 +73,7 @@ function TodosRoute() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-md py-10'>
+    <div className="mx-auto w-full max-w-md py-10">
       <Card>
         <CardHeader>
           <CardTitle>Todo List</CardTitle>
@@ -82,20 +82,20 @@ function TodosRoute() {
         <CardContent>
           <form
             onSubmit={handleAddTodo}
-            className='mb-6 flex items-center space-x-2'
+            className="mb-6 flex items-center space-x-2"
           >
             <Input
               value={newTodoText}
               onChange={(e) => setNewTodoText(e.target.value)}
-              placeholder='Add a new task...'
+              placeholder="Add a new task..."
               disabled={createMutation.isPending}
             />
             <Button
-              type='submit'
+              type="submit"
               disabled={createMutation.isPending || !newTodoText.trim()}
             >
               {createMutation.isPending ? (
-                <Loader2 className='h-4 w-4 animate-spin' />
+                <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 'Add'
               )}
@@ -103,19 +103,19 @@ function TodosRoute() {
           </form>
 
           {todos.isLoading ? (
-            <div className='flex justify-center py-4'>
-              <Loader2 className='h-6 w-6 animate-spin' />
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin" />
             </div>
           ) : todos.data?.length === 0 ? (
-            <p className='py-4 text-center'>No todos yet. Add one above!</p>
+            <p className="py-4 text-center">No todos yet. Add one above!</p>
           ) : (
-            <ul className='space-y-2'>
+            <ul className="space-y-2">
               {todos.data?.map((todo) => (
                 <li
                   key={todo.id}
-                  className='flex items-center justify-between rounded-md border p-2'
+                  className="flex items-center justify-between rounded-md border p-2"
                 >
-                  <div className='flex items-center space-x-2'>
+                  <div className="flex items-center space-x-2">
                     <Checkbox
                       checked={todo.completed}
                       onCheckedChange={() =>
@@ -131,12 +131,12 @@ function TodosRoute() {
                     </label>
                   </div>
                   <Button
-                    variant='ghost'
-                    size='icon'
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDeleteTodo(todo.id)}
-                    aria-label='Delete todo'
+                    aria-label="Delete todo"
                   >
-                    <Trash2 className='h-4 w-4' />
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </li>
               ))}

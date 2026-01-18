@@ -1,7 +1,7 @@
 import { AuthUIProvider } from '@daveyplate/better-auth-ui';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { authClient } from '@/lib/auth-client';
 import { useEffect } from 'react';
+import { authClient } from '@/lib/auth-client';
 import { queryClient } from './utils/trpc';
 
 function AuthProviderInner({ children }: { children: React.ReactNode }) {
