@@ -7,7 +7,9 @@
     "check-types": "tsc -b",
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "dev": "bun run --hot src/index.ts",
-    "start": "bun run dist/index.js"
+    "start": "bun run dist/index.js",
+    "deploy": "wrangler deploy",
+    "cf:dev": "wrangler dev"
   },
   "dependencies": {
     "hono": "catalog:",
@@ -24,6 +26,7 @@
     "typescript": "^5.8.2",
     "@types/bun": "^1.2.6",
     "tsdown": "^0.16.5",
-    "@whats-in-my-mind/config": "workspace:*"
+    "@whats-in-my-mind/config": "workspace:*",
+    "wrangler": "^3.94.0"
   }
 }

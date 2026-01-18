@@ -1,0 +1,16 @@
+name = "whats-in-my-mind-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+node_compat = true
+
+[build]
+command = "bun run build"
+
+# Environment variables - set these in Cloudflare dashboard or via wrangler secret
+[vars]
+CORS_ORIGIN = "https://your-frontend-url.pages.dev"
+
+# For secrets (database URL, auth secrets), use:
+# wrangler secret put DATABASE_URL
+# wrangler secret put BETTER_AUTH_SECRET
+# wrangler secret put BETTER_AUTH_URL

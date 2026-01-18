@@ -29,7 +29,10 @@
     "db:studio": "turbo -F @whats-in-my-mind/db db:studio",
     "db:generate": "turbo -F @whats-in-my-mind/db db:generate",
     "db:migrate": "turbo -F @whats-in-my-mind/db db:migrate",
-    "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' +"
+    "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' +",
+    "deploy:server": "turbo -F server deploy",
+    "deploy:web": "cd apps/web && bun run build && wrangler pages deploy dist",
+    "deploy": "bun run build && bun run deploy:server"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

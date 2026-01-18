@@ -70,3 +70,14 @@ whats-in-my-mind/
 - `bun run db:push`: Push schema changes to database
 - `bun run db:studio`: Open database studio UI
 - `bun run check`: Run Biome formatting and linting
+- `bun run deploy:server`: Deploy backend to Cloudflare Workers
+- `bun run deploy:web`: Deploy frontend to Cloudflare Pages
+- `bun run deploy`: Build and deploy backend
+
+## Deployment
+
+This project can be deployed to Cloudflare (Workers + Pages). See deployment guides:
+
+- 🚀 **Quick Start**: [DEPLOY-QUICKSTART.md](./DEPLOY-QUICKSTART.md) - Get deployed in 20 minutes
+- 📚 **Detailed Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete deployment documentation
+- ✅ **Checklist**: [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) - Step-by-step checklist
