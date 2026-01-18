@@ -19,20 +19,31 @@ if (typeof WebSocket === 'undefined') {
 
 // Lazy initialization - create db connection only when DATABASE_URL is available
 let dbInstance: NeonHttpDatabase | null = null;
+let currentDatabaseUrl: string | null = null;
 
-export const getDb = () => {
+export const getDb = (databaseUrl?: string) => {
+  // Use provided URL or fall back to process.env (for local development)
+  const dbUrl = databaseUrl || process.env.DATABASE_URL;
+  
+  if (!dbUrl) {
+    throw new Error('DATABASE_URL environment variable is not set');
+  }
+  
+  // Recreate connection if URL changed (for multi-tenant scenarios)
+  if (dbInstance && currentDatabaseUrl !== dbUrl) {
+    dbInstance = null;
+  }
+  
   if (!dbInstance) {
-    const databaseUrl = process.env.DATABASE_URL;
-    if (!databaseUrl) {
-      throw new Error('DATABASE_URL environment variable is not set');
-    }
-    const sql = neon(databaseUrl);
+    currentDatabaseUrl = dbUrl;
+    const sql = neon(dbUrl);
     dbInstance = drizzle(sql);
   }
+  
   return dbInstance;
 };
 
-// Maintain backward compatibility
+// Maintain backward compatibility for local development
 export const db = new Proxy({} as NeonHttpDatabase, {
   get(_, prop) {
     return getDb()[prop as keyof NeonHttpDatabase];
