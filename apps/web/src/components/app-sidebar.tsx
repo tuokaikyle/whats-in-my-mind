@@ -30,11 +30,6 @@ export const sidebarData = {
       isActive: true,
     },
     {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: SquareTerminal,
-    },
-    {
       title: 'Todos',
       url: '/todos',
       icon: SquareTerminal,
