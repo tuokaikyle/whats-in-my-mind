@@ -8,7 +8,7 @@ command = "bun run build"
 
 # Environment variables - set these in Cloudflare dashboard or via wrangler secret
 [vars]
-CORS_ORIGIN = "https://your-frontend-url.pages.dev"
+CORS_ORIGIN = "https://whats-in-my-mind.pages.dev"
 
 # For secrets (database URL, auth secrets), use:
 # wrangler secret put DATABASE_URL
