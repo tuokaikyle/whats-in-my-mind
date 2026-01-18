@@ -6,4 +6,5 @@ export default defineConfig({
   outDir: './dist',
   clean: true,
   noExternal: [/@whats-in-my-mind\/.*/],
+  external: ['dotenv', 'ws'],
 });

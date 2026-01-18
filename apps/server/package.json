@@ -23,10 +23,10 @@
     "@whats-in-my-mind/db": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.8.2",
     "@types/bun": "^1.2.6",
-    "tsdown": "^0.16.5",
     "@whats-in-my-mind/config": "workspace:*",
-    "wrangler": "^3.94.0"
+    "tsdown": "^0.16.5",
+    "typescript": "^5.8.2",
+    "wrangler": "4"
   }
 }

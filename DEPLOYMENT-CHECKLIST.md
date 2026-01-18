@@ -114,11 +114,12 @@ wrangler secret put SECRET_NAME
 
 If you encounter issues:
 
-1. **CORS Errors**: Check `CORS_ORIGIN` is set correctly in backend
-2. **Database Errors**: Verify `DATABASE_URL` secret is set and database is accessible
-3. **Auth Errors**: Check `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` are set
-4. **Build Errors**: Test build locally first: `bun run build`
-5. **Worker Logs**: Use `wrangler tail` to see real-time logs
+1. **Wrangler Config**: If you see "node_compat" error, the wrangler.toml already uses `nodejs_compat = true` (correct for Wrangler v4)
+2. **CORS Errors**: Check `CORS_ORIGIN` is set correctly in backend
+3. **Database Errors**: Verify `DATABASE_URL` secret is set and database is accessible
+4. **Auth Errors**: Check `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL` are set
+5. **Build Errors**: Test build locally first: `bun run build`
+6. **Worker Logs**: Use `wrangler tail` to see real-time logs
 
 ## Need Help?
 

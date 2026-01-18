@@ -187,6 +187,17 @@ Update your tRPC client to use this URL. In `apps/web/src/utils/trpc.ts`, ensure
 
 ## Troubleshooting
 
+### Wrangler Configuration Errors
+
+**Error: "node_compat" is no longer supported**
+
+If you see this error with Wrangler v4:
+```
+The "node_compat" field is no longer supported as of Wrangler v4
+```
+
+**Solution**: The `wrangler.toml` file already uses `nodejs_compat = true` (the correct setting for Wrangler v4). If you see this error, make sure your `wrangler.toml` uses `nodejs_compat` instead of `node_compat`.
+
 ### Database Connection Issues
 
 - Ensure your database accepts connections from Cloudflare Workers IPs

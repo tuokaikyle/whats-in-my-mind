@@ -148,10 +148,11 @@ Perfect for hobby projects and small applications!
 1. Check the detailed guide: [DEPLOYMENT.md](./DEPLOYMENT.md)
 2. Use the checklist: [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md)
 3. Common fixes:
-   - CORS errors → Check `CORS_ORIGIN` in `wrangler.toml`
-   - Auth errors → Verify `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`
-   - Database errors → Check `DATABASE_URL` is set correctly
-   - Build errors → Run `bun run build` locally first
+   - **Wrangler v4 error** → The `wrangler.toml` uses `nodejs_compat = true` (correct setting)
+   - **CORS errors** → Check `CORS_ORIGIN` in `wrangler.toml`
+   - **Auth errors** → Verify `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`
+   - **Database errors** → Check `DATABASE_URL` is set correctly
+   - **Build errors** → Run `bun run build` locally first
 
 ## 🌟 Next Steps
 

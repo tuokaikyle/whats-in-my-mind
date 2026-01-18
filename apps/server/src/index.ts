@@ -1,4 +1,8 @@
-import 'dotenv/config';
+// Load dotenv only in local development (not in Cloudflare Workers)
+if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  await import('dotenv/config');
+}
+
 import { trpcServer } from '@hono/trpc-server';
 import { createContext } from '@whats-in-my-mind/api/context';
 import { appRouter } from '@whats-in-my-mind/api/routers/index';

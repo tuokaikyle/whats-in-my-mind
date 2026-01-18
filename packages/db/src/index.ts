@@ -1,14 +1,43 @@
 import { neon, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
-import ws from 'ws';
+import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 
-neonConfig.webSocketConstructor = ws;
+// Configure for edge environments (Cloudflare Workers, Vercel Edge, etc.)
+if (typeof WebSocket === 'undefined') {
+  // Only use ws in Node.js environments (local development)
+  try {
+    const ws = await import('ws');
+    neonConfig.webSocketConstructor = ws.default;
+  } catch {
+    // In Cloudflare Workers, use fetch-based querying
+    neonConfig.poolQueryViaFetch = true;
+  }
+} else {
+  // In edge environments with native WebSocket, use fetch-based querying
+  neonConfig.poolQueryViaFetch = true;
+}
 
-// To work in edge environments (Cloudflare Workers, Vercel Edge, etc.), enable querying over fetch
-// neonConfig.poolQueryViaFetch = true
+// Lazy initialization - create db connection only when DATABASE_URL is available
+let dbInstance: NeonHttpDatabase | null = null;
 
-const sql = neon(process.env.DATABASE_URL || '');
-export const db = drizzle(sql);
+export const getDb = () => {
+  if (!dbInstance) {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    const sql = neon(databaseUrl);
+    dbInstance = drizzle(sql);
+  }
+  return dbInstance;
+};
+
+// Maintain backward compatibility
+export const db = new Proxy({} as NeonHttpDatabase, {
+  get(_, prop) {
+    return getDb()[prop as keyof NeonHttpDatabase];
+  },
+});
 
 // Re-export common drizzle-orm functions to ensure same instance
 export { and, asc, desc, eq, not, or, sql } from 'drizzle-orm';
