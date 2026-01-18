@@ -1,9 +1,9 @@
-# full-stack-better-t
+# whats-in-my-mind
 
 思考：不要用 mongodb atlas cli，不管用。
 
 ```bash
-bun create better-t-stack@latest full-stack-better-t --frontend tanstack-router --backend hono --runtime bun --api trpc --auth better-auth --payments none --database postgres --orm drizzle --db-setup neon --package-manager bun --no-git --web-deploy none --server-deploy none --install --addons biome turborepo --examples todo
+bun create better-t-stack@latest whats-in-my-mind --frontend tanstack-router --backend hono --runtime bun --api trpc --auth better-auth --payments none --database postgres --orm drizzle --db-setup neon --package-manager bun --no-git --web-deploy none --server-deploy none --install --addons biome turborepo --examples todo
 ```
 
 This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, Hono, TRPC, and more.
@@ -56,7 +56,7 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 ## Project Structure
 
 ```
-full-stack-better-t/
+whats-in-my-mind/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Router)
 │   └── server/      # Backend API (Hono, TRPC)

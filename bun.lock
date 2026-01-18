@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "full-stack-better-t",
+      "name": "whats-in-my-mind",
       "dependencies": {
         "dotenv": "^17.2.2",
         "zod": "^4.1.13",
@@ -16,19 +16,19 @@
     "apps/server": {
       "name": "server",
       "dependencies": {
-        "@full-stack-better-t/api": "workspace:*",
-        "@full-stack-better-t/auth": "workspace:*",
-        "@full-stack-better-t/db": "workspace:*",
         "@hono/trpc-server": "^0.4.0",
         "@trpc/server": "catalog:",
+        "@whats-in-my-mind/api": "workspace:*",
+        "@whats-in-my-mind/auth": "workspace:*",
+        "@whats-in-my-mind/db": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "hono": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@full-stack-better-t/config": "workspace:*",
         "@types/bun": "^1.2.6",
+        "@whats-in-my-mind/config": "workspace:*",
         "tsdown": "^0.16.5",
         "typescript": "^5.8.2",
       },
@@ -38,8 +38,6 @@
       "version": "0.0.0",
       "dependencies": {
         "@daveyplate/better-auth-ui": "^3.2.13",
-        "@full-stack-better-t/api": "workspace:*",
-        "@full-stack-better-t/auth": "workspace:*",
         "@hookform/resolvers": "^5.1.1",
         "@radix-ui/react-avatar": "^1.1.11",
         "@radix-ui/react-collapsible": "^1.1.12",
@@ -55,6 +53,8 @@
         "@trpc/client": "catalog:",
         "@trpc/server": "catalog:",
         "@trpc/tanstack-react-query": "^11.5.0",
+        "@whats-in-my-mind/api": "workspace:*",
+        "@whats-in-my-mind/auth": "workspace:*",
         "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -68,7 +68,6 @@
         "tw-animate-css": "^1.2.5",
       },
       "devDependencies": {
-        "@full-stack-better-t/config": "workspace:*",
         "@tanstack/react-query-devtools": "^5.85.5",
         "@tanstack/react-router-devtools": "^1.114.27",
         "@tanstack/router-plugin": "^1.114.27",
@@ -76,6 +75,7 @@
         "@types/react": "~19.1.10",
         "@types/react-dom": "^19.0.4",
         "@vitejs/plugin-react": "^4.3.4",
+        "@whats-in-my-mind/config": "workspace:*",
         "postcss": "^8.5.3",
         "tailwindcss": "^4.0.15",
         "typescript": "^5.8.3",
@@ -83,46 +83,46 @@
       },
     },
     "packages/api": {
-      "name": "@full-stack-better-t/api",
+      "name": "@whats-in-my-mind/api",
       "dependencies": {
-        "@full-stack-better-t/auth": "workspace:*",
-        "@full-stack-better-t/db": "workspace:*",
         "@trpc/client": "catalog:",
         "@trpc/server": "catalog:",
         "@types/pg": "^8.15.6",
+        "@whats-in-my-mind/auth": "workspace:*",
+        "@whats-in-my-mind/db": "workspace:*",
         "dotenv": "catalog:",
         "drizzle-orm": "catalog:",
         "hono": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@full-stack-better-t/config": "workspace:*",
+        "@whats-in-my-mind/config": "workspace:*",
       },
       "peerDependencies": {
         "typescript": "^5",
       },
     },
     "packages/auth": {
-      "name": "@full-stack-better-t/auth",
+      "name": "@whats-in-my-mind/auth",
       "dependencies": {
-        "@full-stack-better-t/db": "workspace:*",
+        "@whats-in-my-mind/db": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@full-stack-better-t/config": "workspace:*",
+        "@whats-in-my-mind/config": "workspace:*",
       },
       "peerDependencies": {
         "typescript": "^5",
       },
     },
     "packages/config": {
-      "name": "@full-stack-better-t/config",
+      "name": "@whats-in-my-mind/config",
       "version": "0.0.0",
     },
     "packages/db": {
-      "name": "@full-stack-better-t/db",
+      "name": "@whats-in-my-mind/db",
       "dependencies": {
         "@neondatabase/serverless": "^1.0.2",
         "dotenv": "catalog:",
@@ -131,8 +131,8 @@
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@full-stack-better-t/config": "workspace:*",
         "@types/ws": "^8.18.1",
+        "@whats-in-my-mind/config": "workspace:*",
         "drizzle-kit": "^0.31.8",
       },
       "peerDependencies": {
@@ -301,14 +301,6 @@
     "@floating-ui/react-dom": ["@floating-ui/react-dom@2.1.6", "", { "dependencies": { "@floating-ui/dom": "^1.7.4" }, "peerDependencies": { "react": ">=16.8.0", "react-dom": ">=16.8.0" } }, "sha512-4JX6rEatQEvlmgU80wZyq9RT96HZJa88q8hp0pBd+LrczeDI4o6uA2M+uvxngVHo4Ihr8uibXxH6+70zhAFrVw=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.10", "", {}, "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ=="],
-
-    "@full-stack-better-t/api": ["@full-stack-better-t/api@workspace:packages/api"],
-
-    "@full-stack-better-t/auth": ["@full-stack-better-t/auth@workspace:packages/auth"],
-
-    "@full-stack-better-t/config": ["@full-stack-better-t/config@workspace:packages/config"],
-
-    "@full-stack-better-t/db": ["@full-stack-better-t/db@workspace:packages/db"],
 
     "@hcaptcha/loader": ["@hcaptcha/loader@2.3.0", "", {}, "sha512-i4lnNxKBe+COf3R1nFZEWaZoHIoJjvDgWqvcNrdZq8ehoSNMN6KVZ56dcQ02qKie2h3+BkbkwlJA9DOIuLlK/g=="],
 
@@ -737,6 +729,14 @@
     "@types/ws": ["@types/ws@8.18.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg=="],
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@4.7.0", "", { "dependencies": { "@babel/core": "^7.28.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-beta.27", "@types/babel__core": "^7.20.5", "react-refresh": "^0.17.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0" } }, "sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA=="],
+
+    "@whats-in-my-mind/api": ["@whats-in-my-mind/api@workspace:packages/api"],
+
+    "@whats-in-my-mind/auth": ["@whats-in-my-mind/auth@workspace:packages/auth"],
+
+    "@whats-in-my-mind/config": ["@whats-in-my-mind/config@workspace:packages/config"],
+
+    "@whats-in-my-mind/db": ["@whats-in-my-mind/db@workspace:packages/db"],
 
     "@wojtekmaj/react-recaptcha-v3": ["@wojtekmaj/react-recaptcha-v3@0.1.4", "", { "dependencies": { "warning": "^4.0.0" }, "peerDependencies": { "@types/react": "^18.0.0 || ^19.0.0", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@types/react"] }, "sha512-zszMOdgI+y1Dz3496pRFr3t68n9+OmX/puLQNnOBDC7WrjM+nOKGyjIMCTe+3J14KDvzcxETeiglyDMGl0Yh/Q=="],
 

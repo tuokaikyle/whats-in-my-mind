@@ -11,8 +11,8 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@full-stack-better-t/api": "workspace:*",
-    "@full-stack-better-t/auth": "workspace:*",
+    "@whats-in-my-mind/api": "workspace:*",
+    "@whats-in-my-mind/auth": "workspace:*",
     "@daveyplate/better-auth-ui": "^3.2.13",
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -53,6 +53,6 @@
     "tailwindcss": "^4.0.15",
     "vite": "^6.2.2",
     "@tanstack/react-query-devtools": "^5.85.5",
-    "@full-stack-better-t/config": "workspace:*"
+    "@whats-in-my-mind/config": "workspace:*"
   }
 }

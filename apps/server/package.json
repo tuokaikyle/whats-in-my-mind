@@ -16,14 +16,14 @@
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:",
-    "@full-stack-better-t/api": "workspace:*",
-    "@full-stack-better-t/auth": "workspace:*",
-    "@full-stack-better-t/db": "workspace:*"
+    "@whats-in-my-mind/api": "workspace:*",
+    "@whats-in-my-mind/auth": "workspace:*",
+    "@whats-in-my-mind/db": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.2",
     "@types/bun": "^1.2.6",
     "tsdown": "^0.16.5",
-    "@full-stack-better-t/config": "workspace:*"
+    "@whats-in-my-mind/config": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-# full-stack-better-t
+# whats-in-my-mind
 
 - [x] add better auth ui
 - [ ] add mongodb

@@ -1,5 +1,5 @@
 {
-  "name": "@full-stack-better-t/api",
+  "name": "@whats-in-my-mind/api",
   "exports": {
     ".": {
       "default": "./src/index.ts"
@@ -11,7 +11,7 @@
   "type": "module",
   "scripts": {},
   "devDependencies": {
-    "@full-stack-better-t/config": "workspace:*"
+    "@whats-in-my-mind/config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -24,7 +24,7 @@
     "@types/pg": "^8.15.6",
     "dotenv": "catalog:",
     "zod": "catalog:",
-    "@full-stack-better-t/auth": "workspace:*",
-    "@full-stack-better-t/db": "workspace:*"
+    "@whats-in-my-mind/auth": "workspace:*",
+    "@whats-in-my-mind/db": "workspace:*"
   }
 }

@@ -5,5 +5,5 @@ export default defineConfig({
 	format: "esm",
 	outDir: "./dist",
 	clean: true,
-	noExternal: [/@full-stack-better-t\/.*/],
+	noExternal: [/@whats-in-my-mind\/.*/],
 });

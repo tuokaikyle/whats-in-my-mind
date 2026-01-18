@@ -1,5 +1,5 @@
-import { db } from "@full-stack-better-t/db";
-import * as schema from "@full-stack-better-t/db/schema/auth";
+import { db } from "@whats-in-my-mind/db";
+import * as schema from "@whats-in-my-mind/db/schema/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 

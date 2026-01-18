@@ -1,4 +1,4 @@
-import { auth } from "@full-stack-better-t/auth";
+import { auth } from "@whats-in-my-mind/auth";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {

@@ -1,5 +1,5 @@
-import { db, and, eq } from "@full-stack-better-t/db";
-import { todo } from "@full-stack-better-t/db/schema/todo";
+import { db, and, eq } from "@whats-in-my-mind/db";
+import { todo } from "@whats-in-my-mind/db/schema/todo";
 import z from "zod";
 import { protectedProcedure, router } from "../index";
 

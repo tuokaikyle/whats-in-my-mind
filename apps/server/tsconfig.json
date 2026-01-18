@@ -1,5 +1,5 @@
 {
-	"extends": "@full-stack-better-t/config/tsconfig.base.json",
+	"extends": "@whats-in-my-mind/config/tsconfig.base.json",
 	"compilerOptions": {
 		"composite": true,
 		"outDir": "dist",

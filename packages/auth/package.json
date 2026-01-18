@@ -1,5 +1,5 @@
 {
-  "name": "@full-stack-better-t/auth",
+  "name": "@whats-in-my-mind/auth",
   "exports": {
     ".": {
       "default": "./src/index.ts"
@@ -11,7 +11,7 @@
   "type": "module",
   "scripts": {},
   "devDependencies": {
-    "@full-stack-better-t/config": "workspace:*"
+    "@whats-in-my-mind/config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -20,6 +20,6 @@
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:",
-    "@full-stack-better-t/db": "workspace:*"
+    "@whats-in-my-mind/db": "workspace:*"
   }
 }
