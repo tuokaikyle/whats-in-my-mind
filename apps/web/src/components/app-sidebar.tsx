@@ -24,12 +24,12 @@ export const sidebarData = {
   },
   navMain: [
     {
-      title: 'View',
+      title: 'Home',
       url: '/',
       items: [
         {
           title: 'Simple',
-          url: 'simple',
+          url: '/simple',
         },
         {
           title: 'Bubble',

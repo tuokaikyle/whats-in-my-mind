@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
 import { trpc } from '@/utils/trpc';
 
-export const Route = createFileRoute('/todos')({
+export const Route = createFileRoute('/simple')({
   component: TodosRoute,
   beforeLoad: async () => {
     const session = await authClient.getSession();

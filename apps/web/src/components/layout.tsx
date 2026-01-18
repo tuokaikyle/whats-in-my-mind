@@ -20,18 +20,24 @@ export default function Layout() {
   const matches = useMatches();
   const currentPath = matches[matches.length - 1]?.pathname || '/';
 
-  // Find the active nav item
-  const activeNavItem = sidebarData.navMain.find(
-    (item) => item.url === currentPath,
-  );
+  // Find current page title
+  let currentPageTitle = 'Home';
 
-  // Build breadcrumb trail
-  const breadcrumbs = [];
-  // if (currentPath !== '/') {
-  //   breadcrumbs.push({ title: 'Home', url: '/' });
-  // }
-  if (activeNavItem) {
-    breadcrumbs.push({ title: activeNavItem.title, url: activeNavItem.url });
+  for (const navItem of sidebarData.navMain) {
+    // Check if current path matches top-level item
+    if (navItem.url === currentPath) {
+      currentPageTitle = navItem.title;
+      break;
+    }
+
+    // Check if current path matches a nested item
+    if (navItem.items) {
+      const subItem = navItem.items.find((sub) => sub.url === currentPath);
+      if (subItem) {
+        currentPageTitle = subItem.title;
+        break;
+      }
+    }
   }
   return (
     <SidebarProvider>
@@ -46,28 +52,9 @@ export default function Layout() {
             />
             <Breadcrumb>
               <BreadcrumbList>
-                {breadcrumbs.length === 0 ? (
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Home</BreadcrumbPage>
-                  </BreadcrumbItem>
-                ) : (
-                  breadcrumbs.map((crumb, index) => (
-                    <div key={crumb.url} className="flex items-center gap-2">
-                      <BreadcrumbItem>
-                        {index === breadcrumbs.length - 1 ? (
-                          <BreadcrumbPage>{crumb.title}</BreadcrumbPage>
-                        ) : (
-                          <BreadcrumbLink asChild>
-                            <Link to={crumb.url}>{crumb.title}</Link>
-                          </BreadcrumbLink>
-                        )}
-                      </BreadcrumbItem>
-                      {index < breadcrumbs.length - 1 && (
-                        <BreadcrumbSeparator />
-                      )}
-                    </div>
-                  ))
-                )}
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{currentPageTitle}</BreadcrumbPage>
+                </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
           </div>

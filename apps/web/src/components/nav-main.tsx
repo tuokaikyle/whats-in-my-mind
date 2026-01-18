@@ -37,16 +37,16 @@ export function NavMain({
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url} className='font-medium'>
+              <Link to={item.url} className='font-medium'>
                 {item.title}
-              </a>
+              </Link>
             </SidebarMenuButton>
             {item.items?.length ? (
               <SidebarMenuSub>
-                {item.items.map((item) => (
-                  <SidebarMenuSubItem key={item.title}>
-                    <SidebarMenuSubButton asChild isActive={item.isActive}>
-                      <a href={item.url}>{item.title}</a>
+                {item.items.map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.title}>
+                    <SidebarMenuSubButton asChild isActive={subItem.isActive}>
+                      <Link to={subItem.url}>{subItem.title}</Link>
                     </SidebarMenuSubButton>
                   </SidebarMenuSubItem>
                 ))}
