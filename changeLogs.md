@@ -6,6 +6,7 @@
 - [x] remove all unused imports and code
 - [x] dynamic breadcrumb
 - [ ] not found component
+- [ ] social
 - [ ] send email
 - [ ] verify email
 
