@@ -19,7 +19,7 @@ export interface AuthEnv {
 // Create auth configuration factory that accepts environment variables
 export function createAuth(env: AuthEnv) {
   const db = getDb(env.DATABASE_URL);
-  
+
   const config: BetterAuthOptions = {
     database: drizzleAdapter(db, {
       provider: 'pg',
@@ -29,7 +29,7 @@ export function createAuth(env: AuthEnv) {
     baseURL: env.BETTER_AUTH_URL,
     trustedOrigins: env.CORS_ORIGIN ? [env.CORS_ORIGIN] : [],
     emailAndPassword: {
-      enabled: false,
+      enabled: true,
     },
     advanced: {
       defaultCookieAttributes: {
