@@ -1,11 +1,11 @@
-import { and, db, eq } from '@whats-in-my-mind/db';
+import { and, eq } from '@whats-in-my-mind/db';
 import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
 import { protectedProcedure, router } from '../index';
 
 export const todoRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    return await db
+    return await ctx.db
       .select()
       .from(todo)
       .where(eq(todo.userId, ctx.session.user.id));
@@ -21,7 +21,7 @@ export const todoRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      return await db.insert(todo).values({
+      return await ctx.db.insert(todo).values({
         text: input.text,
         category: input.category,
         importance: input.importance,
@@ -43,7 +43,7 @@ export const todoRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { id, ...updates } = input;
-      return await db
+      return await ctx.db
         .update(todo)
         .set(updates)
         .where(
@@ -54,7 +54,7 @@ export const todoRouter = router({
   toggle: protectedProcedure
     .input(z.object({ id: z.number(), completed: z.boolean() }))
     .mutation(async ({ input, ctx }) => {
-      return await db
+      return await ctx.db
         .update(todo)
         .set({ completed: input.completed })
         .where(
@@ -65,7 +65,7 @@ export const todoRouter = router({
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      return await db
+      return await ctx.db
         .delete(todo)
         .where(
           and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
