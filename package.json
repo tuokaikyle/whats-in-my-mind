@@ -29,8 +29,6 @@
     "db:studio": "turbo -F @whats-in-my-mind/db db:studio",
     "db:generate": "turbo -F @whats-in-my-mind/db db:generate",
     "db:migrate": "turbo -F @whats-in-my-mind/db db:migrate",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' +"
   },
   "dependencies": {
