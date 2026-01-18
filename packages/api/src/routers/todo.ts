@@ -1,5 +1,5 @@
-import { db, and, eq } from "@OverchargedList/db";
-import { todo } from "@OverchargedList/db/schema/todo";
+import { db, and, eq } from "@full-stack-better-t/db";
+import { todo } from "@full-stack-better-t/db/schema/todo";
 import z from "zod";
 import { protectedProcedure, router } from "../index";
 
@@ -27,10 +27,7 @@ export const todoRouter = router({
 				.update(todo)
 				.set({ completed: input.completed })
 				.where(
-					and(
-						eq(todo.id, input.id),
-						eq(todo.userId, ctx.session.user.id),
-					),
+					and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
 				);
 		}),
 
@@ -40,10 +37,7 @@ export const todoRouter = router({
 			return await db
 				.delete(todo)
 				.where(
-					and(
-						eq(todo.id, input.id),
-						eq(todo.userId, ctx.session.user.id),
-					),
+					and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
 				);
 		}),
 });

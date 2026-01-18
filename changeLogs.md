@@ -1,4 +1,4 @@
-# OverchargedList
+# full-stack-better-t
 
 - [x] add better auth ui
 - [ ] add mongodb
@@ -11,5 +11,3 @@
 
 Remove this line?
 `import type { auth } from "@" `
-
-包含有大量 OverchargedList 关键词

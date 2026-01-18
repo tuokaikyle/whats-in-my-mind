@@ -1,4 +1,4 @@
-import { auth } from "@OverchargedList/auth";
+import { auth } from "@full-stack-better-t/auth";
 import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {

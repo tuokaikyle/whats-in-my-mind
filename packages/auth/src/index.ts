@@ -1,5 +1,5 @@
-import { db } from "@OverchargedList/db";
-import * as schema from "@OverchargedList/db/schema/auth";
+import { db } from "@full-stack-better-t/db";
+import * as schema from "@full-stack-better-t/db/schema/auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 

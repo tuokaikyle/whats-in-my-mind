@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { createContext } from "@OverchargedList/api/context";
-import { appRouter } from "@OverchargedList/api/routers/index";
-import { auth } from "@OverchargedList/auth";
+import { createContext } from "@full-stack-better-t/api/context";
+import { appRouter } from "@full-stack-better-t/api/routers/index";
+import { auth } from "@full-stack-better-t/auth";
 import { trpcServer } from "@hono/trpc-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";

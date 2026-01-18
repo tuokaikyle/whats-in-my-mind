@@ -1,4 +1,3 @@
-import type { auth } from "@OverchargedList/auth";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({

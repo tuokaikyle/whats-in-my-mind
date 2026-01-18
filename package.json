@@ -1,45 +1,45 @@
 {
-	"name": "overchargedlist",
-	"private": true,
-	"type": "module",
-	"workspaces": {
-		"packages": [
-			"apps/*",
-			"packages/*"
-		],
-		"catalog": {
-			"hono": "^4.8.2",
-			"@trpc/server": "^11.5.0",
-			"better-auth": "^1.4.5",
-			"dotenv": "^17.2.2",
-			"zod": "^4.1.13",
-			"@trpc/client": "^11.5.0",
-			"drizzle-orm": "^0.45.0"
-		}
-	},
-	"scripts": {
-		"check": "biome check --write .",
-		"dev": "turbo dev",
-		"build": "turbo build",
-		"check-types": "turbo check-types",
-		"dev:native": "turbo -F native dev",
-		"dev:web": "turbo -F web dev",
-		"dev:server": "turbo -F server dev",
-		"db:push": "turbo -F @OverchargedList/db db:push",
-		"db:studio": "turbo -F @OverchargedList/db db:studio",
-		"db:generate": "turbo -F @OverchargedList/db db:generate",
-		"db:migrate": "turbo -F @OverchargedList/db db:migrate",
-		"lint": "biome check .",
-		"lint:fix": "biome check --write ."
-	},
-	"dependencies": {
-		"dotenv": "^17.2.2",
-		"zod": "^4.1.13"
-	},
-	"devDependencies": {
-		"turbo": "^2.5.4",
-		"@biomejs/biome": "^2.2.0",
-		"@types/bun": "^1.2.6"
-	},
-	"packageManager": "bun@1.2.15"
+  "name": "full-stack-better-t",
+  "private": true,
+  "type": "module",
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "hono": "^4.8.2",
+      "@trpc/server": "^11.5.0",
+      "better-auth": "^1.4.5",
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "@trpc/client": "^11.5.0",
+      "drizzle-orm": "^0.45.0"
+    }
+  },
+  "scripts": {
+    "check": "biome check --write .",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @full-stack-better-t/db db:push",
+    "db:studio": "turbo -F @full-stack-better-t/db db:studio",
+    "db:generate": "turbo -F @full-stack-better-t/db db:generate",
+    "db:migrate": "turbo -F @full-stack-better-t/db db:migrate",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
+  },
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "@biomejs/biome": "^2.2.0",
+    "@types/bun": "^1.2.6"
+  },
+  "packageManager": "bun@1.2.15"
 }
