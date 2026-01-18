@@ -33,7 +33,10 @@ export const Route = createFileRoute('/simple')({
 function TodosRoute() {
   const [newTodoText, setNewTodoText] = useState('');
 
-  const todos = useQuery(trpc.todo.getAll.queryOptions());
+  const todos = useQuery({
+    ...trpc.todo.getAll.queryOptions(),
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+  });
   const createMutation = useMutation(
     trpc.todo.create.mutationOptions({
       onSuccess: () => {

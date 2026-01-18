@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as RichRouteImport } from './routes/rich'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RichRoute = RichRouteImport.update({
+  id: '/rich',
+  path: '/rich',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,30 +37,34 @@ const AuthPathRoute = AuthPathRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/simple' | '/auth/$path'
+  fullPaths: '/' | '/rich' | '/simple' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/simple' | '/auth/$path'
-  id: '__root__' | '/' | '/simple' | '/auth/$path'
+  to: '/' | '/rich' | '/simple' | '/auth/$path'
+  id: '__root__' | '/' | '/rich' | '/simple' | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RichRoute: typeof RichRoute
   SimpleRoute: typeof SimpleRoute
   AuthPathRoute: typeof AuthPathRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/simple'
       fullPath: '/simple'
       preLoaderRoute: typeof SimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rich': {
+      id: '/rich'
+      path: '/rich'
+      fullPath: '/rich'
+      preLoaderRoute: typeof RichRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RichRoute: RichRoute,
   SimpleRoute: SimpleRoute,
   AuthPathRoute: AuthPathRoute,
 }

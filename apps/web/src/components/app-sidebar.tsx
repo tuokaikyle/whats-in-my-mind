@@ -32,8 +32,8 @@ export const sidebarData = {
           url: '/simple',
         },
         {
-          title: 'Bubble',
-          url: '/bubble',
+          title: 'Rich ',
+          url: '/rich',
         },
       ],
     },

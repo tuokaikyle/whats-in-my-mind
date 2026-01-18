@@ -12,12 +12,43 @@ export const todoRouter = router({
   }),
 
   create: protectedProcedure
-    .input(z.object({ text: z.string().min(1) }))
+    .input(
+      z.object({
+        text: z.string().min(1),
+        category: z.string().optional(),
+        importance: z.number().int().min(1).max(5).optional(),
+        progress: z.number().int().min(0).max(100).optional(),
+      })
+    )
     .mutation(async ({ input, ctx }) => {
       return await db.insert(todo).values({
         text: input.text,
+        category: input.category,
+        importance: input.importance,
+        progress: input.progress,
         userId: ctx.session.user.id,
       });
+    }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        text: z.string().min(1).optional(),
+        completed: z.boolean().optional(),
+        category: z.string().optional(),
+        importance: z.number().int().min(1).max(5).optional(),
+        progress: z.number().int().min(0).max(100).optional(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { id, ...updates } = input;
+      return await db
+        .update(todo)
+        .set(updates)
+        .where(
+          and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)),
+        );
     }),
 
   toggle: protectedProcedure
