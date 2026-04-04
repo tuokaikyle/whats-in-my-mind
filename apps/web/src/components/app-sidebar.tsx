@@ -1,8 +1,6 @@
-'use client';
-
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
-import { ChevronLeft, Code, Command, ExternalLink, ExternalLinkIcon, HomeIcon, PanelLeft, Satellite, Send, SquareTerminal, type LucideIcon } from 'lucide-react';
+import { Command, HomeIcon, PanelLeft, Satellite, SquareTerminal } from 'lucide-react';
 import type * as React from 'react';
 import { NavMain } from '@/components/nav-main';
 import {
@@ -37,7 +35,7 @@ export const sidebarData = {
       icon: Satellite
     },
     {
-      title: 'Rich ',
+      title: 'Rich',
       url: '/rich',
     },
     {

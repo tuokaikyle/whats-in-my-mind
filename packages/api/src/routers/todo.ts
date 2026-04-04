@@ -6,7 +6,16 @@ import { protectedProcedure, router } from '../index';
 export const todoRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db
-      .select()
+      .select({
+        id: todo.id,
+        text: todo.text,
+        completed: todo.completed,
+        category: todo.category,
+        importance: todo.importance,
+        progress: todo.progress,
+        createdAt: todo.createdAt,
+        updatedAt: todo.updatedAt,
+      })
       .from(todo)
       .where(eq(todo.userId, ctx.session.user.id));
   }),
@@ -48,17 +57,6 @@ export const todoRouter = router({
         .set(updates)
         .where(
           and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)),
-        );
-    }),
-
-  toggle: protectedProcedure
-    .input(z.object({ id: z.number(), completed: z.boolean() }))
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .update(todo)
-        .set({ completed: input.completed })
-        .where(
-          and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
         );
     }),
 

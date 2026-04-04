@@ -6,10 +6,8 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import {
-  SidebarContent,
   SidebarGroup,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,

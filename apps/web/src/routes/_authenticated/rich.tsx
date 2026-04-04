@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { Loader2, Trash2, Edit } from 'lucide-react';
+import { createFileRoute } from '@tanstack/react-router';
+import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,22 +12,10 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { authClient } from '@/lib/auth-client';
-import { trpc } from '@/utils/trpc';
+import { useTodos } from '@/hooks/use-todos';
 
-export const Route = createFileRoute('/rich')({
+export const Route = createFileRoute('/_authenticated/rich')({
   component: RichTodosRoute,
-  beforeLoad: async () => {
-    const session = await authClient.getSession();
-    if (!session.data) {
-      redirect({
-        to: '/auth/$path',
-        throw: true,
-        params: { path: 'sign-in' },
-      });
-    }
-    return { session };
-  },
 });
 
 function RichTodosRoute() {
@@ -36,64 +23,34 @@ function RichTodosRoute() {
   const [newCategory, setNewCategory] = useState('');
   const [newImportance, setNewImportance] = useState('3');
   const [newProgress, setNewProgress] = useState('0');
-  const [editingId, setEditingId] = useState<number | null>(null);
-
-  const todos = useQuery({
-    ...trpc.todo.getAll.queryOptions(),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-  });
-  
-  const createMutation = useMutation(
-    trpc.todo.create.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-        setNewTodoText('');
-        setNewCategory('');
-        setNewImportance('3');
-        setNewProgress('0');
-      },
-    }),
-  );
-
-  const updateMutation = useMutation(
-    trpc.todo.update.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-        setEditingId(null);
-      },
-    }),
-  );
-
-  const toggleMutation = useMutation(
-    trpc.todo.toggle.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
-
-  const deleteMutation = useMutation(
-    trpc.todo.delete.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
+  const { todos, createMutation, updateMutation, deleteMutation } = useTodos();
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodoText.trim()) {
-      createMutation.mutate({
-        text: newTodoText,
-        category: newCategory || undefined,
-        importance: Number.parseInt(newImportance) || undefined,
-        progress: Number.parseInt(newProgress) || undefined,
-      });
+      const importance = Number.parseInt(newImportance);
+      const progress = Number.parseInt(newProgress);
+      createMutation.mutate(
+        {
+          text: newTodoText,
+          category: newCategory || undefined,
+          importance: Number.isNaN(importance) ? undefined : importance,
+          progress: Number.isNaN(progress) ? undefined : progress,
+        },
+        {
+          onSuccess: () => {
+            setNewTodoText('');
+            setNewCategory('');
+            setNewImportance('3');
+            setNewProgress('0');
+          },
+        },
+      );
     }
   };
 
   const handleToggleTodo = (id: number, completed: boolean) => {
-    toggleMutation.mutate({ id, completed: !completed });
+    updateMutation.mutate({ id, completed: !completed });
   };
 
   const handleDeleteTodo = (id: number) => {

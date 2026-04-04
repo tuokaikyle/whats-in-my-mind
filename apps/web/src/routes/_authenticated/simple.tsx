@@ -1,5 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -12,63 +11,28 @@ import {
 } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { authClient } from '@/lib/auth-client';
-import { trpc } from '@/utils/trpc';
+import { useTodos } from '@/hooks/use-todos';
 
-export const Route = createFileRoute('/simple')({
+export const Route = createFileRoute('/_authenticated/simple')({
   component: TodosRoute,
-  beforeLoad: async () => {
-    const session = await authClient.getSession();
-    if (!session.data) {
-      redirect({
-        to: '/auth/$path',
-        throw: true,
-        params: { path: 'sign-in' },
-      });
-    }
-    return { session };
-  },
 });
 
 function TodosRoute() {
   const [newTodoText, setNewTodoText] = useState('');
-
-  const todos = useQuery({
-    ...trpc.todo.getAll.queryOptions(),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-  });
-  const createMutation = useMutation(
-    trpc.todo.create.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-        setNewTodoText('');
-      },
-    }),
-  );
-  const toggleMutation = useMutation(
-    trpc.todo.toggle.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
-  const deleteMutation = useMutation(
-    trpc.todo.delete.mutationOptions({
-      onSuccess: () => {
-        todos.refetch();
-      },
-    }),
-  );
+  const { todos, createMutation, updateMutation, deleteMutation } = useTodos();
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodoText.trim()) {
-      createMutation.mutate({ text: newTodoText });
+      createMutation.mutate(
+        { text: newTodoText },
+        { onSuccess: () => setNewTodoText('') },
+      );
     }
   };
 
   const handleToggleTodo = (id: number, completed: boolean) => {
-    toggleMutation.mutate({ id, completed: !completed });
+    updateMutation.mutate({ id, completed: !completed });
   };
 
   const handleDeleteTodo = (id: number) => {

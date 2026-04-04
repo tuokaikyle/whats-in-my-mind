@@ -9,25 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SimpleRouteImport } from './routes/simple'
-import { Route as RichRouteImport } from './routes/rich'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
+import { Route as AuthenticatedSimpleRouteImport } from './routes/_authenticated/simple'
+import { Route as AuthenticatedRichRouteImport } from './routes/_authenticated/rich'
 
-const SimpleRoute = SimpleRouteImport.update({
-  id: '/simple',
-  path: '/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RichRoute = RichRouteImport.update({
-  id: '/rich',
-  path: '/rich',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -40,27 +35,38 @@ const AuthPathRoute = AuthPathRouteImport.update({
   path: '/auth/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSimpleRoute = AuthenticatedSimpleRouteImport.update({
+  id: '/simple',
+  path: '/simple',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRichRoute = AuthenticatedRichRouteImport.update({
+  id: '/rich',
+  path: '/rich',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/rich': typeof RichRoute
-  '/simple': typeof SimpleRoute
+  '/rich': typeof AuthenticatedRichRoute
+  '/simple': typeof AuthenticatedSimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/rich': typeof RichRoute
-  '/simple': typeof SimpleRoute
+  '/rich': typeof AuthenticatedRichRoute
+  '/simple': typeof AuthenticatedSimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
-  '/rich': typeof RichRoute
-  '/simple': typeof SimpleRoute
+  '/_authenticated/rich': typeof AuthenticatedRichRoute
+  '/_authenticated/simple': typeof AuthenticatedSimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
@@ -68,38 +74,37 @@ export interface FileRouteTypes {
   fullPaths: '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
-  id: '__root__' | '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/_authenticated/rich'
+    | '/_authenticated/simple'
+    | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
-  RichRoute: typeof RichRoute
-  SimpleRoute: typeof SimpleRoute
   AuthPathRoute: typeof AuthPathRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/simple': {
-      id: '/simple'
-      path: '/simple'
-      fullPath: '/simple'
-      preLoaderRoute: typeof SimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rich': {
-      id: '/rich'
-      path: '/rich'
-      fullPath: '/rich'
-      preLoaderRoute: typeof RichRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -116,14 +121,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthPathRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/simple': {
+      id: '/_authenticated/simple'
+      path: '/simple'
+      fullPath: '/simple'
+      preLoaderRoute: typeof AuthenticatedSimpleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/rich': {
+      id: '/_authenticated/rich'
+      path: '/rich'
+      fullPath: '/rich'
+      preLoaderRoute: typeof AuthenticatedRichRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedRichRoute: typeof AuthenticatedRichRoute
+  AuthenticatedSimpleRoute: typeof AuthenticatedSimpleRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedRichRoute: AuthenticatedRichRoute,
+  AuthenticatedSimpleRoute: AuthenticatedSimpleRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
-  RichRoute: RichRoute,
-  SimpleRoute: SimpleRoute,
   AuthPathRoute: AuthPathRoute,
 }
 export const routeTree = rootRouteImport

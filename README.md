@@ -75,3 +75,7 @@ whats-in-my-mind/
 - `bun run deploy`: Build and deploy backend
 
 ## Make things right
+no logged in user to use local storage
+consider to have a header bar - add todo button
+edit todo
+add test
