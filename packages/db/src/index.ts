@@ -23,7 +23,7 @@ let currentDatabaseUrl: string | null = null;
 
 export const getDb = (databaseUrl?: string) => {
   // Use provided URL or fall back to process.env (for local development)
-  const dbUrl = databaseUrl || process.env.DATABASE_URL;
+  const dbUrl = databaseUrl || process.env.DATABASE_URL_DEV || process.env.DATABASE_URL;
   
   if (!dbUrl) {
     throw new Error('DATABASE_URL environment variable is not set');

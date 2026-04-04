@@ -11,7 +11,7 @@ export async function createContext({ context }: CreateContextOptions) {
   const env = context.env as AuthEnv;
   const auth = createAuth(env);
   const db = getDb(env.DATABASE_URL);
-  
+
   const session = await auth.api.getSession({
     headers: context.req.raw.headers,
   });

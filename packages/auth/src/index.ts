@@ -18,45 +18,58 @@ export interface AuthEnv {
 
 // Create auth configuration factory that accepts environment variables
 export function createAuth(env: AuthEnv) {
-  const db = getDb(env.DATABASE_URL);
-  
+  // Fall back to process.env for local Bun dev (c.env is empty outside Workers)
+  const databaseUrl = env?.DATABASE_URL ?? process.env.DATABASE_URL;
+  const secret = env?.BETTER_AUTH_SECRET ?? process.env.BETTER_AUTH_SECRET ?? '';
+  const baseURL = env?.BETTER_AUTH_URL ?? process.env.BETTER_AUTH_URL ?? '';
+  const corsOrigin = env?.CORS_ORIGIN ?? process.env.CORS_ORIGIN ?? '';
+  const googleClientId = env?.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
+  const googleClientSecret = env?.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET;
+  const facebookClientId = env?.FACEBOOK_CLIENT_ID ?? process.env.FACEBOOK_CLIENT_ID;
+  const facebookClientSecret = env?.FACEBOOK_CLIENT_SECRET ?? process.env.FACEBOOK_CLIENT_SECRET;
+
+  const db = getDb(databaseUrl);
+
+  // Use secure/sameSite:none only in production (HTTPS). Local dev is HTTP.
+  const isProduction = baseURL.startsWith('https://');
+
   const config: BetterAuthOptions = {
     database: drizzleAdapter(db, {
       provider: 'pg',
       schema: schema,
     }),
-    secret: env.BETTER_AUTH_SECRET,
-    baseURL: env.BETTER_AUTH_URL,
-    trustedOrigins: env.CORS_ORIGIN ? [env.CORS_ORIGIN] : [],
+    secret,
+    baseURL,
+    trustedOrigins: corsOrigin ? corsOrigin.split(',').map((o) => o.trim()).filter(Boolean) : [],
     emailAndPassword: {
-      enabled: false,
+      enabled: true,
     },
     advanced: {
       defaultCookieAttributes: {
-        sameSite: 'none',
-        secure: true,
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction,
         httpOnly: true,
       },
     },
   };
 
   // Only add social providers if credentials are provided
-  if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+  if (googleClientId && googleClientSecret) {
     config.socialProviders = {
       ...config.socialProviders,
       google: {
-        clientId: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        clientId: googleClientId,
+        clientSecret: googleClientSecret,
       },
     };
   }
 
-  if (env.FACEBOOK_CLIENT_ID && env.FACEBOOK_CLIENT_SECRET) {
+  if (facebookClientId && facebookClientSecret) {
     config.socialProviders = {
       ...config.socialProviders,
       facebook: {
-        clientId: env.FACEBOOK_CLIENT_ID,
-        clientSecret: env.FACEBOOK_CLIENT_SECRET,
+        clientId: facebookClientId,
+        clientSecret: facebookClientSecret,
       },
     };
   }

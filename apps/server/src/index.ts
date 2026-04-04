@@ -32,7 +32,7 @@ app.use(
     // In Cloudflare Workers, `wrangler.toml [vars]` are provided via the `env`
     // binding (Hono: `c.env`), not reliably via `process.env`.
     origin: (requestOrigin, c) => {
-      const configured = (c.env?.CORS_ORIGIN ?? '').trim();
+      const configured = (c.env?.CORS_ORIGIN ?? process.env.CORS_ORIGIN ?? '').trim();
       if (!configured) return '';
 
       // Allow comma-separated list for multi-environment deploys.

@@ -74,10 +74,4 @@ whats-in-my-mind/
 - `bun run deploy:web`: Deploy frontend to Cloudflare Pages
 - `bun run deploy`: Build and deploy backend
 
-## Deployment
-
-This project can be deployed to Cloudflare (Workers + Pages). See deployment guides:
-
-- 🚀 **Quick Start**: [DEPLOY-QUICKSTART.md](./DEPLOY-QUICKSTART.md) - Get deployed in 20 minutes
-- 📚 **Detailed Guide**: [DEPLOYMENT.md](./DEPLOYMENT.md) - Complete deployment documentation
-- ✅ **Checklist**: [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) - Step-by-step checklist
+## Make things right
