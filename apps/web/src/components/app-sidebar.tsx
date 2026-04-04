@@ -2,10 +2,9 @@
 
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
-import { Code, Command, Send, SquareTerminal } from 'lucide-react';
+import { ChevronLeft, Code, Command, ExternalLink, ExternalLinkIcon, HomeIcon, PanelLeft, Satellite, Send, SquareTerminal, type LucideIcon } from 'lucide-react';
 import type * as React from 'react';
 import { NavMain } from '@/components/nav-main';
-import { NavSecondary } from '@/components/nav-secondary';
 import {
   Sidebar,
   SidebarContent,
@@ -14,7 +13,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  useSidebar,
 } from '@/components/ui/sidebar';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { ModeToggle } from './mode-toggle';
 
 export const sidebarData = {
   user: {
@@ -26,34 +29,43 @@ export const sidebarData = {
     {
       title: 'Home',
       url: '/',
+      icon: HomeIcon,
+    },
+    {
+      title: 'Simple',
+      url: '/simple',
+      icon: Satellite
+    },
+    {
+      title: 'Rich ',
+      url: '/rich',
+    },
+    {
+      title: 'Placeholder',
+      url: '/placeholder',
+      icon: SquareTerminal,
       items: [
         {
-          title: 'Simple',
-          url: '/simple',
+          title: 'Placeholder 1',
+          url: '/placeholder/1',
         },
         {
-          title: 'Rich ',
-          url: '/rich',
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: 'Github',
-      url: 'https://github.com/tuokaikyle',
-      icon: Code,
+          title: 'Placeholder 2',
+          url: '/placeholder/2',
+        }]
     },
     {
-      title: 'Feedback',
-      url: '#',
-      icon: Send,
+      title: 'About',
+      url: '/about',
+      icon: HomeIcon,
     },
-  ],
+  ]
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
+  const { toggleSidebar, open } = useSidebar();
+  const isMobile = useIsMobile();
 
   const navMainWithActive = sidebarData.navMain.map((item) => ({
     ...item,
@@ -61,12 +73,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   return (
-    <Sidebar variant='inset' {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size='lg' asChild>
-              <div>
+            <SidebarMenuButton size='lg' onClick={toggleSidebar} asChild>
+              <div className='group'>
                 <div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
                   <Command className='size-4' />
                 </div>
@@ -74,6 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className='truncate font-medium'>Acme Inc</span>
                   <span className='truncate text-xs'>Fullstack template</span>
                 </div>
+                <PanelLeft className='size-4' />
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -81,12 +94,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMainWithActive} />
-        <NavSecondary items={sidebarData.navSecondary} className='mt-auto' />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className='mb-1'>
         <UserButton
-          size='default'
-          side='right'
+          additionalLinks={[<ModeToggle key="mode-toggle" />]}
+          size={open ? 'default' : 'icon'}
+          side={isMobile ? 'top' : 'right'}
           sideOffset={16}
           className='bg-primary-foreground text-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
         />

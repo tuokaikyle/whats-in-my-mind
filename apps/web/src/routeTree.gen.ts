@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as RichRouteImport } from './routes/rich'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
@@ -22,6 +23,11 @@ const SimpleRoute = SimpleRouteImport.update({
 const RichRoute = RichRouteImport.update({
   id: '/rich',
   path: '/rich',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const AuthPathRoute = AuthPathRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/rich': typeof RichRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rich' | '/simple' | '/auth/$path'
+  fullPaths: '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rich' | '/simple' | '/auth/$path'
-  id: '__root__' | '/' | '/rich' | '/simple' | '/auth/$path'
+  to: '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
+  id: '__root__' | '/' | '/about' | '/rich' | '/simple' | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   RichRoute: typeof RichRoute
   SimpleRoute: typeof SimpleRoute
   AuthPathRoute: typeof AuthPathRoute
@@ -85,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RichRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   RichRoute: RichRoute,
   SimpleRoute: SimpleRoute,
   AuthPathRoute: AuthPathRoute,

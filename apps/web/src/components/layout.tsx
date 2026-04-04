@@ -43,7 +43,7 @@ export default function Layout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="flex flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b">
+        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b md:hidden">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
