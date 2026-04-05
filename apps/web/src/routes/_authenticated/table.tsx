@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTodos } from '@/hooks/use-todos';
 
-export const Route = createFileRoute('/_authenticated/rich')({
+export const Route = createFileRoute('/_authenticated/table')({
   component: RichTodosRoute,
 });
 

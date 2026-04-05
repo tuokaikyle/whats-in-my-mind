@@ -79,3 +79,18 @@ no logged in user to use local storage
 consider to have a header bar - add todo button
 edit todo
 add test
+经常fetch不到 得单独点route才可以成功fetch
+google and facebook
+
+确定现有shape
+bubble - size, deadline columns, category table
+slider - easy
+veroni - ...
+flip - easy
+heatmap
+grid
+
+
+
+大多数免费
+少数收费

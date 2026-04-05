@@ -1,6 +1,6 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
-import { Command, HomeIcon, PanelLeft, Satellite, SquareTerminal } from 'lucide-react';
+import { BrainCircuit, Bubbles, ClipboardCheck, Command, FileCheck, FileCheckIcon, FileText, Grid2X2, HomeIcon, Info, PanelLeft, Satellite, SquareArrowRight, SquareSplitVertical, SquareTerminal, Table2 } from 'lucide-react';
 import type * as React from 'react';
 import { NavMain } from '@/components/nav-main';
 import {
@@ -32,30 +32,51 @@ export const sidebarData = {
     {
       title: 'Simple',
       url: '/simple',
-      icon: Satellite
+      icon: FileCheck
     },
     {
-      title: 'Rich',
-      url: '/rich',
+      title: 'Table',
+      url: '/table',
+      icon: Table2
     },
     {
-      title: 'Placeholder',
-      url: '/placeholder',
-      icon: SquareTerminal,
+      title: 'Slide',
+      url: '/slide',
+      icon: SquareArrowRight,
+    },
+    {
+      title: 'Bubble',
+      url: '/bubble',
+      icon: Bubbles,
+    },
+    {
+      title: 'Veroni',
+      url: '/veroni',
+      icon: BrainCircuit,
+    },
+    {
+      title: 'Flip',
+      url: '/flip',
+      icon: SquareSplitVertical,
+    },
+    {
+      title: 'Heatmap',
+      url: '/heatmap',
+      icon: Grid2X2,
       items: [
         {
-          title: 'Placeholder 1',
-          url: '/placeholder/1',
+          title: 'Github',
+          url: '/heatmap/github',
         },
         {
-          title: 'Placeholder 2',
-          url: '/placeholder/2',
-        }]
+          title: '3D',
+          url: '/heatmap/3d',
+        }],
     },
     {
       title: 'About',
       url: '/about',
-      icon: HomeIcon,
+      icon: Info,
     },
   ]
 };
