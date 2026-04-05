@@ -10,9 +10,11 @@ export const todoRouter = router({
         id: todo.id,
         text: todo.text,
         completed: todo.completed,
-        category: todo.category,
+        categoryId: todo.categoryId,
         importance: todo.importance,
         progress: todo.progress,
+        effort: todo.effort,
+        deadline: todo.deadline,
         createdAt: todo.createdAt,
         updatedAt: todo.updatedAt,
       })
@@ -24,17 +26,21 @@ export const todoRouter = router({
     .input(
       z.object({
         text: z.string().min(1),
-        category: z.string().optional(),
+        categoryId: z.number().int().nullable().optional(),
         importance: z.number().int().min(1).max(5).optional(),
         progress: z.number().int().min(0).max(100).optional(),
+        effort: z.number().int().min(0).optional(),
+        deadline: z.string().datetime().nullable().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.db.insert(todo).values({
         text: input.text,
-        category: input.category,
+        categoryId: input.categoryId,
         importance: input.importance,
         progress: input.progress,
+        effort: input.effort,
+        deadline: input.deadline ? new Date(input.deadline) : null,
         userId: ctx.session.user.id,
       });
     }),
@@ -45,16 +51,21 @@ export const todoRouter = router({
         id: z.number(),
         text: z.string().min(1).optional(),
         completed: z.boolean().optional(),
-        category: z.string().optional(),
+        categoryId: z.number().int().nullable().optional(),
         importance: z.number().int().min(1).max(5).optional(),
         progress: z.number().int().min(0).max(100).optional(),
+        effort: z.number().int().min(0).optional(),
+        deadline: z.string().datetime().nullable().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, ...updates } = input;
+      const { id, deadline, ...rest } = input;
       return await ctx.db
         .update(todo)
-        .set(updates)
+        .set({
+          ...rest,
+          ...(deadline !== undefined ? { deadline: deadline ? new Date(deadline) : null } : {}),
+        })
         .where(
           and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)),
         );

@@ -83,13 +83,14 @@ add test
 google and facebook
 
 确定现有shape
-bubble - size, deadline columns, category table
+bubble - effort, deadline columns, category table
 slider - easy
 veroni - ...
 flip - easy
 heatmap
 grid
 
+category table should be managed by user-preferences
 
 
 大多数免费

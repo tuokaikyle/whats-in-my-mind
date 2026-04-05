@@ -6,12 +6,12 @@ export type BaseTask = {
 export type Task = BaseTask & {
   completed?: boolean;
   progress?: number;
-  category?: string;
-  effort?: number;
-  importance?: number;
-  deadline?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
+  categoryId?: number | null;
+  effort?: number | null;
+  importance?: number | null;
+  deadline?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type SimpleTask = BaseTask & {
