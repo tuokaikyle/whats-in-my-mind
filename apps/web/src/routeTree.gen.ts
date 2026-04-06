@@ -9,26 +9,31 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TableRouteImport } from './routes/table'
 import { Route as SlideRouteImport } from './routes/slide'
+import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
-import { Route as AuthenticatedTableRouteImport } from './routes/_authenticated/table'
-import { Route as AuthenticatedSimpleRouteImport } from './routes/_authenticated/simple'
 
+const TableRoute = TableRouteImport.update({
+  id: '/table',
+  path: '/table',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlideRoute = SlideRouteImport.update({
   id: '/slide',
   path: '/slide',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SimpleRoute = SimpleRouteImport.update({
+  id: '/simple',
+  path: '/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -41,69 +46,65 @@ const AuthPathRoute = AuthPathRouteImport.update({
   path: '/auth/$path',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTableRoute = AuthenticatedTableRouteImport.update({
-  id: '/table',
-  path: '/table',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedSimpleRoute = AuthenticatedSimpleRouteImport.update({
-  id: '/simple',
-  path: '/simple',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
-  '/simple': typeof AuthenticatedSimpleRoute
-  '/table': typeof AuthenticatedTableRoute
+  '/table': typeof TableRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
-  '/simple': typeof AuthenticatedSimpleRoute
-  '/table': typeof AuthenticatedTableRoute
+  '/table': typeof TableRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
+  '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
-  '/_authenticated/simple': typeof AuthenticatedSimpleRoute
-  '/_authenticated/table': typeof AuthenticatedTableRoute
+  '/table': typeof TableRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/slide' | '/simple' | '/table' | '/auth/$path'
+  fullPaths: '/' | '/about' | '/simple' | '/slide' | '/table' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/slide' | '/simple' | '/table' | '/auth/$path'
+  to: '/' | '/about' | '/simple' | '/slide' | '/table' | '/auth/$path'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
     | '/about'
+    | '/simple'
     | '/slide'
-    | '/_authenticated/simple'
-    | '/_authenticated/table'
+    | '/table'
     | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  SimpleRoute: typeof SimpleRoute
   SlideRoute: typeof SlideRoute
+  TableRoute: typeof TableRoute
   AuthPathRoute: typeof AuthPathRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/table': {
+      id: '/table'
+      path: '/table'
+      fullPath: '/table'
+      preLoaderRoute: typeof TableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/slide': {
       id: '/slide'
       path: '/slide'
@@ -111,18 +112,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SlideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/simple': {
+      id: '/simple'
+      path: '/simple'
+      fullPath: '/simple'
+      preLoaderRoute: typeof SimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -139,42 +140,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthPathRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/table': {
-      id: '/_authenticated/table'
-      path: '/table'
-      fullPath: '/table'
-      preLoaderRoute: typeof AuthenticatedTableRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/simple': {
-      id: '/_authenticated/simple'
-      path: '/simple'
-      fullPath: '/simple'
-      preLoaderRoute: typeof AuthenticatedSimpleRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedSimpleRoute: typeof AuthenticatedSimpleRoute
-  AuthenticatedTableRoute: typeof AuthenticatedTableRoute
-}
-
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedSimpleRoute: AuthenticatedSimpleRoute,
-  AuthenticatedTableRoute: AuthenticatedTableRoute,
-}
-
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  SimpleRoute: SimpleRoute,
   SlideRoute: SlideRoute,
+  TableRoute: TableRoute,
   AuthPathRoute: AuthPathRoute,
 }
 export const routeTree = rootRouteImport

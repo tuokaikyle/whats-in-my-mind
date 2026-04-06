@@ -100,7 +100,33 @@ select
 order by created date
 click catetory, open from down
 color set ready
+add effort, deadline
+slide - 100% should toggle complete. 
+please tell me if using tanstack form and a state manager like zustland would make thing easier? 
+
+now go back to point 1: please use the types that I defined in apps/web/src/utils/types.ts in Simple, Table and Slide 
+
+Can I do not set the completed boolean from the frontend, but only set the progress? for example, in Simple and Table, if I toggle the checkbox, it toggles the progress value to be 0 and 100. the completed value in db automatically sets to true if the progress value is 100, and false if the progress is less than 100. 
+
+deadline -> duedate
 
 
-大多数免费
-少数收费
+原则
+一定是可以未登陆尝试
+一定有原始数据
+最好能尝试所有页面 所有功能
+同步 不一定有 就让它存在于local
+得有sample data
+anonymous plugin 
+have stats on how many users
+
+strategies:
+react state
+local storage - no sync
+local storage - with sync
+anonymous account
+
+think:
+one model multiple views
+or 
+multi models multi views
