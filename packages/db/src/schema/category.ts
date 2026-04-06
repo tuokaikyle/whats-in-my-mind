@@ -8,6 +8,7 @@ export const category = pgTable(
   {
     id: serial('id').primaryKey(),
     name: text('name').notNull(),
+    color: text('color'),
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),

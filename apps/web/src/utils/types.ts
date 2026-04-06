@@ -23,3 +23,8 @@ export type TableTask = Omit<BaseTask, 'updatedAt'>
 export type SlideTask = BaseTask & {
   progress: number;
 }
+
+export type BubbleTask = BaseTask & {
+  effort: number;
+  categoryId: number | null;
+}
