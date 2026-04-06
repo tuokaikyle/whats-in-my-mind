@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,10 +10,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { AddCategory } from '@/components/add-category';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useTodos } from '@/hooks/use-todos';
+import { trpc } from '@/utils/trpc';
 
 export const Route = createFileRoute('/_authenticated/table')({
   component: RichTodosRoute,
@@ -20,10 +30,12 @@ export const Route = createFileRoute('/_authenticated/table')({
 
 function RichTodosRoute() {
   const [newTodoText, setNewTodoText] = useState('');
-  const [newCategory, setNewCategory] = useState('');
   const [newImportance, setNewImportance] = useState('3');
   const [newProgress, setNewProgress] = useState('0');
+  const [newCategoryId, setNewCategoryId] = useState<number | undefined>();
+  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const { todos, createMutation, updateMutation, deleteMutation } = useTodos();
+  const { data: categories = [] } = useQuery(trpc.category.getAll.queryOptions());
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,14 +45,12 @@ function RichTodosRoute() {
       createMutation.mutate(
         {
           text: newTodoText,
-          category: newCategory || undefined,
           importance: Number.isNaN(importance) ? undefined : importance,
           progress: Number.isNaN(progress) ? undefined : progress,
         },
         {
           onSuccess: () => {
             setNewTodoText('');
-            setNewCategory('');
             setNewImportance('3');
             setNewProgress('0');
           },
@@ -69,7 +79,7 @@ function RichTodosRoute() {
         <CardHeader>
           <CardTitle>Rich Todo List</CardTitle>
           <CardDescription>
-            Manage your tasks with categories, importance, and progress tracking
+            Manage your tasks with importance and progress tracking
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -82,17 +92,6 @@ function RichTodosRoute() {
                   value={newTodoText}
                   onChange={(e) => setNewTodoText(e.target.value)}
                   placeholder="Enter task description..."
-                  disabled={createMutation.isPending}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Input
-                  id="category"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="e.g., Work, Personal, Health"
                   disabled={createMutation.isPending}
                 />
               </div>
@@ -121,6 +120,60 @@ function RichTodosRoute() {
                   onChange={(e) => setNewProgress(e.target.value)}
                   disabled={createMutation.isPending}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select
+                  onValueChange={(value) => {
+                    if (value === '__add_new__') {
+                      setAddCategoryOpen(true);
+                      return;
+                    }
+                    if (value === 'none') {
+                      setNewCategoryId(undefined);
+                    } else {
+                      setNewCategoryId(parseInt(value));
+                    }
+                  }}
+                  value={newCategoryId?.toString() || 'none'}
+                  disabled={createMutation.isPending}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" side="bottom" sideOffset={2}>
+                    <SelectItem value="none">No category</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="inline-block h-2.5 w-2.5 rounded-full"
+                            style={{ backgroundColor: category.color ?? '#9ca3af' }}
+                            aria-hidden="true"
+                          />
+                          {category.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                    <div className="border-t pt-1 mt-1">
+                      <button
+                        type="button"
+                        className="flex w-full items-center px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          setAddCategoryOpen(true);
+                        }}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add new category
+                      </button>
+                    </div>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -161,21 +214,12 @@ function RichTodosRoute() {
                       <div className="flex-1 space-y-1">
                         <label
                           htmlFor={`todo-${todo.id}`}
-                          className={`text-base font-medium cursor-pointer ${
-                            todo.completed ? 'line-through text-muted-foreground' : ''
-                          }`}
+                          className={`text-base font-medium cursor-pointer ${todo.completed ? 'line-through text-muted-foreground' : ''
+                            }`}
                         >
                           {todo.text}
                         </label>
                         <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                          {todo.category && (
-                            <span className="inline-flex items-center gap-1">
-                              <span className="font-medium">Category:</span>
-                              <span className="px-2 py-0.5 bg-secondary rounded">
-                                {todo.category}
-                              </span>
-                            </span>
-                          )}
                           {todo.importance && (
                             <span className="inline-flex items-center gap-1">
                               <span className="font-medium">Importance:</span>
@@ -213,6 +257,8 @@ function RichTodosRoute() {
           )}
         </CardContent>
       </Card>
+
+      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
     </div>
   );
 }

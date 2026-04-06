@@ -90,7 +90,16 @@ flip - easy
 heatmap
 grid
 
-category table should be managed by user-preferences
+user-preferences
+category table
+color set
+
+react hook form
+select
+
+order by created date
+click catetory, open from down
+color set ready
 
 
 大多数免费
