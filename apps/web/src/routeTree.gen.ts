@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TableRouteImport } from './routes/table'
 import { Route as SlideRouteImport } from './routes/slide'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
@@ -29,6 +30,11 @@ const SlideRoute = SlideRouteImport.update({
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BubbleRoute = BubbleRouteImport.update({
+  id: '/bubble',
+  path: '/bubble',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -50,6 +56,7 @@ const AuthPathRoute = AuthPathRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bubble': typeof BubbleRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bubble': typeof BubbleRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/bubble': typeof BubbleRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -74,13 +83,28 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/simple' | '/slide' | '/table' | '/auth/$path'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/bubble'
+    | '/simple'
+    | '/slide'
+    | '/table'
+    | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/simple' | '/slide' | '/table' | '/auth/$path'
+  to:
+    | '/'
+    | '/about'
+    | '/bubble'
+    | '/simple'
+    | '/slide'
+    | '/table'
+    | '/auth/$path'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/bubble'
     | '/simple'
     | '/slide'
     | '/table'
@@ -90,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BubbleRoute: typeof BubbleRoute
   SimpleRoute: typeof SimpleRoute
   SlideRoute: typeof SlideRoute
   TableRoute: typeof TableRoute
@@ -119,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimpleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bubble': {
+      id: '/bubble'
+      path: '/bubble'
+      fullPath: '/bubble'
+      preLoaderRoute: typeof BubbleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -146,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BubbleRoute: BubbleRoute,
   SimpleRoute: SimpleRoute,
   SlideRoute: SlideRoute,
   TableRoute: TableRoute,
