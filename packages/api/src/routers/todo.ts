@@ -1,4 +1,4 @@
-import { and, eq } from '@whats-in-my-mind/db';
+import { and, asc, eq } from '@whats-in-my-mind/db';
 import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
 import { protectedProcedure, router } from '../index';
@@ -19,7 +19,8 @@ export const todoRouter = router({
         updatedAt: todo.updatedAt,
       })
       .from(todo)
-      .where(eq(todo.userId, ctx.session.user.id));
+      .where(eq(todo.userId, ctx.session.user.id))
+      .orderBy(asc(todo.createdAt), asc(todo.id));
   }),
 
   create: protectedProcedure
