@@ -1,11 +1,12 @@
-import { authClient } from '@/lib/auth-client';
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import HighchartsReact from 'highcharts-react-official';
+import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
+import HighchartsReact from 'highcharts-react-official';
+import { useState } from 'react';
+import { AddCategory } from '@/components/add-category';
+import { AddTaskDrawer } from '@/components/add-task-drawer';
+import { GuestBanner } from '@/components/guest-banner';
+import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import {
   Select,
@@ -14,117 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AddCategory } from '@/components/add-category';
-import { AddTaskDrawer, type AddTaskData } from '@/components/add-task-drawer';
-import { useTodos } from '@/hooks/use-todos';
-import { trpc } from '@/utils/trpc';
-import { sampleData, sampleCategories } from '@/utils/sampleData';
-import type { TableTask } from '@/utils/types';
+import { useCategories, useTodos } from '@/hooks/use-todos';
+import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/bubble')({
   component: BubblePage,
 });
 
 type Metric = 'importance' | 'effort';
-type CategoryItem = { id: number; name: string; color: string | null };
 
-// ─── Page router ─────────────────────────────────────────────────────────────
-
-function BubblePage() {
-  const { data: session, isPending } = authClient.useSession();
-
-  if (isPending) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
-
-  return session ? <BubbleAuthenticated /> : <BubbleGuest />;
-}
-
-// ─── Authenticated ────────────────────────────────────────────────────────────
-
-function BubbleAuthenticated() {
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const { todos, createMutation } = useTodos();
-  const { data: categories = [] } = useQuery(trpc.category.getAll.queryOptions());
-
-  return (
-    <>
-      <BubbleView
-        todos={(todos.data ?? []) as TableTask[]}
-        todosLoading={todos.isLoading}
-        categories={categories}
-        isGuest={false}
-      />
-      <AddTaskDrawer
-        categories={categories}
-        onSubmit={(data) => createMutation.mutate(data)}
-        isPending={createMutation.isPending}
-        onAddCategory={() => setAddCategoryOpen(true)}
-      />
-      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
-    </>
-  );
-}
-
-// ─── Guest ────────────────────────────────────────────────────────────────────
-
-function BubbleGuest() {
-  const [todos, setTodos] = useState<TableTask[]>(sampleData);
-  const [nextId, setNextId] = useState(
-    Math.max(...sampleData.map((t) => t.id)) + 1,
-  );
-
-  const handleAddTodo = (data: AddTaskData) => {
-    const now = new Date().toISOString();
-    setTodos((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        text: data.text,
-        completed: false,
-        importance: data.importance ?? null,
-        effort: data.effort ?? null,
-        progress: data.progress ?? 0,
-        deadline: data.deadline ?? null,
-        categoryId: data.categoryId ?? null,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ]);
-    setNextId((prev) => prev + 1);
-  };
-
-  return (
-    <>
-      <BubbleView
-        todos={todos}
-        todosLoading={false}
-        categories={sampleCategories}
-        isGuest
-      />
-      <AddTaskDrawer
-        categories={sampleCategories}
-        onSubmit={handleAddTodo}
-      />
-    </>
-  );
-}
-
-// ─── Shared view ──────────────────────────────────────────────────────────────
-
-interface BubbleViewProps {
-  todos: TableTask[];
-  todosLoading: boolean;
-  categories: CategoryItem[];
-  isGuest: boolean;
-}
-
-function buildSeries(todos: TableTask[], categories: CategoryItem[], metric: Metric) {
-  const getValue = (t: TableTask) =>
+function buildSeries(todos: Task[], categories: Category[], metric: Metric) {
+  const getValue = (t: Task) =>
     (metric === 'importance' ? t.importance : t.effort) ?? 1;
 
   const categorySeries = categories.map((category) => ({
@@ -151,8 +52,11 @@ function buildSeries(todos: TableTask[], categories: CategoryItem[], metric: Met
   return categorySeries;
 }
 
-function BubbleView({ todos, todosLoading, categories, isGuest }: BubbleViewProps) {
+function BubblePage() {
+  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [metric, setMetric] = useState<Metric>('importance');
+  const { todos, todosLoading, createMutation, isGuest } = useTodos();
+  const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
@@ -168,7 +72,9 @@ function BubbleView({ todos, todosLoading, categories, isGuest }: BubbleViewProp
       type: 'packedbubble',
       height: '80%',
       backgroundColor: 'transparent',
-      style: { fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif' },
+      style: {
+        fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
+      },
     },
     title: {
       text: "What's in my mind",
@@ -202,52 +108,57 @@ function BubbleView({ todos, todosLoading, categories, isGuest }: BubbleViewProp
         },
       },
     },
-    series: buildSeries(activeTodos, categories, metric) as Highcharts.SeriesOptionsType[],
+    series: buildSeries(
+      activeTodos,
+      categories,
+      metric,
+    ) as Highcharts.SeriesOptionsType[],
     credits: { enabled: false },
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl py-10 px-4 space-y-6">
-      {isGuest && (
-        <div className="rounded-md border border-dashed p-3 text-center text-sm text-muted-foreground">
-          This is a demo with sample data.{' '}
-          <Link
-            to="/auth/$path"
-            params={{ path: 'sign-in' }}
-            className="font-medium underline underline-offset-4 hover:text-primary"
-          >
-            Sign in
-          </Link>{' '}
-          to save your work.
-        </div>
-      )}
+    <>
+      <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-10">
+        {isGuest && <GuestBanner />}
 
-      {todosLoading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : activeTodos.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">
-          No tasks yet. Use the + button to add one!
-        </p>
-      ) : (
-        <>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Bubble size:</span>
-            <Select value={metric} onValueChange={(v) => setMetric(v as Metric)}>
-              <SelectTrigger className="w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="importance">Importance</SelectItem>
-                <SelectItem value="effort">Effort</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {todosLoading ? (
+          <PageLoader size="lg" />
+        ) : activeTodos.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">
+            No tasks yet. Use the + button to add one!
+          </p>
+        ) : (
+          <>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground text-sm">
+                Bubble size:
+              </span>
+              <Select
+                value={metric}
+                onValueChange={(v) => setMetric(v as Metric)}
+              >
+                <SelectTrigger className="w-36">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="importance">Importance</SelectItem>
+                  <SelectItem value="effort">Effort</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </>
-      )}
-    </div>
+            <HighchartsReact highcharts={Highcharts} options={options} />
+          </>
+        )}
+      </div>
+
+      <AddTaskDrawer
+        categories={categories}
+        onSubmit={(data) => createMutation.mutate(data)}
+        isPending={createMutation.isPending}
+        onAddCategory={() => setAddCategoryOpen(true)}
+      />
+      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
+    </>
   );
 }

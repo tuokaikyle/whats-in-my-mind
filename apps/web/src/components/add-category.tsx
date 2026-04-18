@@ -1,4 +1,3 @@
-import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { queryClient, trpc } from '@/utils/trpc';
+import { useCategories } from '@/hooks/use-todos';
 
 interface AddCategoryProps {
   open: boolean;
@@ -21,30 +20,29 @@ interface AddCategoryProps {
 export function AddCategory({ open, onOpenChange }: AddCategoryProps) {
   const [name, setName] = useState('');
   const [color, setColor] = useState('#6366f1');
-
-  const createMutation = useMutation(
-    trpc.category.create.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.category.getAll.queryOptions().queryKey,
-        });
-        toast.success('Category created successfully!');
-        setName('');
-        setColor('#6366f1');
-        onOpenChange(false);
-      },
-      onError: (error) => {
-        toast.error(
-          error instanceof Error ? error.message : 'Failed to create category',
-        );
-      },
-    }),
-  );
+  const { createMutation } = useCategories();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    createMutation.mutate({ name: name.trim(), color });
+    createMutation.mutate(
+      { name: name.trim(), color },
+      {
+        onSuccess: () => {
+          toast.success('Category created successfully!');
+          setName('');
+          setColor('#6366f1');
+          onOpenChange(false);
+        },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : 'Failed to create category',
+          );
+        },
+      },
+    );
   };
 
   return (
@@ -73,7 +71,7 @@ export function AddCategory({ open, onOpenChange }: AddCategoryProps) {
             <div className="flex items-center space-x-2">
               <Input
                 type="color"
-                className="w-16 h-10 p-1 rounded cursor-pointer"
+                className="h-10 w-16 cursor-pointer rounded p-1"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
                 disabled={createMutation.isPending}
@@ -87,7 +85,7 @@ export function AddCategory({ open, onOpenChange }: AddCategoryProps) {
                 disabled={createMutation.isPending}
               />
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Choose a color to identify this category
             </p>
           </div>

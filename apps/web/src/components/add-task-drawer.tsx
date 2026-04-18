@@ -1,5 +1,5 @@
+import { Loader2, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +18,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import type { Category } from '@/utils/types';
 
 export type AddTaskData = {
   text: string;
@@ -28,12 +29,10 @@ export type AddTaskData = {
   deadline?: string | null;
 };
 
-type CategoryItem = { id: number; name: string; color: string | null };
-
 const RATING_OPTIONS = ['1', '2', '3', '4', '5'] as const;
 
 interface AddTaskDrawerProps {
-  categories: CategoryItem[];
+  categories: Category[];
   onSubmit: (data: AddTaskData) => void;
   isPending?: boolean;
   onAddCategory?: () => void;
@@ -69,9 +68,9 @@ export function AddTaskDrawer({
     onSubmit({
       text: text.trim(),
       categoryId: categoryId ?? null,
-      importance: Number.parseInt(importance),
-      effort: Number.parseInt(effort),
-      progress: Number.parseInt(progress),
+      importance: Number.parseInt(importance, 10),
+      effort: Number.parseInt(effort, 10),
+      progress: Number.parseInt(progress, 10),
       deadline: deadline ? new Date(deadline).toISOString() : null,
     });
 
@@ -130,7 +129,7 @@ export function AddTaskDrawer({
                     <SelectContent>
                       {RATING_OPTIONS.map((v) => (
                         <SelectItem key={v} value={v}>
-                          {v} {'⭐'.repeat(Number(v))}
+                          {v}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -190,7 +189,7 @@ export function AddTaskDrawer({
                   value={categoryId?.toString() ?? 'none'}
                   onValueChange={(v) =>
                     setCategoryId(
-                      v === 'none' ? undefined : Number.parseInt(v),
+                      v === 'none' ? undefined : Number.parseInt(v, 10),
                     )
                   }
                   disabled={isPending}

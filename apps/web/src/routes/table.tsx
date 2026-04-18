@@ -1,14 +1,22 @@
-import { authClient } from '@/lib/auth-client';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Loader2, MoreHorizontal } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import {
+  CheckCircle2,
+  MoreHorizontal,
+  SquareCheckBig,
+  SquareDashed,
+  Trash2,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { AddCategory } from '@/components/add-category';
+import { AddTaskDrawer } from '@/components/add-task-drawer';
+import { GuestBanner } from '@/components/guest-banner';
+import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,11 +25,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AddCategory } from '@/components/add-category';
-import { AddTaskDrawer, type AddTaskData } from '@/components/add-task-drawer';
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -36,160 +41,86 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useTodos } from '@/hooks/use-todos';
-import { trpc } from '@/utils/trpc';
-import { sampleData, sampleCategories } from '@/utils/sampleData';
-import type { TableTask } from '@/utils/types';
+import { useCategories, useTodos } from '@/hooks/use-todos';
+import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/table')({
   component: TablePage,
 });
 
 function TablePage() {
-  const { data: session, isPending } = authClient.useSession();
-
-  if (isPending) {
-    return (
-      <div className="flex justify-center py-10">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
-
-  return session ? <TableAuthenticated /> : <TableGuest />;
-}
-
-function TableAuthenticated() {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const { todos, createMutation, updateMutation, deleteMutation } = useTodos();
-  const { data: categories = [] } = useQuery(trpc.category.getAll.queryOptions());
-
-  return (
-    <>
-      <TableContent
-        todos={(todos.data ?? []) as TableTask[]}
-        todosLoading={todos.isLoading}
-        isGuest={false}
-        onToggleTodo={(id, completed) =>
-          updateMutation.mutate({ id, completed: !completed })
-        }
-        onDeleteTodo={(id) => deleteMutation.mutate({ id })}
-      />
-      <AddTaskDrawer
-        categories={categories}
-        onSubmit={(data) => createMutation.mutate(data)}
-        isPending={createMutation.isPending}
-        onAddCategory={() => setAddCategoryOpen(true)}
-      />
-      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
-    </>
+  const {
+    todos,
+    todosLoading,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+    isGuest,
+  } = useTodos();
+  const { categories } = useCategories();
+  const categoryById = useMemo(
+    () => new Map(categories.map((category) => [category.id, category])),
+    [categories],
   );
-}
-
-function TableGuest() {
-  const [todos, setTodos] = useState<TableTask[]>(sampleData);
-  const [nextId, setNextId] = useState(
-    Math.max(...sampleData.map((t) => t.id)) + 1,
-  );
-
-  const handleAddTodo = (data: AddTaskData) => {
-    const now = new Date().toISOString();
-    setTodos((prev) => [
-      ...prev,
-      {
-        id: nextId,
-        text: data.text,
-        completed: false,
-        importance: data.importance ?? null,
-        progress: data.progress ?? 0,
-        effort: data.effort ?? null,
-        deadline: data.deadline ?? null,
-        categoryId: data.categoryId ?? null,
-        createdAt: now,
-        updatedAt: now,
-      },
-    ]);
-    setNextId((prev) => prev + 1);
-  };
-
-  return (
-    <>
-      <TableContent
-        todos={todos}
-        todosLoading={false}
-        isGuest
-        onToggleTodo={(id, completed) =>
-          setTodos((prev) =>
-            prev.map((t) =>
-              t.id === id ? { ...t, completed: !completed } : t,
-            ),
-          )
-        }
-        onDeleteTodo={(id) =>
-          setTodos((prev) => prev.filter((t) => t.id !== id))
-        }
-      />
-      <AddTaskDrawer
-        categories={sampleCategories}
-        onSubmit={handleAddTodo}
-      />
-    </>
-  );
-}
-
-interface TableContentProps {
-  todos: TableTask[];
-  todosLoading: boolean;
-  isGuest: boolean;
-  onToggleTodo: (id: number, completed: boolean) => void;
-  onDeleteTodo: (id: number) => void;
-}
-
-function TableContent({
-  todos,
-  todosLoading,
-  isGuest,
-  onToggleTodo,
-  onDeleteTodo,
-}: TableContentProps) {
-  const getImportanceLabel = (importance?: number | null) => {
-    if (!importance) return '';
-    const labels = ['', '⭐', '⭐⭐', '⭐⭐⭐', '⭐⭐⭐⭐', '⭐⭐⭐⭐⭐'];
-    return labels[importance] || '';
-  };
-
-  const columns = useMemo<ColumnDef<TableTask>[]>(
+  const columns = useMemo<ColumnDef<Task>[]>(
     () => [
       {
         accessorKey: 'text',
         header: 'Task',
-        cell: ({ row }) => {
-          const todo = row.original;
-          return (
-            <span
-              className={
-                todo.completed ? 'line-through text-muted-foreground' : 'font-medium'
-              }
-            >
-              {todo.text}
-            </span>
-          );
-        },
+        cell: ({ row }) => (
+          <span
+            className={
+              row.original.completed
+                ? 'text-muted-foreground line-through'
+                : 'font-medium'
+            }
+          >
+            {row.original.text}
+          </span>
+        ),
       },
       {
         accessorKey: 'completed',
         header: 'Status',
         cell: ({ row }) =>
           row.original.completed ? (
-            <span className="text-xs font-medium text-emerald-600">Completed</span>
+            <span className="font-medium text-emerald-600 text-xs">
+              Completed
+            </span>
           ) : (
-            <span className="text-xs text-muted-foreground">Active</span>
+            <span className="text-muted-foreground text-xs">Active</span>
           ),
+      },
+      {
+        accessorKey: 'categoryId',
+        header: 'Category',
+        cell: ({ row }) => {
+          const categoryId = row.original.categoryId;
+          if (categoryId === null) return '-';
+          const category = categoryById.get(categoryId);
+          if (!category) return '-';
+          return (
+            <span
+              className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+              style={{
+                backgroundColor: `${category.color ?? '#9ca3af'}22`,
+                color: category.color ?? '#64748b',
+              }}
+            >
+              {category.name}
+            </span>
+          );
+        },
       },
       {
         accessorKey: 'importance',
         header: 'Importance',
-        cell: ({ row }) => getImportanceLabel(row.original.importance) || '-',
+        cell: ({ row }) => {
+          const importance = row.original.importance;
+          if (!importance) return '-';
+          return <span className="text-sm">{importance}</span>;
+        },
       },
       {
         accessorKey: 'progress',
@@ -212,7 +143,8 @@ function TableContent({
       {
         accessorKey: 'createdAt',
         header: 'Created',
-        cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+        cell: ({ row }) =>
+          new Date(row.original.createdAt).toLocaleDateString(),
       },
       {
         id: 'actions',
@@ -227,19 +159,31 @@ function TableContent({
                   <span className="sr-only">Open actions</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="start" side="right">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={todo.completed}
-                  onCheckedChange={() => onToggleTodo(todo.id, todo.completed)}
+                <DropdownMenuItem
+                  onClick={() =>
+                    updateMutation.mutate({
+                      id: todo.id,
+                      completed: !todo.completed,
+                    })
+                  }
                 >
-                  Completed
-                </DropdownMenuCheckboxItem>
+                  {todo.completed ? (
+                    <SquareDashed className="mr-2 h-4 w-4" />
+                  ) : (
+                    <SquareCheckBig className="mr-2 h-4 w-4" />
+                  )}
+                  {todo.completed
+                    ? 'Mark as not Completed'
+                    : 'Mark as Completed'}
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   variant="destructive"
-                  onClick={() => onDeleteTodo(todo.id)}
+                  onClick={() => deleteMutation.mutate({ id: todo.id })}
                 >
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Delete task
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -248,7 +192,7 @@ function TableContent({
         },
       },
     ],
-    [onDeleteTodo, onToggleTodo],
+    [updateMutation, deleteMutation, categoryById],
   );
 
   const table = useReactTable({
@@ -258,70 +202,69 @@ function TableContent({
   });
 
   return (
-    <div className="mx-auto w-full max-w-4xl py-10 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Rich Todo List</CardTitle>
-          <CardDescription>
-            Manage your tasks with importance and progress tracking
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isGuest && (
-            <div className="mb-4 rounded-md border border-dashed p-3 text-center text-sm text-muted-foreground">
-              This is a demo with sample data.{' '}
-              <Link
-                to="/auth/$path"
-                params={{ path: 'sign-in' }}
-                className="font-medium underline underline-offset-4 hover:text-primary"
-              >
-                Sign in
-              </Link>{' '}
-              to save your work.
-            </div>
-          )}
+    <>
+      <div className="mx-auto w-full max-w-7xl px-4 py-10">
+        <Card>
+          <CardHeader>
+            <CardTitle>Rich Todo List</CardTitle>
+            <CardDescription>
+              Manage your tasks with importance and progress tracking
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isGuest && <GuestBanner className="mb-4" />}
 
-          {todosLoading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : todos.length === 0 ? (
-            <p className="py-8 text-center text-muted-foreground">
-              No tasks yet. Use the + button to add one!
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
+            {todosLoading ? (
+              <PageLoader size="lg" />
+            ) : todos.length === 0 ? (
+              <p className="py-8 text-center text-muted-foreground">
+                No tasks yet. Use the + button to add one!
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
                               header.column.columnDef.header,
                               header.getContext(),
                             )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                        </TableHead>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <AddTaskDrawer
+        categories={categories}
+        onSubmit={(input) => createMutation.mutate(input)}
+        isPending={createMutation.isPending}
+        onAddCategory={() => setAddCategoryOpen(true)}
+      />
+      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
+    </>
   );
 }

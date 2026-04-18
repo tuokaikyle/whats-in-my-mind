@@ -46,10 +46,16 @@ now seeing
 ]
 
 ## features
+
+The features of this app are:
 1. this app is designed to be one model but can be presented in different views - it means one row in the database can be presented differently in the UI. Some views, like table.tsx can display all the attributes of a row, where other views only display some attributes. 
-2. a task can also be added from different views.
-3. if a task is updated from one view, the updated task should be ready for all views. 
-4. if not signed in, some demo data will be loaded and the user can play around with it. if signed in, user's data will be saved to the database.
+2. if not signed in, some demo data will be loaded and the user can play around with it and the data not not stay. if signed in, user will be interacting with the database.
+3. a task can be added from different views.
+4. if a task is updated from one view, the updated task should be ready for all views. 
+5. I may add other views in the future. 
+
+can you identify places where code can be simplified - especially that I have some code repeats where I treat guest users and signed in users differently. 
+also tell me other places things can be improved. is a state manager needed? is react hook form or formik needed? 
 
 
 
@@ -64,3 +70,6 @@ category management
 
 add cypress
 
+deadline -> due date
+
+test view 1 and view 2

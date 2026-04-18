@@ -50,8 +50,8 @@ export const sidebarData = {
       icon: Bubbles,
     },
     {
-      title: 'Veroni',
-      url: '/veroni',
+      title: 'Voronoi',
+      url: '/voronoi',
       icon: BrainCircuit,
     },
     {
