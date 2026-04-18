@@ -45,6 +45,14 @@ now seeing
     }
 ]
 
+## features
+1. this app is designed to be one model but can be presented in different views - it means one row in the database can be presented differently in the UI. Some views, like table.tsx can display all the attributes of a row, where other views only display some attributes. 
+2. a task can also be added from different views.
+3. if a task is updated from one view, the updated task should be ready for all views. 
+4. if not signed in, some demo data will be loaded and the user can play around with it. if signed in, user's data will be saved to the database.
+
+
+
 fixed by:
 Fix can't get todo	613d160	tuokaikyle <kaituo@outlook.com>	18 Jan 2026 at 10:48 pm
 

@@ -1,8 +1,14 @@
 import { authClient } from '@/lib/auth-client';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Loader2, Trash2 } from 'lucide-react';
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
+import { Loader2, MoreHorizontal } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,7 +19,23 @@ import {
 } from '@/components/ui/card';
 import { AddCategory } from '@/components/add-category';
 import { AddTaskDrawer, type AddTaskData } from '@/components/add-task-drawer';
-import { Checkbox } from '@/components/ui/checkbox';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useTodos } from '@/hooks/use-todos';
 import { trpc } from '@/utils/trpc';
 import { sampleData, sampleCategories } from '@/utils/sampleData';
@@ -136,6 +158,105 @@ function TableContent({
     return labels[importance] || '';
   };
 
+  const columns = useMemo<ColumnDef<TableTask>[]>(
+    () => [
+      {
+        accessorKey: 'text',
+        header: 'Task',
+        cell: ({ row }) => {
+          const todo = row.original;
+          return (
+            <span
+              className={
+                todo.completed ? 'line-through text-muted-foreground' : 'font-medium'
+              }
+            >
+              {todo.text}
+            </span>
+          );
+        },
+      },
+      {
+        accessorKey: 'completed',
+        header: 'Status',
+        cell: ({ row }) =>
+          row.original.completed ? (
+            <span className="text-xs font-medium text-emerald-600">Completed</span>
+          ) : (
+            <span className="text-xs text-muted-foreground">Active</span>
+          ),
+      },
+      {
+        accessorKey: 'importance',
+        header: 'Importance',
+        cell: ({ row }) => getImportanceLabel(row.original.importance) || '-',
+      },
+      {
+        accessorKey: 'progress',
+        header: 'Progress',
+        cell: ({ row }) => `${row.original.progress}%`,
+      },
+      {
+        accessorKey: 'effort',
+        header: 'Effort',
+        cell: ({ row }) => row.original.effort ?? '-',
+      },
+      {
+        accessorKey: 'deadline',
+        header: 'Deadline',
+        cell: ({ row }) =>
+          row.original.deadline
+            ? new Date(row.original.deadline).toLocaleDateString()
+            : '-',
+      },
+      {
+        accessorKey: 'createdAt',
+        header: 'Created',
+        cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString(),
+      },
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Actions</span>,
+        cell: ({ row }) => {
+          const todo = row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Open actions</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuCheckboxItem
+                  checked={todo.completed}
+                  onCheckedChange={() => onToggleTodo(todo.id, todo.completed)}
+                >
+                  Completed
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => onDeleteTodo(todo.id)}
+                >
+                  Delete task
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      },
+    ],
+    [onDeleteTodo, onToggleTodo],
+  );
+
+  const table = useReactTable({
+    data: todos,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return (
     <div className="mx-auto w-full max-w-4xl py-10 px-4">
       <Card>
@@ -169,86 +290,35 @@ function TableContent({
               No tasks yet. Use the + button to add one!
             </p>
           ) : (
-            <div className="space-y-3">
-              {todos.map((todo) => (
-                <Card key={todo.id} className="p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 flex-1">
-                      <Checkbox
-                        checked={todo.completed}
-                        onCheckedChange={() =>
-                          onToggleTodo(todo.id, todo.completed)
-                        }
-                        id={`todo-${todo.id}`}
-                        className="mt-1"
-                      />
-                      <div className="flex-1 space-y-1">
-                        <label
-                          htmlFor={`todo-${todo.id}`}
-                          className={`text-base font-medium cursor-pointer ${
-                            todo.completed
-                              ? 'line-through text-muted-foreground'
-                              : ''
-                          }`}
-                        >
-                          {todo.text}
-                        </label>
-                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                          {todo.importance && (
-                            <span className="inline-flex items-center gap-1">
-                              <span className="font-medium">Importance:</span>
-                              <span>
-                                {getImportanceLabel(todo.importance)}
-                              </span>
-                            </span>
-                          )}
-                          {todo.progress !== null &&
-                            todo.progress !== undefined && (
-                              <span className="inline-flex items-center gap-1">
-                                <span className="font-medium">Progress:</span>
-                                <span className="px-2 py-0.5 bg-secondary rounded">
-                                  {todo.progress}%
-                                </span>
-                              </span>
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
                             )}
-                          {todo.effort !== null &&
-                            todo.effort !== undefined && (
-                              <span className="inline-flex items-center gap-1">
-                                <span className="font-medium">Effort:</span>
-                                <span className="px-2 py-0.5 bg-secondary rounded">
-                                  {todo.effort}
-                                </span>
-                              </span>
-                            )}
-                          {todo.deadline && (
-                            <span className="inline-flex items-center gap-1">
-                              <span className="font-medium">Deadline:</span>
-                              <span className="px-2 py-0.5 bg-secondary rounded">
-                                {new Date(todo.deadline).toLocaleDateString()}
-                              </span>
-                            </span>
-                          )}
-                        </div>
-                        {todo.createdAt && (
-                          <div className="text-xs text-muted-foreground">
-                            Created:{' '}
-                            {new Date(todo.createdAt).toLocaleString()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDeleteTodo(todo.id)}
-                      aria-label="Delete task"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
