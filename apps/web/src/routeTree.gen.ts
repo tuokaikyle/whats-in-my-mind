@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoronoiRouteImport } from './routes/voronoi'
 import { Route as TableRouteImport } from './routes/table'
 import { Route as SlideRouteImport } from './routes/slide'
 import { Route as SimpleRouteImport } from './routes/simple'
@@ -17,6 +18,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
+const VoronoiRoute = VoronoiRouteImport.update({
+  id: '/voronoi',
+  path: '/voronoi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TableRoute = TableRouteImport.update({
   id: '/table',
   path: '/table',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
+  '/voronoi': typeof VoronoiRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
+  '/voronoi': typeof VoronoiRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
+  '/voronoi': typeof VoronoiRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/simple'
     | '/slide'
     | '/table'
+    | '/voronoi'
     | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/simple'
     | '/slide'
     | '/table'
+    | '/voronoi'
     | '/auth/$path'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/simple'
     | '/slide'
     | '/table'
+    | '/voronoi'
     | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
@@ -118,11 +130,19 @@ export interface RootRouteChildren {
   SimpleRoute: typeof SimpleRoute
   SlideRoute: typeof SlideRoute
   TableRoute: typeof TableRoute
+  VoronoiRoute: typeof VoronoiRoute
   AuthPathRoute: typeof AuthPathRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voronoi': {
+      id: '/voronoi'
+      path: '/voronoi'
+      fullPath: '/voronoi'
+      preLoaderRoute: typeof VoronoiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/table': {
       id: '/table'
       path: '/table'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   SimpleRoute: SimpleRoute,
   SlideRoute: SlideRoute,
   TableRoute: TableRoute,
+  VoronoiRoute: VoronoiRoute,
   AuthPathRoute: AuthPathRoute,
 }
 export const routeTree = rootRouteImport

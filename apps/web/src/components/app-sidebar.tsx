@@ -1,6 +1,6 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
-import { BrainCircuit, Bubbles, ClipboardCheck, Command, FileCheck, FileCheckIcon, FileText, Grid2X2, HomeIcon, Info, PanelLeft, Satellite, SquareArrowRight, SquareSplitVertical, SquareTerminal, Table2 } from 'lucide-react';
+import { Box, Brain, BrainCircuit, Bubbles, Calendar, Calendar1, CalendarDays, ClipboardCheck, Command, Construction, FileCheck, FileCheckIcon, FileText, Grid2X2, HomeIcon, Info, PanelLeft, Satellite, SquareArrowRight, SquareSplitVertical, SquareTerminal, Table2, ToyBrick } from 'lucide-react';
 import type * as React from 'react';
 import { NavMain } from '@/components/nav-main';
 import {
@@ -52,7 +52,7 @@ export const sidebarData = {
     {
       title: 'Voronoi',
       url: '/voronoi',
-      icon: BrainCircuit,
+      icon: Brain,
     },
     {
       title: 'Flip',
@@ -60,18 +60,24 @@ export const sidebarData = {
       icon: SquareSplitVertical,
     },
     {
-      title: 'Heatmap',
-      url: '/heatmap',
+      title: '3D',
+      url: '/3d',
+      icon: Box
+    },
+    {
+      title: 'Grid',
+      url: '/grid',
       icon: Grid2X2,
       items: [
         {
-          title: 'Github',
-          url: '/heatmap/github',
+          title: 'Stack',
+          url: '/grid/stack',
         },
         {
-          title: '3D',
-          url: '/heatmap/3d',
-        }],
+          title: 'Besieged',
+          url: '/grid/besieged',
+        }
+      ],
     },
     {
       title: 'About',

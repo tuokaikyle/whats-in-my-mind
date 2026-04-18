@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Check, Trash2 } from 'lucide-react';
+import { Check, Circle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { AddCategory } from '@/components/add-category';
 import { AddTaskDrawer } from '@/components/add-task-drawer';
@@ -70,8 +70,8 @@ function SimplePage() {
                           todo.completed ? 'Mark incomplete' : 'Mark complete'
                         }
                       >
-                        <Check
-                          className={`h-4 w-4 ${todo.completed ? 'text-green-500' : 'text-muted-foreground/40'}`}
+                        <Circle
+                          className={`h-4 w-4 ${todo.completed ? 'fill-green-500 text-green-500' : 'text-green-500'}`}
                         />
                       </Button>
                       <span
