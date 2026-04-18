@@ -31,6 +31,7 @@ function SlidePage() {
 
 function SlideAuthenticated() {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
+  const [draftProgress, setDraftProgress] = useState<Record<number, number>>({});
   const { todos, createMutation, updateMutation } = useTodos();
   const { data: categories = [] } = useQuery(trpc.category.getAll.queryOptions());
 
@@ -64,13 +65,19 @@ function SlideAuthenticated() {
                   {task.text}
                 </span>
                 <Slider
-                  value={[task.progress]}
-                  onValueCommit={([v]) => updateProgress(task.id, v)}
+                  value={[draftProgress[task.id] ?? task.progress]}
+                  onValueChange={([v]) =>
+                    setDraftProgress((prev) => ({ ...prev, [task.id]: v }))
+                  }
+                  onValueCommit={([v]) => {
+                    setDraftProgress((prev) => ({ ...prev, [task.id]: v }));
+                    updateProgress(task.id, v);
+                  }}
                   max={100}
                   step={1}
                 />
                 <span className="w-8 shrink-0 text-right text-gray-500">
-                  {task.progress}%
+                  {draftProgress[task.id] ?? task.progress}%
                 </span>
               </div>
             ))}
