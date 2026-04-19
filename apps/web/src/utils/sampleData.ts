@@ -1,12 +1,12 @@
-import { type Category, AppColors, type Task } from './types';
+import { type Category, AppColors500, type Task } from './types';
 
 export const sampleCategories: Category[] = [
-  { id: 1, name: 'Read', color: AppColors.Rose },
-  { id: 2, name: 'Study', color: AppColors.Indigo },
-  { id: 3, name: 'Sport', color: AppColors.Green },
-  { id: 4, name: 'Travel', color: AppColors.Orange },
-  { id: 5, name: 'Buy', color: AppColors.Violet },
-  { id: 6, name: 'Project', color: AppColors.Slate },
+  { id: 1, name: 'Read', color: AppColors500.Rose500 },
+  { id: 2, name: 'Study', color: AppColors500.Indigo500 },
+  { id: 3, name: 'Sport', color: AppColors500.Green500 },
+  { id: 4, name: 'Travel', color: AppColors500.Orange500 },
+  { id: 5, name: 'Buy', color: AppColors500.Violet500 },
+  { id: 6, name: 'Project', color: AppColors500.Slate500 },
 ];
 
 const iso = (d: string) => new Date(d).toISOString();

@@ -15,7 +15,7 @@ type ShapeData = {
   viewBoxHeight: number;
 };
 
-type VoronoiMetadataKey = 'headSide' | 'brain' | 'shirt' | 'rectangular';
+type VoronoiMetadataKey = 'headSide' | 'brain' | 'shirt' | 'rectangular' | 'headSimple';
 
 type ShapeVoronoiPageProps = {
   svgRaw: string;

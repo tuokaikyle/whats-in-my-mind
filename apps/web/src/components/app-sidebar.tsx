@@ -70,6 +70,10 @@ export const sidebarData = {
           title: 'Shirt',
           url: '/voronoi/shirt',
         },
+        {
+          title: 'Head Simple',
+          url: '/voronoi/head-simple',
+        },
       ],
     },
     {

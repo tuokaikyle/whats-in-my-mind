@@ -50,7 +50,7 @@ function RouteComponent() {
                     <img
                       src={item.src}
                       alt={item.name}
-                      className="h-44 w-full object-contain"
+                      className="h-50 w-full object-contain"
                     />
                     <p className="mt-2 text-center text-muted-foreground text-sm">
                       {item.name}
