@@ -3,6 +3,8 @@ import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
 import { protectedProcedure, router } from '../index';
 
+const metadataSchema = z.record(z.string(), z.unknown());
+
 export const todoRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return await ctx.db
@@ -15,6 +17,7 @@ export const todoRouter = router({
         progress: todo.progress,
         effort: todo.effort,
         deadline: todo.deadline,
+        metadata: todo.metadata,
         createdAt: todo.createdAt,
         updatedAt: todo.updatedAt,
       })
@@ -32,6 +35,7 @@ export const todoRouter = router({
         progress: z.number().int().min(0).max(100).optional(),
         effort: z.number().int().min(0).optional(),
         deadline: z.string().datetime().nullable().optional(),
+        metadata: metadataSchema.nullable().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -42,6 +46,7 @@ export const todoRouter = router({
         progress: input.progress,
         effort: input.effort,
         deadline: input.deadline ? new Date(input.deadline) : null,
+        metadata: input.metadata,
         userId: ctx.session.user.id,
       });
     }),
@@ -57,6 +62,7 @@ export const todoRouter = router({
         progress: z.number().int().min(0).max(100).optional(),
         effort: z.number().int().min(0).optional(),
         deadline: z.string().datetime().nullable().optional(),
+        metadata: metadataSchema.nullable().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {

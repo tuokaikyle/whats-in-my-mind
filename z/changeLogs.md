@@ -73,3 +73,22 @@ add cypress
 deadline -> due date
 
 test view 1 and view 2
+
+Two grids demo
+http://localhost:3001/todo/gridstack
+https://github.com/gridstack/gridstack.js/
+大，下载量少
+
+besieged
+http://localhost:3000/grid
+https://github.com/react-grid-layout/react-grid-layout
+小，下载量大
+
+
+I am thinking of saving each cell's position to the db, so the next time the user signed in, he will see the cells in their place that the user dragged to. I am thinking of adding a metadata column to the db. and the field can be {view: voronoi, subview: rectangular, position: {x: 100, y: 200}}. the type of this metadata column should be flexible, as it may store other types for other views in the future. How do you think?
+
+400 colors and 500 colors
+
+bottom sidebar
+category management
+About 

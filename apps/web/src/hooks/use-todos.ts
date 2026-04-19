@@ -15,13 +15,15 @@ type CreateCategoryInput = RouterInputs['category']['create'];
 const GUEST_TODOS_KEY = ['guest', 'todos'] as const;
 const GUEST_CATEGORIES_KEY = ['guest', 'categories'] as const;
 
-function useIsGuest() {
-  const { data: session } = authClient.useSession();
-  return !session;
+function useAuthState() {
+  const { data: session, isPending } = authClient.useSession();
+  const sessionLoading = isPending;
+  const isGuest = !sessionLoading && !session;
+  return { isGuest, sessionLoading };
 }
 
 export function useTodos() {
-  const isGuest = useIsGuest();
+  const { isGuest, sessionLoading } = useAuthState();
 
   const authQueryOptions = trpc.todo.getAll.queryOptions();
   const queryKey: readonly unknown[] = isGuest
@@ -31,7 +33,7 @@ export function useTodos() {
   const authQuery = useQuery({
     ...authQueryOptions,
     staleTime: 5 * 60 * 1000,
-    enabled: !isGuest,
+    enabled: !sessionLoading && !isGuest,
   });
 
   const guestQuery = useQuery<Task[]>({
@@ -40,10 +42,10 @@ export function useTodos() {
       queryClient.getQueryData<Task[]>(GUEST_TODOS_KEY) ?? sampleData,
     staleTime: Number.POSITIVE_INFINITY,
     initialData: sampleData,
-    enabled: isGuest,
+    enabled: !sessionLoading && isGuest,
   });
 
-  const todosQuery = isGuest ? guestQuery : authQuery;
+  const todosQuery = sessionLoading ? authQuery : isGuest ? guestQuery : authQuery;
 
   const setCache = (updater: (prev: Task[]) => Task[]) =>
     queryClient.setQueryData<Task[]>(queryKey, (prev) => updater(prev ?? []));
@@ -68,6 +70,7 @@ export function useTodos() {
             effort: input.effort ?? null,
             progress: input.progress ?? 0,
             deadline: input.deadline ?? null,
+            metadata: input.metadata ?? null,
             createdAt: now,
             updatedAt: now,
           } satisfies Task;
@@ -122,7 +125,7 @@ export function useTodos() {
   });
 
   const todos = (todosQuery.data ?? []) as Task[];
-  const todosLoading = todosQuery.isLoading;
+  const todosLoading = sessionLoading || todosQuery.isLoading;
 
   return {
     todos,
@@ -135,13 +138,16 @@ export function useTodos() {
 }
 
 export function useCategories() {
-  const isGuest = useIsGuest();
+  const { isGuest, sessionLoading } = useAuthState();
   const authQueryOptions = trpc.category.getAll.queryOptions();
   const queryKey: readonly unknown[] = isGuest
     ? GUEST_CATEGORIES_KEY
     : authQueryOptions.queryKey;
 
-  const authQuery = useQuery({ ...authQueryOptions, enabled: !isGuest });
+  const authQuery = useQuery({
+    ...authQueryOptions,
+    enabled: !sessionLoading && !isGuest,
+  });
   const guestQuery = useQuery<Category[]>({
     queryKey: GUEST_CATEGORIES_KEY,
     queryFn: () =>
@@ -149,9 +155,9 @@ export function useCategories() {
       sampleCategories,
     staleTime: Number.POSITIVE_INFINITY,
     initialData: sampleCategories,
-    enabled: isGuest,
+    enabled: !sessionLoading && isGuest,
   });
-  const query = isGuest ? guestQuery : authQuery;
+  const query = sessionLoading ? authQuery : isGuest ? guestQuery : authQuery;
 
   const createMutation = useMutation<
     Category | unknown,

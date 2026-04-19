@@ -53,32 +53,50 @@ export const sidebarData = {
       title: 'Voronoi',
       url: '/voronoi',
       icon: Brain,
+      items: [
+        {
+          title: 'Rectangular',
+          url: '/voronoi/rectangular',
+        },
+        {
+          title: 'Head Side',
+          url: '/voronoi/head-side',
+        },
+        {
+          title: 'Brain',
+          url: '/voronoi/brain',
+        },
+        {
+          title: 'Shirt',
+          url: '/voronoi/shirt',
+        },
+      ],
     },
     {
       title: 'Flip',
       url: '/flip',
       icon: SquareSplitVertical,
     },
-    {
-      title: '3D',
-      url: '/3d',
-      icon: Box
-    },
-    {
-      title: 'Grid',
-      url: '/grid',
-      icon: Grid2X2,
-      items: [
-        {
-          title: 'Stack',
-          url: '/grid/stack',
-        },
-        {
-          title: 'Besieged',
-          url: '/grid/besieged',
-        }
-      ],
-    },
+    // {
+    //   title: '3D',
+    //   url: '/3d',
+    //   icon: Box
+    // },
+    // {
+    //   title: 'Grid',
+    //   url: '/grid',
+    //   icon: Grid2X2,
+    //   items: [
+    //     {
+    //       title: 'Stack',
+    //       url: '/grid/stack',
+    //     },
+    //     {
+    //       title: 'Besieged',
+    //       url: '/grid/besieged',
+    //     }
+    //   ],
+    // },
     {
       title: 'About',
       url: '/about',

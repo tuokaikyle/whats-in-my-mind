@@ -1,3 +1,25 @@
+export type TodoMetadata = {
+  voronoi?: {
+    rectangular?: {
+      x: number;
+      y: number;
+    };
+    headSide?: {
+      x: number;
+      y: number;
+    };
+    brain?: {
+      x: number;
+      y: number;
+    };
+    shirt?: {
+      x: number;
+      y: number;
+    };
+  };
+  [key: string]: unknown;
+};
+
 export type Task = {
   id: number;
   text: string;
@@ -5,8 +27,9 @@ export type Task = {
   categoryId: number | null;
   effort: number | null;
   importance: number | null;
-  progress: number;
+  progress: number | null;
   deadline: string | null;
+  metadata?: TodoMetadata | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -17,12 +40,12 @@ export type Category = {
   color: string | null;
 };
 
-export const PRESET_COLORS = [
-  '#f43f5e', // Rose
-  '#f97316', // Orange
-  '#22c55e', // Green
-  '#3b82f6', // Blue
-  '#6366f1', // Indigo
-  '#8b5cf6', // Violet
-  '#94a3b8', // Slate
-];
+export enum AppColors {
+  Rose = '#f43f5e',
+  Orange = '#f97316',
+  Green = '#22c55e',
+  Blue = '#3b82f6',
+  Indigo = '#6366f1',
+  Violet = '#8b5cf6',
+  Slate = '#94a3b8',
+}

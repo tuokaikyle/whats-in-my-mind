@@ -1,5 +1,14 @@
 import { relations } from 'drizzle-orm';
-import { boolean, index, integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { category } from './category';
 
@@ -14,6 +23,7 @@ export const todo = pgTable(
     progress: integer('progress'),
     effort: integer('effort'),
     deadline: timestamp('deadline'),
+    metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
