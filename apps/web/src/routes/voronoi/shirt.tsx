@@ -7,9 +7,9 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import { ShapeVoronoiPage } from './-shape-voronoi-page';
-import circleSvgRaw from '@/utils/circle.svg?raw';
+import circleSvgRaw from '@/utils/svg/circle.svg?raw';
 
-const clothSvgModules = import.meta.glob('@/utils/cloth-svg/*.svg', {
+const clothSvgModules = import.meta.glob('@/utils/svg/cloth-svg/*.svg', {
   eager: true,
   import: 'default',
 }) as Record<string, string>;

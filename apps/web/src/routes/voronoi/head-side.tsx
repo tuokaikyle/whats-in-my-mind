@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import headSideSvgRaw from '@/utils/head-side-view-black-silhouette-of-male.svg?raw';
+import headSideSvgRaw from '@/utils/svg/head-side-view-black-silhouette-of-male.svg?raw';
 import { ShapeVoronoiPage } from './-shape-voronoi-page';
 
 export const Route = createFileRoute('/voronoi/head-side')({

@@ -1,51 +1,67 @@
-import { type Category, AppColors500, type Task } from './types';
+import { AppColors300 } from './enums';
+import { type Category, type Task } from './types';
 
-export const sampleCategories: Category[] = [
-  { id: 1, name: 'Read', color: AppColors500.Rose500 },
-  { id: 2, name: 'Study', color: AppColors500.Indigo500 },
-  { id: 3, name: 'Sport', color: AppColors500.Green500 },
-  { id: 4, name: 'Travel', color: AppColors500.Orange500 },
-  { id: 5, name: 'Buy', color: AppColors500.Violet500 },
-  { id: 6, name: 'Project', color: AppColors500.Slate500 },
-];
+function createTasks(
+  input: { category: string; color: string; tasks: string[] }[],
+) {
+  const categories: Category[] = input.map((c, i) => ({
+    id: i + 1,
+    name: c.category,
+    color: c.color,
+  }));
 
-const iso = (d: string) => new Date(d).toISOString();
+  let id = 1;
+  const tasks: Task[] = [];
 
-const base = (
-  id: number,
-  text: string,
-  categoryId: number,
-  deadline: string,
-): Task => ({
-  id,
-  text,
-  categoryId,
-  completed: false,
-  effort: Math.round(Math.random() * 5),
-  importance: Math.round(Math.random() * 5),
-  progress: Math.round(Math.random() * 100) || null,
-  deadline: iso(deadline),
-  createdAt: iso(deadline),
-  updatedAt: iso(deadline),
-});
+  for (const [catIdx, cat] of input.entries()) {
+    for (const text of cat.tasks) {
+      const now = new Date();
+      tasks.push({
+        id: id++,
+        text,
+        completed: Math.random() > 0.8,
+        categoryId: catIdx + 1,
+        effort: Math.floor(Math.random() * 5) + 1,
+        importance: Math.floor(Math.random() * 5) + 1,
+        progress: Math.random() > 0.5 ? Math.floor(Math.random() * 101) : null,
+        deadline: new Date(
+          Date.now() - Math.random() * 180 * 86_400_000,
+        ).toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      });
+    }
+  }
 
-export const sampleData: Task[] = [
-  base(1, 'Vanity Fair', 1, '2026-01-01'),
-  base(2, 'Les Miserables', 1, '2026-01-01'),
+  return { tasks, categories };
+}
 
-  base(34, 'Python', 2, '2026-01-03'),
-  base(35, 'Painting', 2, '2026-01-04'),
-  base(36, 'Docker', 2, '2026-01-04'),
+const { tasks: sampleData, categories: sampleCategories } = createTasks([
+  {
+    category: 'Learn',
+    color: AppColors300.Indigo300,
+    tasks: ['React', 'TypeScript', 'GraphQL'],
+  },
+  {
+    category: 'Read',
+    color: AppColors300.Rose300,
+    tasks: ['Vanity Fair', 'Les Miserables'],
+  },
+  {
+    category: 'Sport',
+    color: AppColors300.Green300,
+    tasks: ['Gym', 'Tennis', 'Swimming'],
+  },
+  {
+    category: 'Travel',
+    color: AppColors300.Orange300,
+    tasks: ['Rome', 'Paris', 'New York'],
+  },
+  {
+    category: 'Buy',
+    color: AppColors300.Violet300,
+    tasks: ['Milk', 'Bread', 'Ice Cream'],
+  },
+]);
 
-  base(22, 'Gym', 3, '2026-01-02'),
-  base(23, 'Tennis', 3, '2026-01-04'),
-  base(24, 'Swimming', 3, '2026-01-04'),
-
-  base(46, 'Rome', 4, '2026-01-04'),
-  base(47, 'Paris', 4, '2026-01-04'),
-  base(48, 'New York', 4, '2026-01-04'),
-
-  base(56, 'Milk', 5, '2026-01-04'),
-  base(57, 'Bread', 5, '2026-01-04'),
-  base(65, 'Ice Cream', 5, '2026-01-04'),
-];
+export { sampleCategories, sampleData };

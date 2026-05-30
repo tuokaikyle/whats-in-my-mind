@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "dotenv": "^17.2.2",
-    "react-grid-layout": "^2.2.3",
     "zod": "^4.1.13"
   },
   "devDependencies": {

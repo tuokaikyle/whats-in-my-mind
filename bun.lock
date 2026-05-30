@@ -5,7 +5,6 @@
       "name": "whats-in-my-mind",
       "dependencies": {
         "dotenv": "^17.2.2",
-        "react-grid-layout": "^2.2.3",
         "zod": "^4.1.13",
       },
       "devDependencies": {
@@ -64,6 +63,7 @@
         "d3-delaunay": "^6.0.4",
         "embla-carousel-react": "^8.6.0",
         "framer-motion": "^12.38.0",
+        "gridstack": "^12.6.0",
         "highcharts": "^12.6.0",
         "highcharts-react-official": "^3.2.3",
         "lucide-react": "^0.562.0",
@@ -981,6 +981,8 @@
     "goober": ["goober@2.1.18", "", { "peerDependencies": { "csstype": "^3.0.10" } }, "sha512-2vFqsaDVIT9Gz7N6kAL++pLpp41l3PfDuusHcjnGLfR6+huZkl6ziX+zgVC3ZxpqWhzH6pyDdGrCeDhMIvwaxw=="],
 
     "graceful-fs": ["graceful-fs@4.2.11", "", {}, "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ=="],
+
+    "gridstack": ["gridstack@12.6.0", "", {}, "sha512-dUrqsormSybFn/2P4Dz8AgprftKD5e/IiV7UmC0XLQU+G+/WtkAeFiCSNLoAGhPDXoJ/O61Xtj3gljY/Ds83yQ=="],
 
     "highcharts": ["highcharts@12.6.0", "", { "peerDependencies": { "jspdf": "^4.1.0", "svg2pdf.js": "^2.7.0" }, "optionalPeers": ["jspdf", "svg2pdf.js"] }, "sha512-zWwoXECOakJT2huBMqIZOjDNLLgyZFCcfZqTj2g6cvYOGxjF3nvooC+rIaF5aKiharluyGKNflfRNrzOAIjdRg=="],
 

@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TableRouteImport } from './routes/table'
 import { Route as SlideRouteImport } from './routes/slide'
 import { Route as SimpleRouteImport } from './routes/simple'
-import { Route as GridLayoutRouteImport } from './routes/grid-layout'
+import { Route as GridRouteImport } from './routes/grid'
 import { Route as FlipRouteImport } from './routes/flip'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
@@ -39,9 +39,9 @@ const SimpleRoute = SimpleRouteImport.update({
   path: '/simple',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GridLayoutRoute = GridLayoutRouteImport.update({
-  id: '/grid-layout',
-  path: '/grid-layout',
+const GridRoute = GridRouteImport.update({
+  id: '/grid',
+  path: '/grid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FlipRoute = FlipRouteImport.update({
@@ -100,7 +100,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/flip': typeof FlipRoute
-  '/grid-layout': typeof GridLayoutRoute
+  '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -116,7 +116,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/flip': typeof FlipRoute
-  '/grid-layout': typeof GridLayoutRoute
+  '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -133,7 +133,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/flip': typeof FlipRoute
-  '/grid-layout': typeof GridLayoutRoute
+  '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/slide': typeof SlideRoute
   '/table': typeof TableRoute
@@ -151,7 +151,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/flip'
-    | '/grid-layout'
+    | '/grid'
     | '/simple'
     | '/slide'
     | '/table'
@@ -167,7 +167,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/flip'
-    | '/grid-layout'
+    | '/grid'
     | '/simple'
     | '/slide'
     | '/table'
@@ -183,7 +183,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/flip'
-    | '/grid-layout'
+    | '/grid'
     | '/simple'
     | '/slide'
     | '/table'
@@ -200,7 +200,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
   FlipRoute: typeof FlipRoute
-  GridLayoutRoute: typeof GridLayoutRoute
+  GridRoute: typeof GridRoute
   SimpleRoute: typeof SimpleRoute
   SlideRoute: typeof SlideRoute
   TableRoute: typeof TableRoute
@@ -235,11 +235,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimpleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/grid-layout': {
-      id: '/grid-layout'
-      path: '/grid-layout'
-      fullPath: '/grid-layout'
-      preLoaderRoute: typeof GridLayoutRouteImport
+    '/grid': {
+      id: '/grid'
+      path: '/grid'
+      fullPath: '/grid'
+      preLoaderRoute: typeof GridRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/flip': {
@@ -320,7 +320,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
   FlipRoute: FlipRoute,
-  GridLayoutRoute: GridLayoutRoute,
+  GridRoute: GridRoute,
   SimpleRoute: SimpleRoute,
   SlideRoute: SlideRoute,
   TableRoute: TableRoute,

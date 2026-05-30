@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ShapeVoronoiPage } from './-shape-voronoi-page';
-import headsimpleSvgRaw from '@/utils/head-simple.svg?raw';
+import headsimpleSvgRaw from '@/utils/svg/head-simple.svg?raw';
 
 export const Route = createFileRoute('/voronoi/head-simple')({
   component: RouteComponent,

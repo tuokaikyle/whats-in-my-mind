@@ -36,6 +36,7 @@
     "d3-delaunay": "^6.0.4",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
+    "gridstack": "^12.6.0",
     "highcharts": "^12.6.0",
     "highcharts-react-official": "^3.2.3",
     "lucide-react": "^0.562.0",

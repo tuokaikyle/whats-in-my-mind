@@ -14,6 +14,7 @@ import {
   Table2,
 } from 'lucide-react';
 import type * as React from 'react';
+import { useCallback, useState } from 'react';
 import { NavMain } from '@/components/nav-main';
 import {
   Sidebar,
@@ -27,6 +28,22 @@ import {
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ModeToggle } from './mode-toggle';
+
+const COLLAPSIBLE_STORAGE_KEY = 'sidebar-open-items';
+
+function loadOpenItems(): Set<string> {
+  try {
+    const raw = localStorage.getItem(COLLAPSIBLE_STORAGE_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {
+    /* ignore */
+  }
+  return new Set();
+}
+
+function saveOpenItems(items: Set<string>) {
+  localStorage.setItem(COLLAPSIBLE_STORAGE_KEY, JSON.stringify([...items]));
+}
 
 export const sidebarData = {
   user: {
@@ -94,7 +111,7 @@ export const sidebarData = {
     },
     {
       title: 'Grid',
-      url: '/grid-layout',
+      url: '/grid',
       icon: Grid2X2,
     },
     {
@@ -110,9 +127,44 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar, open } = useSidebar();
   const isMobile = useIsMobile();
 
+  // Persisted collapsible open/closed state
+  const [openItems, setOpenItems] = useState<Set<string>>(loadOpenItems);
+  const [navKey, setNavKey] = useState(0);
+
+  const handleSidebarClick = useCallback((e: React.MouseEvent) => {
+    const trigger = (e.target as HTMLElement).closest(
+      '[data-slot="collapsible-trigger"]'
+    ) as HTMLElement | null;
+    if (!trigger) return;
+
+    const titleEl = trigger.querySelector('span');
+    const title = titleEl?.textContent;
+    if (!title) return;
+
+    // Determine if this click is opening or closing
+    const collapsible = trigger.closest('[data-slot="collapsible"]');
+    const isCurrentlyOpen = collapsible?.getAttribute('data-state') === 'open';
+
+    setOpenItems((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlyOpen) {
+        next.delete(title);
+      } else {
+        next.add(title);
+      }
+      saveOpenItems(next);
+      return next;
+    });
+    setNavKey((k) => k + 1);
+  }, []);
+
   const navMainWithActive = sidebarData.navMain.map((item) => ({
     ...item,
-    isActive: !!matchRoute({ to: item.url }),
+    // For collapsible items, `isActive` is only used as `defaultOpen` in NavMain.
+    // Override it with persisted state so reopening the page restores the sidebar.
+    isActive: item.items
+      ? openItems.has(item.title) || !!matchRoute({ to: item.url })
+      : !!matchRoute({ to: item.url }),
   }));
 
   return (
@@ -135,8 +187,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navMainWithActive} />
+      <SidebarContent onClick={handleSidebarClick}>
+        <NavMain key={navKey} items={navMainWithActive} />
       </SidebarContent>
       <SidebarFooter className='mb-1'>
         <UserButton
