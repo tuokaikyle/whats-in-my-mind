@@ -1,6 +1,18 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
-import { Box, Brain, BrainCircuit, Bubbles, Calendar, Calendar1, CalendarDays, ClipboardCheck, Command, Construction, FileCheck, FileCheckIcon, FileText, Grid2X2, HomeIcon, Info, PanelLeft, Satellite, SquareArrowRight, SquareSplitVertical, SquareTerminal, Table2, ToyBrick } from 'lucide-react';
+import {
+  Brain,
+  Bubbles,
+  Command,
+  FileCheck,
+  Grid2X2,
+  HomeIcon,
+  Info,
+  PanelLeft,
+  SquareArrowRight,
+  SquareSplitVertical,
+  Table2,
+} from 'lucide-react';
 import type * as React from 'react';
 import { NavMain } from '@/components/nav-main';
 import {
@@ -11,7 +23,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -32,12 +43,12 @@ export const sidebarData = {
     {
       title: 'Simple',
       url: '/simple',
-      icon: FileCheck
+      icon: FileCheck,
     },
     {
       title: 'Table',
       url: '/table',
-      icon: Table2
+      icon: Table2,
     },
     {
       title: 'Slide',
@@ -81,32 +92,17 @@ export const sidebarData = {
       url: '/flip',
       icon: SquareSplitVertical,
     },
-    // {
-    //   title: '3D',
-    //   url: '/3d',
-    //   icon: Box
-    // },
-    // {
-    //   title: 'Grid',
-    //   url: '/grid',
-    //   icon: Grid2X2,
-    //   items: [
-    //     {
-    //       title: 'Stack',
-    //       url: '/grid/stack',
-    //     },
-    //     {
-    //       title: 'Besieged',
-    //       url: '/grid/besieged',
-    //     }
-    //   ],
-    // },
+    {
+      title: 'Grid',
+      url: '/grid-layout',
+      icon: Grid2X2,
+    },
     {
       title: 'About',
       url: '/about',
       icon: Info,
     },
-  ]
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -120,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible='icon' {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -144,7 +140,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className='mb-1'>
         <UserButton
-          additionalLinks={[<ModeToggle key="mode-toggle" />]}
+          additionalLinks={[<ModeToggle key='mode-toggle' />]}
           size={open ? 'default' : 'icon'}
           side={isMobile ? 'top' : 'right'}
           sideOffset={16}

@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
-import { ShapeVoronoiPage } from './shape-voronoi-page';
+import { ShapeVoronoiPage } from './-shape-voronoi-page';
 import circleSvgRaw from '@/utils/circle.svg?raw';
 
 const clothSvgModules = import.meta.glob('@/utils/cloth-svg/*.svg', {
@@ -29,30 +29,30 @@ function RouteComponent() {
   return (
     <ShapeVoronoiPage
       svgRaw={circleSvgRaw}
-      metadataKey="shirt"
-      title="Voronoi playground (Shirt)"
-      description="Drag a seed inside the circle. Each seed represents one todo."
+      metadataKey='shirt'
+      title='Voronoi playground (Shirt)'
+      description='Drag a seed inside the circle. Each seed represents one todo.'
       showCanvasBorder={false}
-      contentClassName="mb-0"
+      contentClassName='mb-0'
       afterCanvas={
-        <div className="-mt-4 pb-1">
+        <div className='-mt-4 pb-1'>
           <Carousel
             opts={{
               align: 'start',
               loop: clothItems.length > 1,
             }}
-            className="mx-auto w-full max-w-[12rem] sm:max-w-xs"
+            className='mx-auto w-full max-w-[12rem] sm:max-w-xs'
           >
             <CarouselContent>
               {clothItems.map((item) => (
-                <CarouselItem key={item.name} className="basis-full">
-                  <div className="flex h-full flex-col items-center p-3">
+                <CarouselItem key={item.name} className='basis-full'>
+                  <div className='flex h-full flex-col items-center p-3'>
                     <img
                       src={item.src}
                       alt={item.name}
-                      className="h-50 w-full object-contain"
+                      className='h-50 w-full object-contain'
                     />
-                    <p className="mt-2 text-center text-muted-foreground text-sm">
+                    <p className='mt-2 text-center text-muted-foreground text-sm'>
                       {item.name}
                     </p>
                   </div>
