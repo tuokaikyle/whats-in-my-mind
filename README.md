@@ -86,7 +86,6 @@ google and facebook
 bubble - effort, deadline columns, category table
 flip - easy
 heatmap
-grid
 
 user-preferences
 category table

@@ -4,7 +4,6 @@ import {
   Bubbles,
   Command,
   FileCheck,
-  Grid2X2,
   HomeIcon,
   Info,
   PanelLeft,
@@ -69,11 +68,6 @@ export const sidebarData: {
       title: 'Bubble',
       url: '/bubble',
       icon: Bubbles,
-    },
-    {
-      title: 'Grid',
-      url: '/grid',
-      icon: Grid2X2,
     },
     {
       title: 'About',

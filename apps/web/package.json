@@ -33,7 +33,6 @@
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^12.38.0",
-    "gridstack": "^12.6.0",
     "highcharts": "^12.6.0",
     "highcharts-react-official": "^3.2.3",
     "lucide-react": "^0.562.0",
@@ -41,7 +40,6 @@
     "radix-ui": "^1.4.3",
     "react": "19.1.2",
     "react-dom": "19.1.2",
-    "react-grid-layout": "^2.2.3",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
     "tw-animate-css": "^1.2.5"
