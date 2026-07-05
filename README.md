@@ -143,3 +143,7 @@ v3
 more better-t, polished
 
 has better-t postgres as a remote. 
+
+v4
+1. remove flip. this will be a new app. flip means accomplishing DAILY jobs. github view shows how well-accomplished a day is. 
+2. 

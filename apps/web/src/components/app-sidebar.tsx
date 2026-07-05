@@ -10,7 +10,6 @@ import {
   Info,
   PanelLeft,
   SquareArrowRight,
-  SquareSplitVertical,
   Table2,
 } from 'lucide-react';
 import type * as React from 'react';
@@ -99,11 +98,6 @@ export const sidebarData = {
           url: '/voronoi/shirt',
         },
       ],
-    },
-    {
-      title: 'Flip',
-      url: '/flip',
-      icon: SquareSplitVertical,
     },
     {
       title: 'Grid',
