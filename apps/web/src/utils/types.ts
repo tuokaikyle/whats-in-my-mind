@@ -1,28 +1,4 @@
-export type TodoMetadata = {
-  voronoi?: {
-    rectangular?: {
-      x: number;
-      y: number;
-    };
-    headSide?: {
-      x: number;
-      y: number;
-    };
-    brain?: {
-      x: number;
-      y: number;
-    };
-    shirt?: {
-      x: number;
-      y: number;
-    };
-    headSimple?: {
-      x: number;
-      y: number;
-    };
-  };
-  [key: string]: unknown;
-};
+export type TodoMetadata = Record<string, unknown>;
 
 export type Task = {
   id: number;

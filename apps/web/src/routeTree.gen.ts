@@ -14,10 +14,6 @@ import { Route as GridRouteImport } from './routes/grid'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as VoronoiShirtRouteImport } from './routes/voronoi/shirt'
-import { Route as VoronoiRectangularRouteImport } from './routes/voronoi/rectangular'
-import { Route as VoronoiHeadSideRouteImport } from './routes/voronoi/head-side'
-import { Route as VoronoiBrainRouteImport } from './routes/voronoi/brain'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
 const SimpleRoute = SimpleRouteImport.update({
@@ -45,26 +41,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VoronoiShirtRoute = VoronoiShirtRouteImport.update({
-  id: '/voronoi/shirt',
-  path: '/voronoi/shirt',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VoronoiRectangularRoute = VoronoiRectangularRouteImport.update({
-  id: '/voronoi/rectangular',
-  path: '/voronoi/rectangular',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VoronoiHeadSideRoute = VoronoiHeadSideRouteImport.update({
-  id: '/voronoi/head-side',
-  path: '/voronoi/head-side',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const VoronoiBrainRoute = VoronoiBrainRouteImport.update({
-  id: '/voronoi/brain',
-  path: '/voronoi/brain',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthPathRoute = AuthPathRouteImport.update({
   id: '/auth/$path',
   path: '/auth/$path',
@@ -78,10 +54,6 @@ export interface FileRoutesByFullPath {
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
-  '/voronoi/brain': typeof VoronoiBrainRoute
-  '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/rectangular': typeof VoronoiRectangularRoute
-  '/voronoi/shirt': typeof VoronoiShirtRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -90,10 +62,6 @@ export interface FileRoutesByTo {
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
-  '/voronoi/brain': typeof VoronoiBrainRoute
-  '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/rectangular': typeof VoronoiRectangularRoute
-  '/voronoi/shirt': typeof VoronoiShirtRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -103,36 +71,12 @@ export interface FileRoutesById {
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
-  '/voronoi/brain': typeof VoronoiBrainRoute
-  '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/rectangular': typeof VoronoiRectangularRoute
-  '/voronoi/shirt': typeof VoronoiShirtRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/bubble'
-    | '/grid'
-    | '/simple'
-    | '/auth/$path'
-    | '/voronoi/brain'
-    | '/voronoi/head-side'
-    | '/voronoi/rectangular'
-    | '/voronoi/shirt'
+  fullPaths: '/' | '/about' | '/bubble' | '/grid' | '/simple' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/bubble'
-    | '/grid'
-    | '/simple'
-    | '/auth/$path'
-    | '/voronoi/brain'
-    | '/voronoi/head-side'
-    | '/voronoi/rectangular'
-    | '/voronoi/shirt'
+  to: '/' | '/about' | '/bubble' | '/grid' | '/simple' | '/auth/$path'
   id:
     | '__root__'
     | '/'
@@ -141,10 +85,6 @@ export interface FileRouteTypes {
     | '/grid'
     | '/simple'
     | '/auth/$path'
-    | '/voronoi/brain'
-    | '/voronoi/head-side'
-    | '/voronoi/rectangular'
-    | '/voronoi/shirt'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -154,10 +94,6 @@ export interface RootRouteChildren {
   GridRoute: typeof GridRoute
   SimpleRoute: typeof SimpleRoute
   AuthPathRoute: typeof AuthPathRoute
-  VoronoiBrainRoute: typeof VoronoiBrainRoute
-  VoronoiHeadSideRoute: typeof VoronoiHeadSideRoute
-  VoronoiRectangularRoute: typeof VoronoiRectangularRoute
-  VoronoiShirtRoute: typeof VoronoiShirtRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -197,34 +133,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/voronoi/shirt': {
-      id: '/voronoi/shirt'
-      path: '/voronoi/shirt'
-      fullPath: '/voronoi/shirt'
-      preLoaderRoute: typeof VoronoiShirtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/voronoi/rectangular': {
-      id: '/voronoi/rectangular'
-      path: '/voronoi/rectangular'
-      fullPath: '/voronoi/rectangular'
-      preLoaderRoute: typeof VoronoiRectangularRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/voronoi/head-side': {
-      id: '/voronoi/head-side'
-      path: '/voronoi/head-side'
-      fullPath: '/voronoi/head-side'
-      preLoaderRoute: typeof VoronoiHeadSideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/voronoi/brain': {
-      id: '/voronoi/brain'
-      path: '/voronoi/brain'
-      fullPath: '/voronoi/brain'
-      preLoaderRoute: typeof VoronoiBrainRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/auth/$path': {
       id: '/auth/$path'
       path: '/auth/$path'
@@ -242,10 +150,6 @@ const rootRouteChildren: RootRouteChildren = {
   GridRoute: GridRoute,
   SimpleRoute: SimpleRoute,
   AuthPathRoute: AuthPathRoute,
-  VoronoiBrainRoute: VoronoiBrainRoute,
-  VoronoiHeadSideRoute: VoronoiHeadSideRoute,
-  VoronoiRectangularRoute: VoronoiRectangularRoute,
-  VoronoiShirtRoute: VoronoiShirtRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

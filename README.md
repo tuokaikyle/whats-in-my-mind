@@ -84,7 +84,6 @@ google and facebook
 
 确定现有shape
 bubble - effort, deadline columns, category table
-veroni - ...
 flip - easy
 heatmap
 grid

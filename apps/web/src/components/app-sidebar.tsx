@@ -1,7 +1,6 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { useMatchRoute } from '@tanstack/react-router';
 import {
-  Brain,
   Bubbles,
   Command,
   FileCheck,
@@ -12,7 +11,7 @@ import {
 } from 'lucide-react';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
-import { NavMain } from '@/components/nav-main';
+import { NavMain, type NavItem } from '@/components/nav-main';
 import {
   Sidebar,
   SidebarContent,
@@ -42,7 +41,14 @@ function saveOpenItems(items: Set<string>) {
   localStorage.setItem(COLLAPSIBLE_STORAGE_KEY, JSON.stringify([...items]));
 }
 
-export const sidebarData = {
+export const sidebarData: {
+  user: {
+    name: string;
+    email: string;
+    avatar: string;
+  };
+  navMain: NavItem[];
+} = {
   user: {
     name: 'shadcn',
     email: 'm@example.com',
@@ -63,29 +69,6 @@ export const sidebarData = {
       title: 'Bubble',
       url: '/bubble',
       icon: Bubbles,
-    },
-    {
-      title: 'Voronoi',
-      url: '/voronoi',
-      icon: Brain,
-      items: [
-        {
-          title: 'Rectangular',
-          url: '/voronoi/rectangular',
-        },
-        {
-          title: 'Head Side',
-          url: '/voronoi/head-side',
-        },
-        {
-          title: 'Brain',
-          url: '/voronoi/brain',
-        },
-        {
-          title: 'Shirt',
-          url: '/voronoi/shirt',
-        },
-      ],
     },
     {
       title: 'Grid',
