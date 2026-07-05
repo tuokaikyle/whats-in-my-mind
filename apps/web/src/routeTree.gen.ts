@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as ManageRouteImport } from './routes/manage'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,6 +19,11 @@ import { Route as AuthPathRouteImport } from './routes/auth/$path'
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManageRoute = ManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BubbleRoute = BubbleRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/manage': typeof ManageRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/manage': typeof ManageRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/manage': typeof ManageRoute
   '/simple': typeof SimpleRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/bubble' | '/simple' | '/auth/$path'
+  fullPaths: '/' | '/about' | '/bubble' | '/manage' | '/simple' | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/bubble' | '/simple' | '/auth/$path'
-  id: '__root__' | '/' | '/about' | '/bubble' | '/simple' | '/auth/$path'
+  to: '/' | '/about' | '/bubble' | '/manage' | '/simple' | '/auth/$path'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/bubble'
+    | '/manage'
+    | '/simple'
+    | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
+  ManageRoute: typeof ManageRoute
   SimpleRoute: typeof SimpleRoute
   AuthPathRoute: typeof AuthPathRoute
 }
@@ -86,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/simple'
       fullPath: '/simple'
       preLoaderRoute: typeof SimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manage': {
+      id: '/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof ManageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bubble': {
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
+  ManageRoute: ManageRoute,
   SimpleRoute: SimpleRoute,
   AuthPathRoute: AuthPathRoute,
 }

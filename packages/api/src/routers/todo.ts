@@ -1,4 +1,4 @@
-import { and, asc, eq } from '@whats-in-my-mind/db';
+import { and, asc, eq, sql } from '@whats-in-my-mind/db';
 import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
 import { protectedProcedure, router } from '../index';
@@ -61,6 +61,24 @@ export const todoRouter = router({
         .update(todo)
         .set(rest)
         .where(and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)));
+    }),
+
+  reorderSimple: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        simpleOrder: z.number().finite(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.db
+        .update(todo)
+        .set({
+          metadata: sql`jsonb_set(coalesce(${todo.metadata}, '{}'::jsonb), '{simpleOrder}', to_jsonb(${input.simpleOrder}::double precision), true)`,
+        })
+        .where(
+          and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
+        );
     }),
 
   delete: protectedProcedure

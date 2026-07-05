@@ -4,9 +4,9 @@ import {
   Bubbles,
   Command,
   FileCheck,
-  HomeIcon,
   Info,
   PanelLeft,
+  Settings2,
 } from 'lucide-react';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
@@ -55,11 +55,6 @@ export const sidebarData: {
   },
   navMain: [
     {
-      title: 'Home',
-      url: '/',
-      icon: HomeIcon,
-    },
-    {
       title: 'Simple',
       url: '/simple',
       icon: FileCheck,
@@ -73,6 +68,11 @@ export const sidebarData: {
       title: 'About',
       url: '/about',
       icon: Info,
+    },
+    {
+      title: 'Manage',
+      url: '/manage',
+      icon: Settings2,
     },
   ],
 };

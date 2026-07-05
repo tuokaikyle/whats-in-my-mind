@@ -151,6 +151,12 @@ All non-production branches. Now I changed it to none. and no auto deploy to pro
 local 
 db dev
 
+production
+db production
+
+db migrate better to use the direct url
+db url to add to the deploy, need to use the one with pool
+
 deployed can be cloudflare production and preview. 
 web is deployed automatically after a push. 
 api needs to be deployed manually. the command needs to log into cloudflare through wrangler. 

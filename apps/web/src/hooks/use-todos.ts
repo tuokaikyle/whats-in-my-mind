@@ -10,6 +10,7 @@ type RouterInputs = inferRouterInputs<AppRouter>;
 type CreateInput = RouterInputs['todo']['create'];
 type UpdateInput = RouterInputs['todo']['update'];
 type DeleteInput = RouterInputs['todo']['delete'];
+type ReorderSimpleInput = RouterInputs['todo']['reorderSimple'];
 type CreateCategoryInput = RouterInputs['category']['create'];
 
 const GUEST_TODOS_KEY = ['guest', 'todos'] as const;
@@ -125,6 +126,37 @@ export function useTodos() {
     onSettled: () => invalidate(),
   });
 
+  const reorderSimpleMutation = useMutation<
+    unknown,
+    Error,
+    ReorderSimpleInput,
+    { prev: Task[] | undefined }
+  >({
+    mutationFn: isGuest
+      ? async (v) => v
+      : (v) => trpcClient.todo.reorderSimple.mutate(v),
+    onMutate: async (v) => {
+      await queryClient.cancelQueries({ queryKey });
+      const prev = snapshot();
+      setCache((list) =>
+        list.map((t) =>
+          t.id === v.id
+            ? {
+                ...t,
+                metadata: {
+                  ...(t.metadata ?? {}),
+                  simpleOrder: v.simpleOrder,
+                },
+              }
+            : t,
+        ),
+      );
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => restore(ctx?.prev),
+    onSettled: () => invalidate(),
+  });
+
   const todos = (todosQuery.data ?? []) as Task[];
   const todosLoading = sessionLoading || todosQuery.isLoading;
 
@@ -134,6 +166,7 @@ export function useTodos() {
     createMutation,
     updateMutation,
     deleteMutation,
+    reorderSimpleMutation,
     isGuest,
   };
 }

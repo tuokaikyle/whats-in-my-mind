@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Circle, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Reorder, useDragControls } from 'framer-motion';
+import { Ellipsis, GripVertical, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AddCategory } from '@/components/add-category';
 import { AddTaskDrawer } from '@/components/add-task-drawer';
 import { GuestBanner } from '@/components/guest-banner';
@@ -13,23 +14,176 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/simple')({
   component: SimplePage,
 });
 
+const SIMPLE_ORDER_STEP = 1000;
+
+function compareByCreatedAt(a: Task, b: Task) {
+  const createdDiff =
+    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+
+  if (createdDiff !== 0) return createdDiff;
+
+  return a.id - b.id;
+}
+
+function getSimpleOrder(todo: Task) {
+  const value = todo.metadata?.simpleOrder;
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function getEffectiveOrder(todo: Task, fallbackOrders: Map<number, number>) {
+  return getSimpleOrder(todo) ?? fallbackOrders.get(todo.id) ?? todo.id;
+}
+
+function sameOrder(a: number[], b: number[]) {
+  return a.length === b.length && a.every((id, index) => id === b[index]);
+}
+
+function getNextSimpleOrder({
+  movedId,
+  orderedIds,
+  todoById,
+  fallbackOrders,
+}: {
+  movedId: number;
+  orderedIds: number[];
+  todoById: Map<number, Task>;
+  fallbackOrders: Map<number, number>;
+}) {
+  const index = orderedIds.indexOf(movedId);
+  if (index === -1) return null;
+
+  const previousTodo = todoById.get(orderedIds[index - 1]);
+  const nextTodo = todoById.get(orderedIds[index + 1]);
+  const previousOrder = previousTodo
+    ? getEffectiveOrder(previousTodo, fallbackOrders)
+    : null;
+  const nextOrder = nextTodo
+    ? getEffectiveOrder(nextTodo, fallbackOrders)
+    : null;
+
+  if (previousOrder !== null && nextOrder !== null) {
+    if (nextOrder > previousOrder) return (previousOrder + nextOrder) / 2;
+    return (index + 1) * SIMPLE_ORDER_STEP;
+  }
+
+  if (previousOrder !== null) return previousOrder + SIMPLE_ORDER_STEP;
+  if (nextOrder !== null) return nextOrder - SIMPLE_ORDER_STEP;
+
+  return (index + 1) * SIMPLE_ORDER_STEP;
+}
+
 function SimplePage() {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
+  const [newText, setNewText] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
   const {
     todos,
     todosLoading,
     createMutation,
     updateMutation,
     deleteMutation,
+    reorderSimpleMutation,
     isGuest,
   } = useTodos();
   const { categories } = useCategories();
+  const dragStartOrderRef = useRef<number[] | null>(null);
+  const orderedIdsRef = useRef<number[]>([]);
+
+  const fallbackOrders = useMemo(() => {
+    return new Map(
+      [...todos]
+        .sort(compareByCreatedAt)
+        .map((todo, index) => [todo.id, (index + 1) * SIMPLE_ORDER_STEP]),
+    );
+  }, [todos]);
+
+  const sortedTodos = useMemo(() => {
+    return [...todos].sort((a, b) => {
+      const orderDiff =
+        getEffectiveOrder(a, fallbackOrders) -
+        getEffectiveOrder(b, fallbackOrders);
+
+      if (orderDiff !== 0) return orderDiff;
+
+      return compareByCreatedAt(a, b);
+    });
+  }, [fallbackOrders, todos]);
+
+  const todoById = useMemo(
+    () => new Map(todos.map((todo) => [todo.id, todo])),
+    [todos],
+  );
+  const sortedIds = useMemo(
+    () => sortedTodos.map((todo) => todo.id),
+    [sortedTodos],
+  );
+  const [orderedIds, setOrderedIds] = useState<number[]>(sortedIds);
+
+  useEffect(() => {
+    orderedIdsRef.current = sortedIds;
+    setOrderedIds(sortedIds);
+  }, [sortedIds]);
+
+  const setNextOrderedIds = (ids: number[]) => {
+    orderedIdsRef.current = ids;
+    setOrderedIds(ids);
+  };
+
+  const orderedTodos = orderedIds
+    .map((id) => todoById.get(id))
+    .filter((todo): todo is Task => Boolean(todo));
+
+  const handleAddTodo = () => {
+    const trimmed = newText.trim();
+    if (!trimmed) return;
+    createMutation.mutate({
+      text: trimmed,
+      progress: 0,
+      effort: 3,
+    });
+    setNewText('');
+    setIsAdding(false);
+  };
+
+  const handleDragStart = () => {
+    dragStartOrderRef.current = orderedIdsRef.current;
+  };
+
+  const handleDragEnd = (todoId: number) => {
+    const startOrder = dragStartOrderRef.current;
+    const nextOrder = orderedIdsRef.current;
+    dragStartOrderRef.current = null;
+
+    if (!startOrder || sameOrder(startOrder, nextOrder)) return;
+
+    const simpleOrder = getNextSimpleOrder({
+      movedId: todoId,
+      orderedIds: nextOrder,
+      todoById,
+      fallbackOrders,
+    });
+
+    if (simpleOrder === null) return;
+
+    reorderSimpleMutation.mutate({ id: todoId, simpleOrder });
+  };
 
   return (
     <>
@@ -49,50 +203,73 @@ function SimplePage() {
                 No todos yet. Use the + button to add one!
               </p>
             ) : (
-              <ul className="space-y-2">
-                {todos.map((todo) => {
-                  const isDone = todo.progress === 100;
+              <Reorder.Group
+                axis="y"
+                values={orderedIds}
+                onReorder={setNextOrderedIds}
+                className="space-y-2"
+              >
+                {orderedTodos.map((todo) => (
+                  <SimpleTodoItem
+                    key={todo.id}
+                    todo={todo}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    onDelete={() => deleteMutation.mutate({ id: todo.id })}
+                    onEffortChange={(effort) =>
+                      updateMutation.mutate({ id: todo.id, effort })
+                    }
+                    onProgressChange={(progress) =>
+                      updateMutation.mutate({ id: todo.id, progress })
+                    }
+                  />
+                ))}
+              </Reorder.Group>
+            )}
 
-                  return (
-                    <li key={todo.id} className="rounded-md border p-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex min-w-0 items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7 shrink-0"
-                            onClick={() =>
-                              updateMutation.mutate({
-                                id: todo.id,
-                                progress: isDone ? 0 : 100,
-                              })
-                            }
-                            aria-label={
-                              isDone ? 'Mark incomplete' : 'Mark complete'
-                            }
-                          >
-                            {isDone ? (
-                              <Circle className="h-4 w-4 text-green-500" fill="currentColor" />
-                            ) : (
-                              <Circle className="h-4 w-4 text-green-500" />
-                            )}
-                          </Button>
-                          <span className="truncate">{todo.text}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0"
-                          onClick={() => deleteMutation.mutate({ id: todo.id })}
-                          aria-label="Delete todo"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+            {isAdding ? (
+              <div className="mt-2 flex items-center gap-2">
+                <Input
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                  placeholder="What needs to be done?"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddTodo();
+                    if (e.key === 'Escape') {
+                      setNewText('');
+                      setIsAdding(false);
+                    }
+                  }}
+                  autoFocus
+                />
+                <Button
+                  size="sm"
+                  onClick={handleAddTodo}
+                  disabled={!newText.trim()}
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setNewText('');
+                    setIsAdding(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2 w-full"
+                onClick={() => setIsAdding(true)}
+              >
+                <Plus className="mr-1 h-4 w-4" />
+                Add item
+              </Button>
             )}
           </CardContent>
         </Card>
@@ -106,5 +283,104 @@ function SimplePage() {
       />
       <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
     </>
+  );
+}
+
+function SimpleTodoItem({
+  todo,
+  onDragStart,
+  onDragEnd,
+  onDelete,
+  onEffortChange,
+  onProgressChange,
+}: {
+  todo: Task;
+  onDragStart: () => void;
+  onDragEnd: (id: number) => void;
+  onDelete: () => void;
+  onEffortChange: (effort: number) => void;
+  onProgressChange: (progress: number) => void;
+}) {
+  const dragControls = useDragControls();
+  const effort = todo.effort ?? 1;
+  const progress = todo.progress ?? 0;
+  const filled = Math.round((progress / 100) * effort);
+
+  return (
+    <Reorder.Item
+      value={todo.id}
+      dragControls={dragControls}
+      dragListener={false}
+      onDragStart={onDragStart}
+      onDragEnd={() => onDragEnd(todo.id)}
+      className="relative rounded-md border bg-card p-2"
+      whileDrag={{ scale: 1.02 }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-1">
+          <button
+            type="button"
+            className="-ml-1 flex h-7 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
+            onPointerDown={(event) => dragControls.start(event)}
+            aria-label={`Reorder ${todo.text}`}
+          >
+            <GripVertical className="h-4 w-4" />
+          </button>
+          <span className="truncate">{todo.text}</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: effort }, (_, i) => {
+              const n = i + 1;
+              const isFilled = n <= filled;
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  className={`h-3 w-3 rounded-sm border ${
+                    isFilled
+                      ? 'border-green-500 bg-green-500'
+                      : 'border-muted-foreground/40'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onProgressChange(Math.round((n / effort) * 100));
+                  }}
+                  aria-label={`Progress ${n}`}
+                />
+              );
+            })}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 shrink-0"
+                aria-label="More options"
+              >
+                <Ellipsis className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Set effort</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent sideOffset={8}>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
+                      {n}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem variant="destructive" onClick={onDelete}>
+                <Trash2 className="h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </Reorder.Item>
   );
 }

@@ -19,7 +19,7 @@ export default function Layout() {
   const currentPath = matches[matches.length - 1]?.pathname || '/';
 
   // Find current page title
-  let currentPageTitle = 'Home';
+  let currentPageTitle = 'Simple';
 
   for (const navItem of sidebarData.navMain) {
     // Check if current path matches top-level item
