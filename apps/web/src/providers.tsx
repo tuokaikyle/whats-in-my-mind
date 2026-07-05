@@ -10,7 +10,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     queryClient.clear();
-  }, [session?.user.id]);
+  }, [session?.user?.id]);
 
   return (
     <AuthUIProvider
