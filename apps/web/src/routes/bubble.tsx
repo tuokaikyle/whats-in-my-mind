@@ -2,9 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
-import { useState } from 'react';
-import { AddCategory } from '@/components/add-category';
-import { AddTaskDrawer } from '@/components/add-task-drawer';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
@@ -41,8 +38,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
 }
 
 function BubblePage() {
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const { todos, todosLoading, createMutation, isGuest } = useTodos();
+  const { todos, todosLoading, isGuest } = useTodos();
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -88,7 +84,8 @@ function BubblePage() {
           enabled: true,
           format: '{point.name}',
           style: {
-            color: 'white',
+            color: 'black',
+            fontSize: '14px',
             textOutline: 'none',
             fontWeight: 'normal',
           },
@@ -111,20 +108,12 @@ function BubblePage() {
           <PageLoader size="lg" />
         ) : activeTodos.length === 0 ? (
           <p className="py-8 text-center text-muted-foreground">
-            No tasks yet. Use the + button to add one!
+            No tasks yet.
           </p>
         ) : (
           <HighchartsReact highcharts={Highcharts} options={options} />
         )}
       </div>
-
-      <AddTaskDrawer
-        categories={categories}
-        onSubmit={(data) => createMutation.mutate(data)}
-        isPending={createMutation.isPending}
-        onAddCategory={() => setAddCategoryOpen(true)}
-      />
-      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
     </>
   );
 }
