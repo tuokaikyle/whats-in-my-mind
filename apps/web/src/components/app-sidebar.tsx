@@ -9,7 +9,6 @@ import {
   HomeIcon,
   Info,
   PanelLeft,
-  SquareArrowRight,
 } from 'lucide-react';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
@@ -59,11 +58,6 @@ export const sidebarData = {
       title: 'Simple',
       url: '/simple',
       icon: FileCheck,
-    },
-    {
-      title: 'Slide',
-      url: '/slide',
-      icon: SquareArrowRight,
     },
     {
       title: 'Bubble',

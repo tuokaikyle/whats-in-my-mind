@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SlideRouteImport } from './routes/slide'
 import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as GridRouteImport } from './routes/grid'
 import { Route as BubbleRouteImport } from './routes/bubble'
@@ -21,11 +20,6 @@ import { Route as VoronoiHeadSideRouteImport } from './routes/voronoi/head-side'
 import { Route as VoronoiBrainRouteImport } from './routes/voronoi/brain'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
-const SlideRoute = SlideRouteImport.update({
-  id: '/slide',
-  path: '/slide',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
@@ -83,7 +77,6 @@ export interface FileRoutesByFullPath {
   '/bubble': typeof BubbleRoute
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
-  '/slide': typeof SlideRoute
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
@@ -96,7 +89,6 @@ export interface FileRoutesByTo {
   '/bubble': typeof BubbleRoute
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
-  '/slide': typeof SlideRoute
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
@@ -110,7 +102,6 @@ export interface FileRoutesById {
   '/bubble': typeof BubbleRoute
   '/grid': typeof GridRoute
   '/simple': typeof SimpleRoute
-  '/slide': typeof SlideRoute
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
@@ -125,7 +116,6 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/grid'
     | '/simple'
-    | '/slide'
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
@@ -138,7 +128,6 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/grid'
     | '/simple'
-    | '/slide'
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
@@ -151,7 +140,6 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/grid'
     | '/simple'
-    | '/slide'
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
@@ -165,7 +153,6 @@ export interface RootRouteChildren {
   BubbleRoute: typeof BubbleRoute
   GridRoute: typeof GridRoute
   SimpleRoute: typeof SimpleRoute
-  SlideRoute: typeof SlideRoute
   AuthPathRoute: typeof AuthPathRoute
   VoronoiBrainRoute: typeof VoronoiBrainRoute
   VoronoiHeadSideRoute: typeof VoronoiHeadSideRoute
@@ -175,13 +162,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/slide': {
-      id: '/slide'
-      path: '/slide'
-      fullPath: '/slide'
-      preLoaderRoute: typeof SlideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/simple': {
       id: '/simple'
       path: '/simple'
@@ -261,7 +241,6 @@ const rootRouteChildren: RootRouteChildren = {
   BubbleRoute: BubbleRoute,
   GridRoute: GridRoute,
   SimpleRoute: SimpleRoute,
-  SlideRoute: SlideRoute,
   AuthPathRoute: AuthPathRoute,
   VoronoiBrainRoute: VoronoiBrainRoute,
   VoronoiHeadSideRoute: VoronoiHeadSideRoute,

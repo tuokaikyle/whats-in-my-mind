@@ -84,7 +84,6 @@ google and facebook
 
 确定现有shape
 bubble - effort, deadline columns, category table
-slider - easy
 veroni - ...
 flip - easy
 heatmap
@@ -101,12 +100,11 @@ order by created date
 click catetory, open from down
 color set ready
 add effort, deadline
-slide - 100% should toggle complete. 
 please tell me if using tanstack form and a state manager like zustland would make thing easier? 
 
-now go back to point 1: please use the types that I defined in apps/web/src/utils/types.ts in Simple, Table and Slide 
+now go back to point 1: please use the types that I defined in apps/web/src/utils/types.ts in Simple 
 
-Can I do not set the completed boolean from the frontend, but only set the progress? for example, in Simple and Table, if I toggle the checkbox, it toggles the progress value to be 0 and 100. the completed value in db automatically sets to true if the progress value is 100, and false if the progress is less than 100. 
+Can I do not set the completed boolean from the frontend, but only set the progress? for example, in Simple, if I toggle the checkbox, it toggles the progress value to be 0 and 100. the completed value in db automatically sets to true if the progress value is 100, and false if the progress is less than 100. 
 
 deadline -> duedate
 
