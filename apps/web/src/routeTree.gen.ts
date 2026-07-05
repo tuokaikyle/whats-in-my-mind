@@ -19,7 +19,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as VoronoiShirtRouteImport } from './routes/voronoi/shirt'
 import { Route as VoronoiRectangularRouteImport } from './routes/voronoi/rectangular'
-import { Route as VoronoiHeadSimpleRouteImport } from './routes/voronoi/head-simple'
 import { Route as VoronoiHeadSideRouteImport } from './routes/voronoi/head-side'
 import { Route as VoronoiBrainRouteImport } from './routes/voronoi/brain'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
@@ -74,11 +73,6 @@ const VoronoiRectangularRoute = VoronoiRectangularRouteImport.update({
   path: '/voronoi/rectangular',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VoronoiHeadSimpleRoute = VoronoiHeadSimpleRouteImport.update({
-  id: '/voronoi/head-simple',
-  path: '/voronoi/head-simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const VoronoiHeadSideRoute = VoronoiHeadSideRouteImport.update({
   id: '/voronoi/head-side',
   path: '/voronoi/head-side',
@@ -107,7 +101,6 @@ export interface FileRoutesByFullPath {
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/head-simple': typeof VoronoiHeadSimpleRoute
   '/voronoi/rectangular': typeof VoronoiRectangularRoute
   '/voronoi/shirt': typeof VoronoiShirtRoute
 }
@@ -123,7 +116,6 @@ export interface FileRoutesByTo {
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/head-simple': typeof VoronoiHeadSimpleRoute
   '/voronoi/rectangular': typeof VoronoiRectangularRoute
   '/voronoi/shirt': typeof VoronoiShirtRoute
 }
@@ -140,7 +132,6 @@ export interface FileRoutesById {
   '/auth/$path': typeof AuthPathRoute
   '/voronoi/brain': typeof VoronoiBrainRoute
   '/voronoi/head-side': typeof VoronoiHeadSideRoute
-  '/voronoi/head-simple': typeof VoronoiHeadSimpleRoute
   '/voronoi/rectangular': typeof VoronoiRectangularRoute
   '/voronoi/shirt': typeof VoronoiShirtRoute
 }
@@ -158,7 +149,6 @@ export interface FileRouteTypes {
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
-    | '/voronoi/head-simple'
     | '/voronoi/rectangular'
     | '/voronoi/shirt'
   fileRoutesByTo: FileRoutesByTo
@@ -174,7 +164,6 @@ export interface FileRouteTypes {
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
-    | '/voronoi/head-simple'
     | '/voronoi/rectangular'
     | '/voronoi/shirt'
   id:
@@ -190,7 +179,6 @@ export interface FileRouteTypes {
     | '/auth/$path'
     | '/voronoi/brain'
     | '/voronoi/head-side'
-    | '/voronoi/head-simple'
     | '/voronoi/rectangular'
     | '/voronoi/shirt'
   fileRoutesById: FileRoutesById
@@ -207,7 +195,6 @@ export interface RootRouteChildren {
   AuthPathRoute: typeof AuthPathRoute
   VoronoiBrainRoute: typeof VoronoiBrainRoute
   VoronoiHeadSideRoute: typeof VoronoiHeadSideRoute
-  VoronoiHeadSimpleRoute: typeof VoronoiHeadSimpleRoute
   VoronoiRectangularRoute: typeof VoronoiRectangularRoute
   VoronoiShirtRoute: typeof VoronoiShirtRoute
 }
@@ -284,13 +271,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VoronoiRectangularRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/voronoi/head-simple': {
-      id: '/voronoi/head-simple'
-      path: '/voronoi/head-simple'
-      fullPath: '/voronoi/head-simple'
-      preLoaderRoute: typeof VoronoiHeadSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/voronoi/head-side': {
       id: '/voronoi/head-side'
       path: '/voronoi/head-side'
@@ -327,7 +307,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthPathRoute: AuthPathRoute,
   VoronoiBrainRoute: VoronoiBrainRoute,
   VoronoiHeadSideRoute: VoronoiHeadSideRoute,
-  VoronoiHeadSimpleRoute: VoronoiHeadSimpleRoute,
   VoronoiRectangularRoute: VoronoiRectangularRoute,
   VoronoiShirtRoute: VoronoiShirtRoute,
 }
