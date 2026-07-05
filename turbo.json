@@ -26,6 +26,44 @@
       "persistent": true
     },
     "db:migrate": {
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_URL_DEV",
+        "DATABASE_URL_DEV_DIRECT",
+        "DATABASE_URL_DIRECT",
+        "DATABASE_URL_PRODUCTION",
+        "DATABASE_URL_PRODUCTION_DIRECT",
+        "DATABASE_URL_MIGRATE",
+        "DB_TARGET"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "db:migrate:dev": {
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_URL_DEV",
+        "DATABASE_URL_DEV_DIRECT",
+        "DATABASE_URL_DIRECT",
+        "DATABASE_URL_PRODUCTION",
+        "DATABASE_URL_PRODUCTION_DIRECT",
+        "DATABASE_URL_MIGRATE",
+        "DB_TARGET"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "db:migrate:prod": {
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_URL_DEV",
+        "DATABASE_URL_DEV_DIRECT",
+        "DATABASE_URL_DIRECT",
+        "DATABASE_URL_PRODUCTION",
+        "DATABASE_URL_PRODUCTION_DIRECT",
+        "DATABASE_URL_MIGRATE",
+        "DB_TARGET"
+      ],
       "cache": false,
       "persistent": true
     },

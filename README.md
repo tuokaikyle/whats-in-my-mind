@@ -139,3 +139,14 @@ has better-t postgres as a remote.
 v4
 1. remove flip. this will be a new app. flip means accomplishing DAILY jobs. github view shows how well-accomplished a day is. 
 2. 
+
+##  quick note
+cloudflare prod:
+https://whats-in-my-mind.pages.dev/
+brand: v3
+
+preview:
+All non-production branches. Now I changed it to none. and no auto deploy to prod. 
+
+local 
+db dev
