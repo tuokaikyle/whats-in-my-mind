@@ -130,3 +130,16 @@ think:
 one model multiple views
 or 
 multi models multi views
+
+
+## dev log
+main -> can change to v1
+original
+
+v2
+use better t
+
+v3
+more better-t, polished
+
+has better-t postgres as a remote. 
