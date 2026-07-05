@@ -10,7 +10,6 @@ import {
   Info,
   PanelLeft,
   SquareArrowRight,
-  Table2,
 } from 'lucide-react';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
@@ -60,11 +59,6 @@ export const sidebarData = {
       title: 'Simple',
       url: '/simple',
       icon: FileCheck,
-    },
-    {
-      title: 'Table',
-      url: '/table',
-      icon: Table2,
     },
     {
       title: 'Slide',
