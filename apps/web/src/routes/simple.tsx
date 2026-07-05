@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Check, Circle, Trash2 } from 'lucide-react';
+import { Circle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { AddCategory } from '@/components/add-category';
 import { AddTaskDrawer } from '@/components/add-task-drawer';
@@ -72,20 +72,12 @@ function SimplePage() {
                             }
                           >
                             {isDone ? (
-                              <Check className="h-4 w-4 text-green-500" />
+                              <Circle className="h-4 w-4 text-green-500" fill="currentColor" />
                             ) : (
                               <Circle className="h-4 w-4 text-green-500" />
                             )}
                           </Button>
-                          <span
-                            className={
-                              isDone
-                                ? 'truncate text-muted-foreground line-through'
-                                : 'truncate'
-                            }
-                          >
-                            {todo.text}
-                          </span>
+                          <span className="truncate">{todo.text}</span>
                         </div>
                         <Button
                           variant="ghost"
