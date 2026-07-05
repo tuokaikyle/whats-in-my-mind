@@ -146,7 +146,12 @@ https://whats-in-my-mind.pages.dev/
 brand: v3
 
 preview:
-All non-production branches. Now I changed it to none. and no auto deploy to prod. 
+All non-production branches. Now I changed it to none. and no auto deploy to prod. This can be toggled. 
 
 local 
 db dev
+
+deployed can be cloudflare production and preview. 
+web is deployed automatically after a push. 
+api needs to be deployed manually. the command needs to log into cloudflare through wrangler. 
+wed deploy page - there is a vite server url. this needs to be the domain of the api deployments. maybe no need to have the / in the end. 
