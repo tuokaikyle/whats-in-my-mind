@@ -12,6 +12,7 @@ type UpdateInput = RouterInputs['todo']['update'];
 type DeleteInput = RouterInputs['todo']['delete'];
 type ReorderSimpleInput = RouterInputs['todo']['reorderSimple'];
 type CreateCategoryInput = RouterInputs['category']['create'];
+type DeleteCategoryInput = RouterInputs['category']['delete'];
 
 const GUEST_TODOS_KEY = ['guest', 'todos'] as const;
 const GUEST_CATEGORIES_KEY = ['guest', 'categories'] as const;
@@ -217,12 +218,32 @@ export function useCategories() {
     },
   });
 
+  const deleteMutation = useMutation<
+    unknown,
+    Error,
+    DeleteCategoryInput
+  >({
+    mutationFn: isGuest
+      ? async (input) => {
+          queryClient.setQueryData<Category[]>(queryKey, (prev) =>
+            (prev ?? []).filter((c) => c.id !== input.id),
+          );
+        }
+      : (input) => trpcClient.category.delete.mutate(input),
+    onSuccess: () => {
+      if (!isGuest) {
+        queryClient.invalidateQueries({ queryKey });
+      }
+    },
+  });
+
   const categories = (query.data ?? []) as Category[];
 
   return {
     categories,
     isLoading: query.isLoading,
     createMutation,
+    deleteMutation,
     isGuest,
   };
 }

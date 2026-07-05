@@ -2,8 +2,6 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Reorder, useDragControls } from 'framer-motion';
 import { Ellipsis, GripVertical, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AddCategory } from '@/components/add-category';
-import { AddTaskDrawer } from '@/components/add-task-drawer';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
@@ -90,7 +88,6 @@ function getNextSimpleOrder({
 }
 
 function SimplePage() {
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const {
@@ -213,6 +210,7 @@ function SimplePage() {
                   <SimpleTodoItem
                     key={todo.id}
                     todo={todo}
+                    categories={categories}
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
                     onDelete={() => deleteMutation.mutate({ id: todo.id })}
@@ -221,6 +219,9 @@ function SimplePage() {
                     }
                     onProgressChange={(progress) =>
                       updateMutation.mutate({ id: todo.id, progress })
+                    }
+                    onCategoryChange={(categoryId) =>
+                      updateMutation.mutate({ id: todo.id, categoryId })
                     }
                   />
                 ))}
@@ -274,32 +275,28 @@ function SimplePage() {
           </CardContent>
         </Card>
       </div>
-
-      <AddTaskDrawer
-        categories={categories}
-        onSubmit={(data) => createMutation.mutate(data)}
-        isPending={createMutation.isPending}
-        onAddCategory={() => setAddCategoryOpen(true)}
-      />
-      <AddCategory open={addCategoryOpen} onOpenChange={setAddCategoryOpen} />
     </>
   );
 }
 
 function SimpleTodoItem({
   todo,
+  categories,
   onDragStart,
   onDragEnd,
   onDelete,
   onEffortChange,
   onProgressChange,
+  onCategoryChange,
 }: {
   todo: Task;
+  categories: { id: number; name: string; color: string | null }[];
   onDragStart: () => void;
   onDragEnd: (id: number) => void;
   onDelete: () => void;
   onEffortChange: (effort: number) => void;
   onProgressChange: (progress: number) => void;
+  onCategoryChange: (categoryId: number | null) => void;
 }) {
   const dragControls = useDragControls();
   const effort = todo.effort ?? 1;
@@ -369,6 +366,26 @@ function SimpleTodoItem({
                   {[1, 2, 3, 4, 5].map((n) => (
                     <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
                       {n}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Set category</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent sideOffset={8}>
+                  <DropdownMenuItem onClick={() => onCategoryChange(null)}>
+                    None
+                  </DropdownMenuItem>
+                  {categories.map((cat) => (
+                    <DropdownMenuItem
+                      key={cat.id}
+                      onClick={() => onCategoryChange(cat.id)}
+                    >
+                      <div
+                        className="mr-2 h-3 w-3 rounded-full border"
+                        style={{ backgroundColor: cat.color ?? '#6366f1' }}
+                      />
+                      {cat.name}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>
