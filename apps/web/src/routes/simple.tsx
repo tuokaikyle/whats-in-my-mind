@@ -244,13 +244,6 @@ function SimplePage() {
                 />
                 <Button
                   size="sm"
-                  onClick={handleAddTodo}
-                  disabled={!newText.trim()}
-                >
-                  Save
-                </Button>
-                <Button
-                  size="sm"
                   variant="ghost"
                   onClick={() => {
                     setNewText('');
@@ -258,6 +251,13 @@ function SimplePage() {
                   }}
                 >
                   Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleAddTodo}
+                  disabled={!newText.trim()}
+                >
+                  Save
                 </Button>
               </div>
             ) : (
