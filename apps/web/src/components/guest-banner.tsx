@@ -1,12 +1,13 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 export function GuestBanner({ className }: { className?: string }) {
   return (
     <div
-      className={
-        'rounded-md border border-dashed p-3 text-center text-muted-foreground text-sm' +
-        (className ?? '')
-      }
+      className={cn(
+        'mb-4 rounded-md border border-dashed p-3 text-center text-muted-foreground text-sm',
+        className,
+      )}
     >
       This is a demo with sample data.{' '}
       <Link
