@@ -11,12 +11,9 @@ export const todoRouter = router({
       .select({
         id: todo.id,
         text: todo.text,
-        completed: todo.completed,
         categoryId: todo.categoryId,
-        importance: todo.importance,
         progress: todo.progress,
         effort: todo.effort,
-        deadline: todo.deadline,
         metadata: todo.metadata,
         createdAt: todo.createdAt,
         updatedAt: todo.updatedAt,
@@ -31,21 +28,17 @@ export const todoRouter = router({
       z.object({
         text: z.string().min(1),
         categoryId: z.number().int().nullable().optional(),
-        importance: z.number().int().min(1).max(5).optional(),
         progress: z.number().int().min(0).max(100).optional(),
         effort: z.number().int().min(0).optional(),
-        deadline: z.string().datetime().nullable().optional(),
         metadata: metadataSchema.nullable().optional(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.db.insert(todo).values({
         text: input.text,
         categoryId: input.categoryId,
-        importance: input.importance,
         progress: input.progress,
         effort: input.effort,
-        deadline: input.deadline ? new Date(input.deadline) : null,
         metadata: input.metadata,
         userId: ctx.session.user.id,
       });
@@ -56,26 +49,18 @@ export const todoRouter = router({
       z.object({
         id: z.number(),
         text: z.string().min(1).optional(),
-        completed: z.boolean().optional(),
         categoryId: z.number().int().nullable().optional(),
-        importance: z.number().int().min(1).max(5).optional(),
         progress: z.number().int().min(0).max(100).optional(),
         effort: z.number().int().min(0).optional(),
-        deadline: z.string().datetime().nullable().optional(),
         metadata: metadataSchema.nullable().optional(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
-      const { id, deadline, ...rest } = input;
+      const { id, ...rest } = input;
       return await ctx.db
         .update(todo)
-        .set({
-          ...rest,
-          ...(deadline !== undefined ? { deadline: deadline ? new Date(deadline) : null } : {}),
-        })
-        .where(
-          and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)),
-        );
+        .set(rest)
+        .where(and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)));
     }),
 
   delete: protectedProcedure

@@ -23,10 +23,8 @@ import type { Category } from '@/utils/types';
 export type AddTaskData = {
   text: string;
   categoryId?: number | null;
-  importance?: number;
   effort?: number;
   progress?: number;
-  deadline?: string | null;
 };
 
 const RATING_OPTIONS = ['1', '2', '3', '4', '5'] as const;
@@ -47,18 +45,14 @@ export function AddTaskDrawer({
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [categoryId, setCategoryId] = useState<number | undefined>();
-  const [importance, setImportance] = useState('3');
   const [effort, setEffort] = useState('3');
   const [progress, setProgress] = useState('0');
-  const [deadline, setDeadline] = useState('');
 
   const reset = () => {
     setText('');
     setCategoryId(undefined);
-    setImportance('3');
     setEffort('3');
     setProgress('0');
-    setDeadline('');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -68,10 +62,8 @@ export function AddTaskDrawer({
     onSubmit({
       text: text.trim(),
       categoryId: categoryId ?? null,
-      importance: Number.parseInt(importance, 10),
       effort: Number.parseInt(effort, 10),
       progress: Number.parseInt(progress, 10),
-      deadline: deadline ? new Date(deadline).toISOString() : null,
     });
 
     reset();
@@ -117,26 +109,6 @@ export function AddTaskDrawer({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="drawer-importance">Importance</Label>
-                  <Select
-                    value={importance}
-                    onValueChange={setImportance}
-                    disabled={isPending}
-                  >
-                    <SelectTrigger id="drawer-importance" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {RATING_OPTIONS.map((v) => (
-                        <SelectItem key={v} value={v}>
-                          {v}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="drawer-effort">Effort</Label>
                   <Select
                     value={effort}
@@ -155,9 +127,7 @@ export function AddTaskDrawer({
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="drawer-progress">Progress (%)</Label>
                   <Input
@@ -167,17 +137,6 @@ export function AddTaskDrawer({
                     max="100"
                     value={progress}
                     onChange={(e) => setProgress(e.target.value)}
-                    disabled={isPending}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="drawer-deadline">Deadline</Label>
-                  <Input
-                    id="drawer-deadline"
-                    type="date"
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
                     disabled={isPending}
                   />
                 </div>

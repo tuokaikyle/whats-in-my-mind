@@ -1,1 +1,1 @@
-ALTER TABLE "category" ADD COLUMN "color" text;
+ALTER TABLE "category" ADD COLUMN IF NOT EXISTS "color" text;

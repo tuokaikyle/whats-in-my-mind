@@ -29,6 +29,8 @@
     "db:studio": "turbo -F @whats-in-my-mind/db db:studio",
     "db:generate": "turbo -F @whats-in-my-mind/db db:generate",
     "db:migrate": "turbo -F @whats-in-my-mind/db db:migrate",
+    "db:migrate:dev": "turbo -F @whats-in-my-mind/db db:migrate:dev",
+    "db:migrate:prod": "turbo -F @whats-in-my-mind/db db:migrate:prod",
     "clean": "find . -name node_modules -type d -prune -exec rm -rf '{}' +",
     "deploy:server": "turbo -F server deploy",
     "deploy:web": "cd apps/web && bun run build && wrangler pages deploy dist",

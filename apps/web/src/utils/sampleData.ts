@@ -1,5 +1,5 @@
 import { AppColors300 } from './enums';
-import { type Category, type Task } from './types';
+import type { Category, Task } from './types';
 
 function createTasks(
   input: { category: string; color: string; tasks: string[] }[],
@@ -19,14 +19,9 @@ function createTasks(
       tasks.push({
         id: id++,
         text,
-        completed: Math.random() > 0.8,
         categoryId: catIdx + 1,
         effort: Math.floor(Math.random() * 5) + 1,
-        importance: Math.floor(Math.random() * 5) + 1,
         progress: Math.random() > 0.5 ? Math.floor(Math.random() * 101) : null,
-        deadline: new Date(
-          Date.now() - Math.random() * 180 * 86_400_000,
-        ).toISOString(),
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
       });

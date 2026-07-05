@@ -50,50 +50,56 @@ function SimplePage() {
               </p>
             ) : (
               <ul className="space-y-2">
-                {todos.map((todo) => (
-                  <li
-                    key={todo.id}
-                    className="flex items-center justify-between rounded-md border p-2"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 shrink-0"
-                        onClick={() =>
-                          updateMutation.mutate({
-                            id: todo.id,
-                            completed: !todo.completed,
-                          })
-                        }
-                        aria-label={
-                          todo.completed ? 'Mark incomplete' : 'Mark complete'
-                        }
-                      >
-                        <Circle
-                          className={`h-4 w-4 ${todo.completed ? 'fill-green-500 text-green-500' : 'text-green-500'}`}
-                        />
-                      </Button>
-                      <span
-                        className={
-                          todo.completed
-                            ? 'text-muted-foreground line-through'
-                            : ''
-                        }
-                      >
-                        {todo.text}
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteMutation.mutate({ id: todo.id })}
-                      aria-label="Delete todo"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </li>
-                ))}
+                {todos.map((todo) => {
+                  const isDone = todo.progress === 100;
+
+                  return (
+                    <li key={todo.id} className="rounded-md border p-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 items-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={() =>
+                              updateMutation.mutate({
+                                id: todo.id,
+                                progress: isDone ? 0 : 100,
+                              })
+                            }
+                            aria-label={
+                              isDone ? 'Mark incomplete' : 'Mark complete'
+                            }
+                          >
+                            {isDone ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Circle className="h-4 w-4 text-green-500" />
+                            )}
+                          </Button>
+                          <span
+                            className={
+                              isDone
+                                ? 'truncate text-muted-foreground line-through'
+                                : 'truncate'
+                            }
+                          >
+                            {todo.text}
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0"
+                          onClick={() => deleteMutation.mutate({ id: todo.id })}
+                          aria-label="Delete todo"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </CardContent>

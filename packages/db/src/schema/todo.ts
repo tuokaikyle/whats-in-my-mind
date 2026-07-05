@@ -1,6 +1,5 @@
 import { relations } from 'drizzle-orm';
 import {
-  boolean,
   index,
   integer,
   jsonb,
@@ -17,12 +16,11 @@ export const todo = pgTable(
   {
     id: serial('id').primaryKey(),
     text: text('text').notNull(),
-    completed: boolean('completed').default(false).notNull(),
-    categoryId: integer('category_id').references(() => category.id, { onDelete: 'set null' }),
-    importance: integer('importance'),
+    categoryId: integer('category_id').references(() => category.id, {
+      onDelete: 'set null',
+    }),
     progress: integer('progress'),
     effort: integer('effort'),
-    deadline: timestamp('deadline'),
     metadata: jsonb('metadata').$type<Record<string, unknown> | null>(),
     userId: text('user_id')
       .notNull()

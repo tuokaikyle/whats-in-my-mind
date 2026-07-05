@@ -8,13 +8,6 @@ import { AddTaskDrawer } from '@/components/add-task-drawer';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import type { Category, Task } from '@/utils/types';
 
@@ -22,18 +15,13 @@ export const Route = createFileRoute('/bubble')({
   component: BubblePage,
 });
 
-type Metric = 'importance' | 'effort';
-
-function buildSeries(todos: Task[], categories: Category[], metric: Metric) {
-  const getValue = (t: Task) =>
-    (metric === 'importance' ? t.importance : t.effort) ?? 1;
-
+function buildSeries(todos: Task[], categories: Category[]) {
   const categorySeries = categories.map((category) => ({
     name: category.name,
     color: category.color ?? undefined,
     data: todos
       .filter((t) => t.categoryId === category.id)
-      .map((t) => ({ name: t.text, value: getValue(t) })),
+      .map((t) => ({ name: t.text, value: t.effort ?? 1 })),
   }));
 
   const knownIds = new Set(categories.map((c) => c.id));
@@ -45,7 +33,7 @@ function buildSeries(todos: Task[], categories: Category[], metric: Metric) {
     categorySeries.push({
       name: 'Other',
       color: '#94a3b8',
-      data: uncategorized.map((t) => ({ name: t.text, value: getValue(t) })),
+      data: uncategorized.map((t) => ({ name: t.text, value: t.effort ?? 1 })),
     });
   }
 
@@ -54,13 +42,12 @@ function buildSeries(todos: Task[], categories: Category[], metric: Metric) {
 
 function BubblePage() {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const [metric, setMetric] = useState<Metric>('importance');
   const { todos, todosLoading, createMutation, isGuest } = useTodos();
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
-  const activeTodos = todos.filter((t) => !t.completed);
+  const activeTodos = todos.filter((t) => t.progress !== 100);
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -81,11 +68,11 @@ function BubblePage() {
       style: { color: textColor, fontWeight: '600' },
     },
     subtitle: {
-      text: `Grouped by category — bubble size reflects ${metric}`,
+      text: 'Grouped by category. Bubble size reflects effort.',
       style: { color: mutedColor },
     },
     tooltip: {
-      pointFormat: `<b>{point.name}</b><br/>${metric === 'importance' ? 'Importance' : 'Effort'}: {point.value}`,
+      pointFormat: '<b>{point.name}</b><br/>Effort: {point.value}',
       backgroundColor: tooltipBg,
       borderColor: tooltipBorder,
       style: { color: textColor },
@@ -111,7 +98,6 @@ function BubblePage() {
     series: buildSeries(
       activeTodos,
       categories,
-      metric,
     ) as Highcharts.SeriesOptionsType[],
     credits: { enabled: false },
   };
@@ -128,27 +114,7 @@ function BubblePage() {
             No tasks yet. Use the + button to add one!
           </p>
         ) : (
-          <>
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-sm">
-                Bubble size:
-              </span>
-              <Select
-                value={metric}
-                onValueChange={(v) => setMetric(v as Metric)}
-              >
-                <SelectTrigger className="w-36">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="importance">Importance</SelectItem>
-                  <SelectItem value="effort">Effort</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <HighchartsReact highcharts={Highcharts} options={options} />
-          </>
+          <HighchartsReact highcharts={Highcharts} options={options} />
         )}
       </div>
 

@@ -45,7 +45,11 @@ export function useTodos() {
     enabled: !sessionLoading && isGuest,
   });
 
-  const todosQuery = sessionLoading ? authQuery : isGuest ? guestQuery : authQuery;
+  const todosQuery = sessionLoading
+    ? authQuery
+    : isGuest
+      ? guestQuery
+      : authQuery;
 
   const setCache = (updater: (prev: Task[]) => Task[]) =>
     queryClient.setQueryData<Task[]>(queryKey, (prev) => updater(prev ?? []));
@@ -64,12 +68,9 @@ export function useTodos() {
           return {
             id: Date.now(),
             text: input.text,
-            completed: false,
             categoryId: input.categoryId ?? null,
-            importance: input.importance ?? null,
             effort: input.effort ?? null,
             progress: input.progress ?? 0,
-            deadline: input.deadline ?? null,
             metadata: input.metadata ?? null,
             createdAt: now,
             updatedAt: now,
