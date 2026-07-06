@@ -74,55 +74,6 @@ whats-in-my-mind/
 - `bun run deploy:web`: Deploy frontend to Cloudflare Pages
 - `bun run deploy`: Build and deploy backend
 
-## Make things right
-no logged in user to use local storage
-consider to have a header bar - add todo button
-edit todo
-add test
-经常fetch不到 得单独点route才可以成功fetch
-google and facebook
-
-确定现有shape
-bubble - effort columns, category table
-flip - easy
-heatmap
-
-user-preferences
-category table
-color set
-
-react hook form
-select
-
-order by created date
-click catetory, open from down
-color set ready
-add effort
-please tell me if using tanstack form and a state manager like zustland would make thing easier? 
-
-now go back to point 1: please use the types that I defined in apps/web/src/utils/types.ts in Simple 
-
-
-原则
-一定是可以未登陆尝试
-一定有原始数据
-最好能尝试所有页面 所有功能
-同步 不一定有 就让它存在于local
-得有sample data
-anonymous plugin 
-have stats on how many users
-
-strategies:
-react state
-local storage - no sync
-local storage - with sync
-anonymous account
-
-think:
-one model multiple views
-or 
-multi models multi views
-
 
 ## dev log
 main -> can change to v1
@@ -134,11 +85,8 @@ use better t
 v3
 more better-t, polished
 
-has better-t postgres as a remote. 
-
 v4
-1. remove flip. this will be a new app. flip means accomplishing DAILY jobs. github view shows how well-accomplished a day is. 
-2. 
+only keep the simple and bubble views. 
 
 ##  quick note
 cloudflare prod:
@@ -161,3 +109,11 @@ deployed can be cloudflare production and preview.
 web is deployed automatically after a push. 
 api needs to be deployed manually. the command needs to log into cloudflare through wrangler. 
 wed deploy page - there is a vite server url. this needs to be the domain of the api deployments. maybe no need to have the / in the end. 
+
+## issues
+bubble does not drag
+email verify
+social log in
+pre set colors, or use v1 bubble colors
+order todo
+category 
