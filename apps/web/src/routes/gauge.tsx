@@ -1,74 +1,203 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
+import { GuestBanner } from '@/components/guest-banner';
+import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { useTodos } from '@/hooks/use-todos';
+import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/gauge')({
   component: GaugePage,
 });
 
-function GaugePage() {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
-
+function buildGaugeOptions(
+  todo: Task,
+  isDark: boolean,
+  name: string
+): Highcharts.Options {
   const textColor = isDark ? '#f5f5f5' : '#171717';
+  const mutedColor = isDark ? '#a3a3a3' : '#737373';
+  const trackColor = isDark ? '#262626' : '#e5e5e5';
+  const progress = Math.max(0, Math.min(100, todo.progress ?? 0));
 
-  const options: Highcharts.Options = {
+  const progressColor = '#10b981';
+
+  return {
     chart: {
       type: 'gauge',
+      height: '240px',
       backgroundColor: 'transparent',
       style: {
         fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
       },
+      spacing: [10, 20, 10, 20], // Padding to ensure outside numbers aren't cut off
     },
     title: {
-      text: 'Default look',
-      style: { color: textColor },
+      text: undefined,
+    },
+    subtitle: {
+      text: name,
+      align: 'center',
+      verticalAlign: 'bottom',
+      y: 4,
+      style: {
+        color: textColor,
+        fontSize: '16px',
+      },
     },
     pane: {
-      startAngle: -90,
-      endAngle: 90,
-      borderRadius: '50%',
-      background: null,
+      startAngle: -125,
+      endAngle: 125,
+      background: [
+        {
+          // The background track for the meter (inner band)
+          backgroundColor: trackColor,
+          borderWidth: 0,
+          outerRadius: '100%',
+          innerRadius: '78%',
+          shape: 'arc',
+          borderRadius: '50%',
+        },
+      ],
     } as unknown as Highcharts.PaneOptions,
     yAxis: {
       min: 0,
       max: 100,
+      // Explicitly define where the numbers appear
+      tickPositions: [0, 20, 40, 60, 80, 100],
+      tickColor: mutedColor,
+      tickLength: 8,
+      tickWidth: 2,
+      // Add minor ticks for that classic instrument cluster look
+      minorTickInterval: 5,
+      minorTickLength: 4,
+      minorTickWidth: 1,
+      minorTickColor: mutedColor,
+      offset: -25,
+      gridLineWidth: 0,
+      labels: {
+        // Pushes the numbers outside the 100% radius
+        distance: 40,
+        style: {
+          color: mutedColor,
+          fontSize: '11px',
+          fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
+        },
+      },
       plotBands: [
-        { from: 0, to: 50, color: '#55BF3B' },
-        { from: 50, to: 75, color: '#DDDF0D' },
-        { from: 75, to: 100, color: '#DF5353' },
+        {
+          // Full background track (gray)
+          from: 0,
+          to: 100,
+          color: trackColor,
+          outerRadius: '100%',
+          innerRadius: '78%',
+          borderWidth: 0,
+          borderRadius: '50%',
+        },
+        {
+          // Progress track (colored)
+          from: 0,
+          to: progress,
+          color: progressColor,
+          outerRadius: '100%',
+          innerRadius: '78%',
+          borderWidth: 0,
+          borderRadius: '50%',
+        },
       ],
     },
     series: [
       {
-        name: 'Score',
-        data: [68],
-        tooltip: { valueSuffix: ' / 100' },
+        name: 'Progress',
+        data: [progress],
+        tooltip: { valueSuffix: '%' },
+        // The Needle
+        dial: {
+          radius: '60%', // Needle stops inside the inner band
+          backgroundColor: textColor,
+          baseWidth: 6,
+          topWidth: 1,
+          baseLength: '10%',
+          rearLength: '0%',
+          borderColor: 'transparent',
+          borderWidth: 0,
+        },
+        // The center hub of the needle
+        pivot: {
+          radius: 6,
+          backgroundColor: textColor,
+          borderColor: isDark ? '#262626' : '#ffffff',
+          borderWidth: 2,
+        },
+        dataLabels: {
+          enabled: true,
+          format:
+            '<span style="font-size:28px;font-weight:700;letter-spacing:-0.03em;color:' +
+            textColor +
+            '">{y}%</span>',
+          y: 45, // Position text below the needle hub
+          borderWidth: 0,
+          useHTML: true,
+          backgroundColor: 'transparent',
+          shadow: false,
+        },
       } as Highcharts.SeriesOptionsType,
     ],
     credits: { enabled: false },
+    xAxis: {
+      visible: false,
+    },
+    plotOptions: {
+      gauge: {
+        dataLabels: { borderWidth: 0 },
+      },
+    },
   };
+}
+
+function GaugePage() {
+  const { todos, todosLoading, isGuest } = useTodos();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
+  const activeTodos = useMemo(
+    () => todos.filter((t) => t.progress !== 100),
+    [todos]
+  );
 
   return (
-    <div className='mx-auto w-full max-w-md py-10'>
-      <Card>
-        <CardHeader>
-          <CardTitle>Gauge</CardTitle>
-          <CardDescription>Score gauge</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </CardContent>
-      </Card>
+    <div className='mx-auto w-full max-w-6xl space-y-6 px-4 py-10'>
+      {isGuest && <GuestBanner />}
+
+      {todosLoading ? (
+        <PageLoader size='lg' />
+      ) : activeTodos.length === 0 ? (
+        <div className='flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center'>
+          <p className='text-lg font-medium text-foreground'>
+            No tasks in progress
+          </p>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            Complete some tasks or add new ones to see them here.
+          </p>
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+          {activeTodos.map((todo) => {
+            return (
+              <div key={todo.id} className='flex flex-col items-center'>
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={buildGaugeOptions(todo, isDark, todo.text)}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
