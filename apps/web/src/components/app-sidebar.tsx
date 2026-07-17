@@ -1,5 +1,5 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
-import { useMatchRoute } from '@tanstack/react-router';
+import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Bubbles,
   Command,
@@ -12,12 +12,12 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
-import { useCallback, useState } from 'react';
-import { NavMain, type NavItem } from '@/components/nav-main';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -27,29 +27,18 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ModeToggle } from './mode-toggle';
 
-const COLLAPSIBLE_STORAGE_KEY = 'sidebar-open-items';
-
-function loadOpenItems(): Set<string> {
-  try {
-    const raw = localStorage.getItem(COLLAPSIBLE_STORAGE_KEY);
-    if (raw) return new Set(JSON.parse(raw));
-  } catch {
-    /* ignore */
-  }
-  return new Set();
-}
-
-function saveOpenItems(items: Set<string>) {
-  localStorage.setItem(COLLAPSIBLE_STORAGE_KEY, JSON.stringify([...items]));
-}
-
 export const sidebarData: {
   user: {
     name: string;
     email: string;
     avatar: string;
   };
-  navMain: NavItem[];
+  navMain: {
+    title: string;
+    url: string;
+    icon: React.ElementType;
+    group: string;
+  }[];
 } = {
   user: {
     name: 'shadcn',
@@ -61,36 +50,43 @@ export const sidebarData: {
       title: 'Simple',
       url: '/simple',
       icon: FileCheck,
+      group: 'Edit',
     },
     {
       title: 'Progress',
       url: '/progress',
       icon: TrendingUp,
+      group: 'Edit',
     },
     {
       title: 'Bubble',
       url: '/bubble',
       icon: Bubbles,
+      group: 'View',
     },
     {
       title: 'Gauge',
       url: '/gauge',
       icon: Gauge,
+      group: 'View',
     },
     {
       title: 'Tree Map',
       url: '/treemap',
       icon: LayoutGrid,
-    },
-    {
-      title: 'About',
-      url: '/about',
-      icon: Info,
+      group: 'View',
     },
     {
       title: 'Manage',
       url: '/manage',
       icon: Settings2,
+      group: 'Other',
+    },
+    {
+      title: 'About',
+      url: '/about',
+      icon: Info,
+      group: 'Other',
     },
   ],
 };
@@ -100,45 +96,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { toggleSidebar, open } = useSidebar();
   const isMobile = useIsMobile();
 
-  // Persisted collapsible open/closed state
-  const [openItems, setOpenItems] = useState<Set<string>>(loadOpenItems);
-  const [navKey, setNavKey] = useState(0);
-
-  const handleSidebarClick = useCallback((e: React.MouseEvent) => {
-    const trigger = (e.target as HTMLElement).closest(
-      '[data-slot="collapsible-trigger"]'
-    ) as HTMLElement | null;
-    if (!trigger) return;
-
-    const titleEl = trigger.querySelector('span');
-    const title = titleEl?.textContent;
-    if (!title) return;
-
-    // Determine if this click is opening or closing
-    const collapsible = trigger.closest('[data-slot="collapsible"]');
-    const isCurrentlyOpen = collapsible?.getAttribute('data-state') === 'open';
-
-    setOpenItems((prev) => {
-      const next = new Set(prev);
-      if (isCurrentlyOpen) {
-        next.delete(title);
-      } else {
-        next.add(title);
-      }
-      saveOpenItems(next);
-      return next;
-    });
-    setNavKey((k) => k + 1);
-  }, []);
-
-  const navMainWithActive = sidebarData.navMain.map((item) => ({
-    ...item,
-    // For collapsible items, `isActive` is only used as `defaultOpen` in NavMain.
-    // Override it with persisted state so reopening the page restores the sidebar.
-    isActive: item.items
-      ? openItems.has(item.title) || !!matchRoute({ to: item.url })
-      : !!matchRoute({ to: item.url }),
-  }));
+  // Group items by their 'group' property
+  const groupedNavMain = sidebarData.navMain.reduce((acc, item) => {
+    const group = item.group || 'Other';
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(item);
+    return acc;
+  }, {} as Record<string, typeof sidebarData.navMain>);
 
   return (
     <Sidebar collapsible='icon' {...props}>
@@ -151,8 +115,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className='size-4' />
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-medium'>Acme Inc</span>
-                  <span className='truncate text-xs'>Fullstack template</span>
+                  <span className='truncate font-medium'>
+                    What's in my mind
+                  </span>
+                  <span className='truncate text-xs'>View differently</span>
                 </div>
                 <PanelLeft className='size-4' />
               </div>
@@ -160,8 +126,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent onClick={handleSidebarClick}>
-        <NavMain key={navKey} items={navMainWithActive} />
+      <SidebarContent>
+        {Object.entries(groupedNavMain).map(([group, items]) => (
+          <SidebarGroup key={group}>
+            <SidebarGroupLabel>{group}</SidebarGroupLabel>
+            <SidebarMenu>
+              {items.map((item) => (
+                <SidebarMenuItem key={item.url}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={!!matchRoute({ to: item.url })}
+                  >
+                    <Link to={item.url}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter className='mb-1'>
         <UserButton
