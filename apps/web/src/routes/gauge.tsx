@@ -77,6 +77,7 @@ function buildGaugeOptions(
       minorTickWidth: 1,
       minorTickColor: mutedColor,
       offset: -25,
+      // lineWidth: 0,
       gridLineWidth: 0,
       labels: {
         // Pushes the numbers outside the 100% radius
@@ -117,14 +118,14 @@ function buildGaugeOptions(
         tooltip: { valueSuffix: '%' },
         // The Needle
         dial: {
-          radius: '60%', // Needle stops inside the inner band
-          backgroundColor: textColor,
-          baseWidth: 6,
-          topWidth: 1,
-          baseLength: '10%',
-          rearLength: '0%',
-          borderColor: 'transparent',
-          borderWidth: 0,
+          radius: '55%',
+          // backgroundColor: textColor,
+          // baseWidth: 6,
+          // topWidth: 1,
+          // baseLength: '10%',
+          // rearLength: '0%',
+          // borderColor: 'transparent',
+          // borderWidth: 0,
         },
         // The center hub of the needle
         pivot: {
