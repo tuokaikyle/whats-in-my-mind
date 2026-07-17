@@ -11,6 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCategories } from '@/hooks/use-todos';
+import { highChartColors } from '@/utils/enums';
 
 interface AddCategoryProps {
   open: boolean;
@@ -19,7 +20,7 @@ interface AddCategoryProps {
 
 export function AddCategory({ open, onOpenChange }: AddCategoryProps) {
   const [name, setName] = useState('');
-  const [color, setColor] = useState('#6366f1');
+  const [color, setColor] = useState(highChartColors.Indigo);
   const { createMutation } = useCategories();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,76 +32,74 @@ export function AddCategory({ open, onOpenChange }: AddCategoryProps) {
         onSuccess: () => {
           toast.success('Category created successfully!');
           setName('');
-          setColor('#6366f1');
+          setColor(highChartColors.Indigo);
           onOpenChange(false);
         },
         onError: (error) => {
           toast.error(
-            error instanceof Error
-              ? error.message
-              : 'Failed to create category',
+            error instanceof Error ? error.message : 'Failed to create category'
           );
         },
-      },
+      }
     );
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Add New Category</DialogTitle>
           <DialogDescription>
             Create a new category to organize your entries.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="category-name">Category Name *</Label>
+        <form onSubmit={handleSubmit} className='space-y-4'>
+          <div className='space-y-2'>
+            <Label htmlFor='category-name'>Category Name *</Label>
             <Input
-              id="category-name"
-              placeholder="Enter category name..."
+              id='category-name'
+              placeholder='Enter category name...'
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={createMutation.isPending}
             />
           </div>
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Color</Label>
-            <div className="flex items-center space-x-2">
-              <Input
-                type="color"
-                className="h-10 w-16 cursor-pointer rounded p-1"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                disabled={createMutation.isPending}
-              />
-              <Input
-                type="text"
-                placeholder="#6366f1"
-                className="flex-1"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                disabled={createMutation.isPending}
-              />
+            <div className='flex flex-wrap gap-2'>
+              {Object.entries(highChartColors).map(([name, hex]) => (
+                <button
+                  key={name}
+                  type='button'
+                  className={`h-8 w-8 rounded-full border-2 transition-all hover:scale-110 ${
+                    color === hex
+                      ? 'border-white shadow-md scale-110'
+                      : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: hex }}
+                  title={name}
+                  onClick={() => setColor(hex)}
+                  disabled={createMutation.isPending}
+                />
+              ))}
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className='text-muted-foreground text-sm'>
               Choose a color to identify this category
             </p>
           </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className='flex justify-end space-x-2 pt-4'>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={() => onOpenChange(false)}
               disabled={createMutation.isPending}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
+              type='submit'
               disabled={createMutation.isPending || !name.trim()}
             >
               {createMutation.isPending ? 'Creating...' : 'Create Category'}

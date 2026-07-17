@@ -47,3 +47,26 @@ export enum AppColors500 {
   Pink500 = '#ec4899',
   Rose500 = '#f43f5e',
 }
+
+export enum highChartColors {
+  // Bright sky blue
+  Blue = '#2caffe',
+  // Deep indigo
+  Indigo = '#544fc5',
+  // Vibrant green
+  Green = '#00e272',
+  // Warm orange
+  Orange = '#fe6a35',
+  // Steel blue
+  SteelBlue = '#6b8abc',
+  // Soft pink-purple
+  Pink = '#d568fb',
+  // Bright teal
+  Teal = '#2ee0ca',
+  // Bold red
+  Red = '#fa4b42',
+  // Warm peach
+  Peach = '#feb56a',
+  // Light mint teal
+  Mint = '#91e8e1',
+}

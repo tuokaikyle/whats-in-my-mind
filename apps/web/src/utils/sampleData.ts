@@ -1,4 +1,4 @@
-import { AppColors300 } from './enums';
+import { highChartColors } from './enums';
 import type { Category, Task } from './types';
 
 function createTasks(
@@ -34,27 +34,27 @@ function createTasks(
 const { tasks: sampleData, categories: sampleCategories } = createTasks([
   {
     category: 'Learn',
-    color: AppColors300.Indigo300,
+    color: highChartColors.Indigo,
     tasks: ['React', 'TypeScript', 'GraphQL'],
   },
   {
     category: 'Read',
-    color: AppColors300.Rose300,
+    color: highChartColors.SteelBlue,
     tasks: ['Vanity Fair', 'Les Miserables'],
   },
   {
     category: 'Sport',
-    color: AppColors300.Green300,
+    color: highChartColors.Green,
     tasks: ['Gym', 'Tennis', 'Swimming'],
   },
   {
     category: 'Travel',
-    color: AppColors300.Orange300,
+    color: highChartColors.Pink,
     tasks: ['Rome', 'Paris', 'New York'],
   },
   {
     category: 'Buy',
-    color: AppColors300.Violet300,
+    color: highChartColors.Blue,
     tasks: ['Milk', 'Bread', 'Ice Cream'],
   },
 ]);

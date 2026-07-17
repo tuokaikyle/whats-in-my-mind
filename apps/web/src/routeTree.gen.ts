@@ -9,21 +9,39 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TreemapRouteImport } from './routes/treemap'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ManageRouteImport } from './routes/manage'
+import { Route as GaugeRouteImport } from './routes/gauge'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthPathRouteImport } from './routes/auth/$path'
 
+const TreemapRoute = TreemapRouteImport.update({
+  id: '/treemap',
+  path: '/treemap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ManageRoute = ManageRouteImport.update({
   id: '/manage',
   path: '/manage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GaugeRoute = GaugeRouteImport.update({
+  id: '/gauge',
+  path: '/gauge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BubbleRoute = BubbleRouteImport.update({
@@ -51,16 +69,22 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/progress': typeof ProgressRoute
   '/simple': typeof SimpleRoute
+  '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/progress': typeof ProgressRoute
   '/simple': typeof SimpleRoute
+  '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRoutesById {
@@ -68,22 +92,46 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/progress': typeof ProgressRoute
   '/simple': typeof SimpleRoute
+  '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/bubble' | '/manage' | '/simple' | '/auth/$path'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/bubble'
+    | '/gauge'
+    | '/manage'
+    | '/progress'
+    | '/simple'
+    | '/treemap'
+    | '/auth/$path'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/bubble' | '/manage' | '/simple' | '/auth/$path'
+  to:
+    | '/'
+    | '/about'
+    | '/bubble'
+    | '/gauge'
+    | '/manage'
+    | '/progress'
+    | '/simple'
+    | '/treemap'
+    | '/auth/$path'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/bubble'
+    | '/gauge'
     | '/manage'
+    | '/progress'
     | '/simple'
+    | '/treemap'
     | '/auth/$path'
   fileRoutesById: FileRoutesById
 }
@@ -91,13 +139,23 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
+  GaugeRoute: typeof GaugeRoute
   ManageRoute: typeof ManageRoute
+  ProgressRoute: typeof ProgressRoute
   SimpleRoute: typeof SimpleRoute
+  TreemapRoute: typeof TreemapRoute
   AuthPathRoute: typeof AuthPathRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/treemap': {
+      id: '/treemap'
+      path: '/treemap'
+      fullPath: '/treemap'
+      preLoaderRoute: typeof TreemapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/simple': {
       id: '/simple'
       path: '/simple'
@@ -105,11 +163,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimpleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/manage': {
       id: '/manage'
       path: '/manage'
       fullPath: '/manage'
       preLoaderRoute: typeof ManageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gauge': {
+      id: '/gauge'
+      path: '/gauge'
+      fullPath: '/gauge'
+      preLoaderRoute: typeof GaugeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bubble': {
@@ -147,8 +219,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
+  GaugeRoute: GaugeRoute,
   ManageRoute: ManageRoute,
+  ProgressRoute: ProgressRoute,
   SimpleRoute: SimpleRoute,
+  TreemapRoute: TreemapRoute,
   AuthPathRoute: AuthPathRoute,
 }
 export const routeTree = rootRouteImport

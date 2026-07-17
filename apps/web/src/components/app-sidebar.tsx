@@ -4,9 +4,12 @@ import {
   Bubbles,
   Command,
   FileCheck,
+  Gauge,
   Info,
+  LayoutGrid,
   PanelLeft,
   Settings2,
+  TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
 import { useCallback, useState } from 'react';
@@ -60,9 +63,24 @@ export const sidebarData: {
       icon: FileCheck,
     },
     {
+      title: 'Progress',
+      url: '/progress',
+      icon: TrendingUp,
+    },
+    {
       title: 'Bubble',
       url: '/bubble',
       icon: Bubbles,
+    },
+    {
+      title: 'Gauge',
+      url: '/gauge',
+      icon: Gauge,
+    },
+    {
+      title: 'Tree Map',
+      url: '/treemap',
+      icon: LayoutGrid,
     },
     {
       title: 'About',

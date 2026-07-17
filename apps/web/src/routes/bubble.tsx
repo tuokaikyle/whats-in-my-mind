@@ -85,7 +85,7 @@ function BubblePage() {
           format: '{point.name}',
           style: {
             color: 'black',
-            fontSize: '14px',
+            fontSize: '11px',
             textOutline: 'none',
             fontWeight: 'normal',
           },
