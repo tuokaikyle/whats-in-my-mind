@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,8 +11,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AddCategory } from '@/components/add-category';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { ManageCategory } from '@/components/manage-category';
 import { useCategories } from '@/hooks/use-todos';
+import type { Category } from '@/utils/types';
 import { trpc } from '@/utils/trpc';
 import { GuestBanner } from '@/components/guest-banner';
 
@@ -22,16 +37,20 @@ export const Route = createFileRoute('/manage')({
 
 function ManagePage() {
   const { categories, isLoading, deleteMutation, isGuest } = useCategories();
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+  const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
   const healthCheck = useQuery(trpc.healthCheck.queryOptions());
 
-  const handleDelete = (id: number, name: string) => {
-    if (!window.confirm(`Delete category "${name}"?`)) return;
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    const { id, name } = deleteTarget;
     deleteMutation.mutate(
       { id },
       {
         onSuccess: () => {
           toast.success(`Category "${name}" deleted`);
+          setDeleteTarget(null);
         },
         onError: (error) => {
           toast.error(
@@ -40,6 +59,16 @@ function ManagePage() {
         },
       },
     );
+  };
+
+  const openAdd = () => {
+    setEditingCategory(undefined);
+    setCategoryOpen(true);
+  };
+
+  const openEdit = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryOpen(true);
   };
 
   return (
@@ -55,7 +84,7 @@ function ManagePage() {
                 Manage your categories for organizing entries.
               </CardDescription>
             </div>
-            <Button onClick={() => setAddCategoryOpen(true)}>
+            <Button onClick={openAdd}>
               Add Category
             </Button>
           </CardHeader>
@@ -95,17 +124,33 @@ function ManagePage() {
                         </td>
                         <td className="px-4 py-3 text-sm">{category.name}</td>
                         <td className="px-4 py-3">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                            disabled={deleteMutation.isPending}
-                            onClick={() =>
-                              handleDelete(category.id, category.name)
-                            }
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                              >
+                                <Ellipsis className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="right" align="start">
+                              <DropdownMenuItem
+                                onClick={() => openEdit(category)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                                Edit Category
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                disabled={deleteMutation.isPending}
+                                onClick={() => setDeleteTarget(category)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Delete Category
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))}
@@ -141,11 +186,39 @@ function ManagePage() {
       </Card>
 
       {!isGuest && (
-        <AddCategory
-          open={addCategoryOpen}
-          onOpenChange={setAddCategoryOpen}
+        <ManageCategory
+          open={categoryOpen}
+          onOpenChange={setCategoryOpen}
+          category={editingCategory}
         />
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent className='sm:max-w-[400px]'>
+          <DialogHeader>
+            <DialogTitle>Delete Category</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{deleteTarget?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setDeleteTarget(null)}
+              disabled={deleteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

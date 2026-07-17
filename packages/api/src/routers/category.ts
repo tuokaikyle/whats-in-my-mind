@@ -30,4 +30,16 @@ export const categoryRouter = router({
           and(eq(category.id, input.id), eq(category.userId, ctx.session.user.id)),
         );
     }),
+
+  update: protectedProcedure
+    .input(z.object({ id: z.number(), name: z.string().min(1).optional(), color: z.string().optional() }))
+    .mutation(async ({ input, ctx }) => {
+      const { id, ...data } = input;
+      return await ctx.db
+        .update(category)
+        .set(data)
+        .where(
+          and(eq(category.id, id), eq(category.userId, ctx.session.user.id)),
+        );
+    }),
 });
