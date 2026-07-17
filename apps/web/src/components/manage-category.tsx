@@ -21,7 +21,11 @@ interface ManageCategoryProps {
   category?: Category;
 }
 
-export function ManageCategory({ open, onOpenChange, category }: ManageCategoryProps) {
+export function ManageCategory({
+  open,
+  onOpenChange,
+  category,
+}: ManageCategoryProps) {
   const isEditing = !!category;
   const [name, setName] = useState('');
   const [color, setColor] = useState(highChartColors.Indigo);
@@ -55,10 +59,12 @@ export function ManageCategory({ open, onOpenChange, category }: ManageCategoryP
           },
           onError: (error) => {
             toast.error(
-              error instanceof Error ? error.message : 'Failed to update category',
+              error instanceof Error
+                ? error.message
+                : 'Failed to update category'
             );
           },
-        },
+        }
       );
     } else {
       createMutation.mutate(
@@ -70,10 +76,12 @@ export function ManageCategory({ open, onOpenChange, category }: ManageCategoryP
           },
           onError: (error) => {
             toast.error(
-              error instanceof Error ? error.message : 'Failed to create category',
+              error instanceof Error
+                ? error.message
+                : 'Failed to create category'
             );
           },
-        },
+        }
       );
     }
   };
@@ -82,7 +90,9 @@ export function ManageCategory({ open, onOpenChange, category }: ManageCategoryP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Category' : 'Add New Category'}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Edit Category' : 'Add New Category'}
+          </DialogTitle>
           <DialogDescription>
             {isEditing
               ? 'Update the category name or color.'
@@ -115,11 +125,13 @@ export function ManageCategory({ open, onOpenChange, category }: ManageCategoryP
                         ? 'outline outline-2 outline-offset-2 scale-110'
                         : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
-                    style={{
-                      backgroundColor: hex,
-                      borderColor: hex,
-                      ...(isSelected ? { outlineColor: hex } : {}),
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        backgroundColor: hex,
+                        borderColor: hex,
+                        ...(isSelected ? { outlineColor: hex } : {}),
+                      } as React.CSSProperties
+                    }
                     title={colorName}
                     onClick={() => setColor(hex)}
                     disabled={isPending}
@@ -148,17 +160,14 @@ export function ManageCategory({ open, onOpenChange, category }: ManageCategoryP
             >
               Cancel
             </Button>
-            <Button
-              type='submit'
-              disabled={isPending || !name.trim()}
-            >
+            <Button type='submit' disabled={isPending || !name.trim()}>
               {isPending
                 ? isEditing
                   ? 'Updating...'
                   : 'Creating...'
                 : isEditing
-                  ? 'Update Category'
-                  : 'Create Category'}
+                ? 'Update Category'
+                : 'Create Category'}
             </Button>
           </div>
         </form>

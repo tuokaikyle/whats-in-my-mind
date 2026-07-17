@@ -118,7 +118,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className='truncate font-medium'>
                     What's in my mind
                   </span>
-                  <span className='truncate text-xs'>View differently</span>
+                  <span className='truncate text-xs'>
+                    Present ideas differently
+                  </span>
                 </div>
                 <PanelLeft className='size-4' />
               </div>
@@ -151,6 +153,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter className='mb-1'>
         <UserButton
           additionalLinks={[<ModeToggle key='mode-toggle' />]}
+          disableDefaultLinks={true}
           size={open ? 'default' : 'icon'}
           side={isMobile ? 'top' : 'right'}
           sideOffset={16}

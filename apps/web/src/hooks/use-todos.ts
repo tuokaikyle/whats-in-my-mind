@@ -219,11 +219,7 @@ export function useCategories() {
     },
   });
 
-  const deleteMutation = useMutation<
-    unknown,
-    Error,
-    DeleteCategoryInput
-  >({
+  const deleteMutation = useMutation<unknown, Error, DeleteCategoryInput>({
     mutationFn: isGuest
       ? async (input) => {
           queryClient.setQueryData<Category[]>(queryKey, (prev) =>
@@ -238,11 +234,7 @@ export function useCategories() {
     },
   });
 
-  const updateMutation = useMutation<
-    unknown,
-    Error,
-    UpdateCategoryInput
-  >({
+  const updateMutation = useMutation<unknown, Error, UpdateCategoryInput>({
     mutationFn: isGuest
       ? async (input) => {
           queryClient.setQueryData<Category[]>(queryKey, (prev) =>

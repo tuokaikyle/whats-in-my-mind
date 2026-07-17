@@ -27,12 +27,21 @@ export const categoryRouter = router({
       return await ctx.db
         .delete(category)
         .where(
-          and(eq(category.id, input.id), eq(category.userId, ctx.session.user.id)),
+          and(
+            eq(category.id, input.id),
+            eq(category.userId, ctx.session.user.id),
+          ),
         );
     }),
 
   update: protectedProcedure
-    .input(z.object({ id: z.number(), name: z.string().min(1).optional(), color: z.string().optional() }))
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        color: z.string().optional(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
       return await ctx.db

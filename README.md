@@ -76,7 +76,7 @@ whats-in-my-mind/
 
 
 ## dev log
-main -> can change to v1
+main is technically v1
 original
 
 v2
@@ -86,34 +86,4 @@ v3
 more better-t, polished
 
 v4
-only keep the simple and bubble views. 
-
-##  quick note
-cloudflare prod:
-https://whats-in-my-mind.pages.dev/
-brand: v3
-
-preview:
-All non-production branches. Now I changed it to none. and no auto deploy to prod. This can be toggled. 
-
-local 
-db dev
-
-production
-db production
-
-db migrate better to use the direct url
-db url to add to the deploy, need to use the one with pool
-
-deployed can be cloudflare production and preview. 
-web is deployed automatically after a push. 
-api needs to be deployed manually. the command needs to log into cloudflare through wrangler. 
-wed deploy page - there is a vite server url. this needs to be the domain of the api deployments. maybe no need to have the / in the end. 
-
-## issues
-bubble does not drag
-email verify
-social log in
-pre set colors, or use v1 bubble colors
-order todo
-category 
+more polishing
