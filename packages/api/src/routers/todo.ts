@@ -1,9 +1,12 @@
+import { TRPCError } from '@trpc/server';
 import { and, asc, eq, sql } from '@whats-in-my-mind/db';
+import { category } from '@whats-in-my-mind/db/schema/category';
 import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
 import { protectedProcedure, router } from '../index';
 
 const metadataSchema = z.record(z.string(), z.unknown());
+const effortSchema = z.number().int().min(1).optional();
 
 export const todoRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -29,11 +32,29 @@ export const todoRouter = router({
         text: z.string().min(1),
         categoryId: z.number().int().nullable().optional(),
         progress: z.number().int().min(0).max(100).optional(),
-        effort: z.number().int().min(0).optional(),
+        effort: effortSchema,
         metadata: metadataSchema.nullable().optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.categoryId != null) {
+        const cats = await ctx.db
+          .select({ id: category.id })
+          .from(category)
+          .where(
+            and(
+              eq(category.id, input.categoryId),
+              eq(category.userId, ctx.session.user.id),
+            ),
+          )
+          .limit(1);
+        if (cats.length === 0) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Category not found',
+          });
+        }
+      }
       return await ctx.db.insert(todo).values({
         text: input.text,
         categoryId: input.categoryId,
@@ -51,11 +72,29 @@ export const todoRouter = router({
         text: z.string().min(1).optional(),
         categoryId: z.number().int().nullable().optional(),
         progress: z.number().int().min(0).max(100).optional(),
-        effort: z.number().int().min(0).optional(),
+        effort: effortSchema,
         metadata: metadataSchema.nullable().optional(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (input.categoryId != null) {
+        const cats = await ctx.db
+          .select({ id: category.id })
+          .from(category)
+          .where(
+            and(
+              eq(category.id, input.categoryId),
+              eq(category.userId, ctx.session.user.id),
+            ),
+          )
+          .limit(1);
+        if (cats.length === 0) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Category not found',
+          });
+        }
+      }
       const { id, ...rest } = input;
       return await ctx.db
         .update(todo)

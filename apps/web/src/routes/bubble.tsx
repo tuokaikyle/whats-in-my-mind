@@ -80,11 +80,14 @@ function BubblePage() {
     plotOptions: {
       packedbubble: {
         minSize: 20,
+        marker: {
+          fillOpacity: isDark ? 0.75 : 0.85,
+        },
         dataLabels: {
           enabled: true,
           format: '{point.name}',
           style: {
-            color: 'black',
+            color: isDark ? '#e5e5e5' : '#171717',
             fontSize: '11px',
             textOutline: 'none',
             fontWeight: 'normal',

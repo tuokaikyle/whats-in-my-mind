@@ -42,18 +42,22 @@ function RootComponent() {
     <>
       <HeadContent />
       <ThemeProvider
-        attribute="class"
-        defaultTheme="dark"
+        attribute='class'
+        defaultTheme='dark'
         disableTransitionOnChange
-        storageKey="vite-ui-theme"
+        storageKey='vite-ui-theme'
       >
-        <div className="grid h-svh grid-rows-[auto_1fr]">
+        <div className='grid h-svh grid-rows-[auto_1fr]'>
           <Layout />
         </div>
         <Toaster richColors />
       </ThemeProvider>
-      <TanStackRouterDevtools position="bottom-right" />
-      <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+      {import.meta.env.DEV && (
+        <>
+          <TanStackRouterDevtools position='bottom-right' />
+          <ReactQueryDevtools position='bottom' buttonPosition='bottom-right' />
+        </>
+      )}
     </>
   );
 }

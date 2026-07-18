@@ -28,7 +28,7 @@ export function ManageCategory({
 }: ManageCategoryProps) {
   const isEditing = !!category;
   const [name, setName] = useState('');
-  const [color, setColor] = useState(highChartColors.Indigo);
+  const [color, setColor] = useState<string>(highChartColors.Indigo);
   const { createMutation, updateMutation } = useCategories();
 
   useEffect(() => {

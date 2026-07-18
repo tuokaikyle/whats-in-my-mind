@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/modules/treemap';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { useTheme } from '@/components/theme-provider';
 import Loader from '@/components/loader';
 import type { Category, Task } from '@/utils/types';
 
@@ -69,14 +70,27 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
 function TreemapPage() {
   const { todos, todosLoading } = useTodos();
   const { categories, isLoading: categoriesLoading } = useCategories();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   const loading = todosLoading || categoriesLoading;
+
+  const textColor = isDark ? '#f5f5f5' : '#171717';
+  const mutedColor = isDark ? '#a3a3a3' : '#737373';
+  const tooltipBg = isDark ? '#262626' : '#ffffff';
+  const tooltipBorder = isDark ? '#404040' : '#e5e5e5';
 
   // biome-ignore lint/suspicious/noExplicitAny: Highcharts v12 types are missing some treemap level options
   const options = useMemo<any>(() => {
     const data = buildTreemapData(todos, categories);
 
     return {
+      chart: {
+        backgroundColor: 'transparent',
+        style: {
+          fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
+        },
+      },
       series: [
         {
           type: 'treemap',
@@ -86,6 +100,7 @@ function TreemapPage() {
           dataLabels: {
             format: '{point.name}',
             style: {
+              color: isDark ? '#e5e5e5' : '#171717',
               textOutline: 'none',
             },
           },
@@ -103,7 +118,7 @@ function TreemapPage() {
                   fontSize: '0.6em',
                   fontWeight: 'normal',
                   textTransform: 'uppercase',
-                  color: 'var(--highcharts-neutral-color-100, #000)',
+                  color: isDark ? '#d4d4d4' : '#404040',
                 },
               },
               borderRadius: 3,
@@ -115,6 +130,9 @@ function TreemapPage() {
               dataLabels: {
                 enabled: true,
                 inside: false,
+                style: {
+                  color: isDark ? '#e5e5e5' : '#171717',
+                },
               },
             },
           ],
@@ -124,16 +142,22 @@ function TreemapPage() {
       title: {
         text: 'Todo Items by Effort',
         align: 'left',
+        style: { color: textColor, fontWeight: '600' },
       },
       subtitle: {
         text: 'Grouped by category — rectangle size represents effort',
         align: 'left',
+        style: { color: mutedColor },
       },
       tooltip: {
         pointFormat: '<b>{point.name}</b><br/>Effort: <b>{point.value}</b>',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
+        style: { color: textColor },
       },
+      credits: { enabled: false },
     };
-  }, [todos, categories]);
+  }, [todos, categories, isDark, textColor, mutedColor, tooltipBg, tooltipBorder]);
 
   if (loading) {
     return (

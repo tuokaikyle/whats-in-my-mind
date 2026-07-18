@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { inferRouterInputs } from '@trpc/server';
 import type { AppRouter } from '@whats-in-my-mind/api/routers/index';
+import { useMemo } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { sampleCategories, sampleData } from '@/utils/sampleData';
 import { queryClient, trpc, trpcClient } from '@/utils/trpc';
@@ -23,6 +24,11 @@ function useAuthState() {
   const sessionLoading = isPending;
   const isGuest = !sessionLoading && !session;
   return { isGuest, sessionLoading };
+}
+
+function normalizeTodo(todo: Task): Task {
+  if (todo.effort == null || todo.effort >= 1) return todo;
+  return { ...todo, effort: 1 };
 }
 
 export function useTodos() {
@@ -159,7 +165,10 @@ export function useTodos() {
     onSettled: () => invalidate(),
   });
 
-  const todos = (todosQuery.data ?? []) as Task[];
+  const todos = useMemo(
+    () => ((todosQuery.data ?? []) as Task[]).map(normalizeTodo),
+    [todosQuery.data],
+  );
   const todosLoading = sessionLoading || todosQuery.isLoading;
 
   return {
@@ -176,9 +185,13 @@ export function useTodos() {
 export function useCategories() {
   const { isGuest, sessionLoading } = useAuthState();
   const authQueryOptions = trpc.category.getAll.queryOptions();
-  const queryKey: readonly unknown[] = isGuest
+  const todoQueryOptions = trpc.todo.getAll.queryOptions();
+  const categoryQueryKey: readonly unknown[] = isGuest
     ? GUEST_CATEGORIES_KEY
     : authQueryOptions.queryKey;
+  const todoQueryKey: readonly unknown[] = isGuest
+    ? GUEST_TODOS_KEY
+    : todoQueryOptions.queryKey;
 
   const authQuery = useQuery({
     ...authQueryOptions,
@@ -209,12 +222,12 @@ export function useCategories() {
       : (input) => trpcClient.category.create.mutate(input),
     onSuccess: (result) => {
       if (isGuest) {
-        queryClient.setQueryData<Category[]>(queryKey, (prev) => [
+        queryClient.setQueryData<Category[]>(categoryQueryKey, (prev) => [
           ...(prev ?? []),
           result as Category,
         ]);
       } else {
-        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey: categoryQueryKey });
       }
     },
   });
@@ -222,14 +235,22 @@ export function useCategories() {
   const deleteMutation = useMutation<unknown, Error, DeleteCategoryInput>({
     mutationFn: isGuest
       ? async (input) => {
-          queryClient.setQueryData<Category[]>(queryKey, (prev) =>
+          queryClient.setQueryData<Category[]>(categoryQueryKey, (prev) =>
             (prev ?? []).filter((c) => c.id !== input.id),
+          );
+          queryClient.setQueryData<Task[]>(todoQueryKey, (prev) =>
+            (prev ?? []).map((todo) =>
+              todo.categoryId === input.id
+                ? { ...todo, categoryId: null }
+                : todo,
+            ),
           );
         }
       : (input) => trpcClient.category.delete.mutate(input),
     onSuccess: () => {
       if (!isGuest) {
-        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey: categoryQueryKey });
+        queryClient.invalidateQueries({ queryKey: todoQueryKey });
       }
     },
   });
@@ -237,7 +258,7 @@ export function useCategories() {
   const updateMutation = useMutation<unknown, Error, UpdateCategoryInput>({
     mutationFn: isGuest
       ? async (input) => {
-          queryClient.setQueryData<Category[]>(queryKey, (prev) =>
+          queryClient.setQueryData<Category[]>(categoryQueryKey, (prev) =>
             (prev ?? []).map((c) =>
               c.id === input.id ? { ...c, ...input } : c,
             ),
@@ -246,7 +267,7 @@ export function useCategories() {
       : (input) => trpcClient.category.update.mutate(input),
     onSuccess: () => {
       if (!isGuest) {
-        queryClient.invalidateQueries({ queryKey });
+        queryClient.invalidateQueries({ queryKey: categoryQueryKey });
       }
     },
   });

@@ -22,31 +22,21 @@ export default function Layout() {
   let currentPageTitle = 'Simple';
 
   for (const navItem of sidebarData.navMain) {
-    // Check if current path matches top-level item
     if (navItem.url === currentPath) {
       currentPageTitle = navItem.title;
       break;
-    }
-
-    // Check if current path matches a nested item
-    if (navItem.items) {
-      const subItem = navItem.items.find((sub) => sub.url === currentPath);
-      if (subItem) {
-        currentPageTitle = subItem.title;
-        break;
-      }
     }
   }
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="flex flex-col">
-        <header className="flex h-16 shrink-0 items-center justify-between gap-2 border-b md:hidden">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
+      <SidebarInset className='flex flex-col'>
+        <header className='flex h-16 shrink-0 items-center justify-between gap-2 border-b md:hidden'>
+          <div className='flex items-center gap-2 px-4'>
+            <SidebarTrigger className='-ml-1' />
             <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
+              orientation='vertical'
+              className='mr-2 data-[orientation=vertical]:h-4'
             />
             <Breadcrumb>
               <BreadcrumbList>
@@ -56,11 +46,11 @@ export default function Layout() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <div className="px-4">
+          <div className='px-4'>
             <ModeToggle />
           </div>
         </header>
-        <div className="flex-1 overflow-y-auto">
+        <div className='flex-1 overflow-y-auto'>
           <Outlet />
         </div>
       </SidebarInset>
