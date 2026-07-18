@@ -310,6 +310,7 @@ function ProgressTodoItem({
   const effort = todo.effort ?? 1;
   const progress = todo.progress ?? 0;
   const steps = Array.from({ length: effort }, (_, i) => i + 1);
+  const completedSteps = Math.round((progress / 100) * effort);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const handleBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -362,14 +363,16 @@ function ProgressTodoItem({
           <TooltipContent side='top'>{todo.text}</TooltipContent>
         </Tooltip>
         <div
-          className='flex h-5 flex-1 cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted'
+          className='flex h-5 flex-1 cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
           onClick={handleBarClick}
           onKeyDown={handleBarKeyDown}
-          role='progressbar'
+          role='slider'
+          tabIndex={0}
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label={`${todo.text}: ${progress}%`}
+          aria-valuetext={`${completedSteps} of ${effort} steps complete`}
+          aria-label={`${todo.text} progress`}
         >
           {steps.map((n) => {
             const stepPct = Math.round((n / effort) * 100);
