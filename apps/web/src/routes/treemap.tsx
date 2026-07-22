@@ -1,10 +1,20 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/modules/treemap';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { useTheme } from '@/components/theme-provider';
+import { TodoListPanel } from '@/components/todo-list-panel';
+import { Button } from '@/components/ui/button';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { cn } from '@/lib/utils';
 import Loader from '@/components/loader';
 import type { Category, Task } from '@/utils/types';
 
@@ -86,6 +96,7 @@ function TreemapPage() {
 
     return {
       chart: {
+        height: 600,
         backgroundColor: 'transparent',
         style: {
           fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
@@ -184,12 +195,56 @@ function TreemapPage() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-4xl px-4 py-10'>
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
         containerProps={{ className: 'w-full' }}
       />
+
+      <div className='flex justify-center'>
+        <TodoEditorDrawerDemo />
+      </div>
     </div>
+  );
+}
+
+function TodoEditorDrawerDemo() {
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false);
+  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
+
+  const handleEditorPanelOpenChange = (open: boolean) => {
+    setEditorPanelOpen(open);
+    if (!open) setNestedEditorOpen(false);
+  };
+
+  return (
+    <Drawer
+      modal={false}
+      direction='right'
+      open={editorPanelOpen}
+      onOpenChange={handleEditorPanelOpenChange}
+    >
+      <DrawerTrigger asChild>
+        <Button variant='secondary'>Show item editor panel</Button>
+      </DrawerTrigger>
+      <DrawerContent
+        className={cn(
+          'data-[vaul-drawer-direction=right]:w-72',
+          nestedEditorOpen &&
+            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out',
+        )}
+      >
+        <TodoListPanel
+          enableNestedEdit
+          onNestedEditOpenChange={setNestedEditorOpen}
+        />
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant='outline'>Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

@@ -1,11 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
+import { TodoListPanel } from '@/components/todo-list-panel';
+import { Button } from '@/components/ui/button';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { cn } from '@/lib/utils';
 import { useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
@@ -17,7 +27,7 @@ export const Route = createFileRoute('/gauge')({
 function buildGaugeOptions(
   todo: Task,
   isDark: boolean,
-  name: string,
+  name: string
 ): Highcharts.Options {
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -168,41 +178,98 @@ function GaugePage() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
+  const textColor = isDark ? '#f5f5f5' : '#171717';
+  const mutedColor = isDark ? '#a3a3a3' : '#737373';
+
   const activeTodos = useMemo(
     () =>
       todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
-    [todos],
+    [todos]
   );
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10">
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       {isGuest && <GuestBanner />}
 
       {todosLoading ? (
-        <PageLoader size="lg" />
+        <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
-          <p className="text-lg font-medium text-foreground">
+        <div className='flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center'>
+          <p className='text-lg font-medium text-foreground'>
             No tasks in progress
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className='mt-1 text-sm text-muted-foreground'>
             Complete some tasks or add new ones to see them here.
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {activeTodos.map((todo) => {
-            return (
-              <div key={todo.id} className="flex flex-col items-center">
-                <HighchartsReact
-                  highcharts={Highcharts}
-                  options={buildGaugeOptions(todo, isDark, todo.text)}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <>
+          <div className='mb-6'>
+            <h1 className='text-lg font-semibold' style={{ color: textColor }}>
+              Progress Gauges
+            </h1>
+            <p className='text-sm' style={{ color: mutedColor }}>
+              Each gauge shows completion progress for an active task.
+            </p>
+          </div>
+          <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            {activeTodos.map((todo) => {
+              return (
+                <div key={todo.id} className='flex flex-col items-center'>
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={buildGaugeOptions(todo, isDark, todo.text)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+
+          <div className='flex justify-center'>
+            <TodoEditorDrawerDemo />
+          </div>
+        </>
       )}
     </div>
+  );
+}
+
+function TodoEditorDrawerDemo() {
+  const [editorPanelOpen, setEditorPanelOpen] = useState(false);
+  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
+
+  const handleEditorPanelOpenChange = (open: boolean) => {
+    setEditorPanelOpen(open);
+    if (!open) setNestedEditorOpen(false);
+  };
+
+  return (
+    <Drawer
+      modal={false}
+      direction='right'
+      open={editorPanelOpen}
+      onOpenChange={handleEditorPanelOpenChange}
+    >
+      <DrawerTrigger asChild>
+        <Button variant='secondary'>Show item editor panel</Button>
+      </DrawerTrigger>
+      <DrawerContent
+        className={cn(
+          'data-[vaul-drawer-direction=right]:w-72',
+          nestedEditorOpen &&
+            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out',
+        )}
+      >
+        <TodoListPanel
+          enableNestedEdit
+          onNestedEditOpenChange={setNestedEditorOpen}
+        />
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant='outline'>Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }

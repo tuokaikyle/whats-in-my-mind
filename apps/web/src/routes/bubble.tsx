@@ -35,7 +35,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
 
   const knownIds = new Set(categories.map((c) => c.id));
   const uncategorized = todos.filter(
-    (t) => t.categoryId === null || !knownIds.has(t.categoryId),
+    (t) => t.categoryId === null || !knownIds.has(t.categoryId)
   );
 
   if (uncategorized.length > 0) {
@@ -59,7 +59,7 @@ function BubblePage() {
   const isDark = resolvedTheme === 'dark';
 
   const activeTodos = todos.filter(
-    (t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0]),
+    (t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])
   );
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
@@ -99,7 +99,7 @@ function BubblePage() {
         minSize: 40,
         maxSize: 100,
         marker: {
-          fillOpacity: isDark ? 0.75 : 0.85,
+          fillOpacity: 0.5,
         },
         dataLabels: {
           enabled: true,
@@ -115,24 +115,24 @@ function BubblePage() {
     },
     series: buildSeries(
       activeTodos,
-      categories,
+      categories
     ) as Highcharts.SeriesOptionsType[],
     credits: { enabled: false },
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       {isGuest && <GuestBanner />}
 
       {todosLoading ? (
-        <PageLoader size="lg" />
+        <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">No tasks yet.</p>
+        <p className='py-8 text-center text-muted-foreground'>No tasks yet.</p>
       ) : (
         <HighchartsReact highcharts={Highcharts} options={options} />
       )}
 
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         <TodoEditorDrawerDemo />
       </div>
     </div>
@@ -151,18 +151,18 @@ function TodoEditorDrawerDemo() {
   return (
     <Drawer
       modal={false}
-      direction="right"
+      direction='right'
       open={editorPanelOpen}
       onOpenChange={handleEditorPanelOpenChange}
     >
       <DrawerTrigger asChild>
-        <Button variant="secondary">Show item editor panel</Button>
+        <Button variant='secondary'>Show item editor panel</Button>
       </DrawerTrigger>
       <DrawerContent
         className={cn(
           'data-[vaul-drawer-direction=right]:w-72',
           nestedEditorOpen &&
-            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out',
+            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
         )}
       >
         <TodoListPanel
@@ -171,7 +171,7 @@ function TodoEditorDrawerDemo() {
         />
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button variant="outline">Close</Button>
+            <Button variant='outline'>Close</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

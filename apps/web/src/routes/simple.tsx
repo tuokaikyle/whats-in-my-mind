@@ -12,15 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -117,7 +109,7 @@ function SimplePage() {
     return new Map(
       [...todos]
         .sort(compareByCreatedAt)
-        .map((todo, index) => [todo.id, (index + 1) * SIMPLE_ORDER_STEP]),
+        .map((todo, index) => [todo.id, (index + 1) * SIMPLE_ORDER_STEP])
     );
   }, [todos]);
 
@@ -135,11 +127,11 @@ function SimplePage() {
 
   const todoById = useMemo(
     () => new Map(todos.map((todo) => [todo.id, todo])),
-    [todos],
+    [todos]
   );
   const sortedIds = useMemo(
     () => sortedTodos.map((todo) => todo.id),
-    [sortedTodos],
+    [sortedTodos]
   );
   const [orderedIds, setOrderedIds] = useState<number[]>(sortedIds);
   const isReordering = reorderSimpleMutation.isPending;
@@ -197,27 +189,27 @@ function SimplePage() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-md py-10">
+      <div className='mx-auto w-full max-w-md py-10'>
         <Card>
           <CardHeader>
             <CardTitle>Todo List</CardTitle>
             <CardDescription>Manage your tasks efficiently</CardDescription>
           </CardHeader>
           <CardContent>
-            {isGuest && <GuestBanner className="mb-4" />}
+            {isGuest && <GuestBanner className='mb-4' />}
 
             {todosLoading ? (
               <PageLoader />
             ) : todos.length === 0 ? (
-              <p className="py-4 text-center text-muted-foreground">
+              <p className='py-4 text-center text-muted-foreground'>
                 No todos yet. Use the + button to add one!
               </p>
             ) : (
               <Reorder.Group
-                axis="y"
+                axis='y'
                 values={orderedIds}
                 onReorder={setNextOrderedIds}
-                className="space-y-2"
+                className='space-y-2'
               >
                 {orderedTodos.map((todo) => (
                   <SimpleTodoItem
@@ -246,11 +238,11 @@ function SimplePage() {
             )}
 
             {isAdding ? (
-              <div className="mt-2 flex items-center gap-2">
+              <div className='mt-2 flex items-center gap-2'>
                 <Input
                   value={newText}
                   onChange={(e) => setNewText(e.target.value)}
-                  placeholder="What needs to be done?"
+                  placeholder='What needs to be done?'
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleAddTodo();
                     if (e.key === 'Escape') {
@@ -261,8 +253,8 @@ function SimplePage() {
                   autoFocus
                 />
                 <Button
-                  size="sm"
-                  variant="ghost"
+                  size='sm'
+                  variant='ghost'
                   onClick={() => {
                     setNewText('');
                     setIsAdding(false);
@@ -271,7 +263,7 @@ function SimplePage() {
                   Cancel
                 </Button>
                 <Button
-                  size="sm"
+                  size='sm'
                   onClick={handleAddTodo}
                   disabled={!newText.trim()}
                 >
@@ -280,12 +272,12 @@ function SimplePage() {
               </div>
             ) : (
               <Button
-                variant="ghost"
-                size="sm"
-                className="mt-2 w-full"
+                variant='ghost'
+                size='sm'
+                className='mt-2 w-full'
                 onClick={() => setIsAdding(true)}
               >
-                <Plus className="mr-1 h-4 w-4" />
+                <Plus className='mr-1 h-4 w-4' />
                 Add item
               </Button>
             )}
@@ -327,30 +319,30 @@ function SimpleTodoItem({
       dragListener={false}
       onDragStart={onDragStart}
       onDragEnd={() => onDragEnd(todo.id)}
-      className="relative rounded-md border bg-card p-2"
+      className='relative rounded-md border bg-card p-2'
       whileDrag={{ scale: 1.02 }}
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-1">
+      <div className='flex items-center justify-between gap-2'>
+        <div className='flex min-w-0 items-center gap-1'>
           <button
-            type="button"
-            className="-ml-1 flex h-7 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing"
+            type='button'
+            className='-ml-1 flex h-7 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:cursor-grabbing'
             onPointerDown={(event) => dragControls.start(event)}
             aria-label={`Reorder ${todo.text}`}
           >
-            <GripVertical className="h-4 w-4" />
+            <GripVertical className='h-4 w-4' />
           </button>
-          <span className="truncate">{todo.text}</span>
+          <span className='truncate'>{todo.text}</span>
         </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <div className="flex items-center gap-0.5">
+        <div className='flex shrink-0 items-center gap-1'>
+          <div className='flex items-center gap-0.5'>
             {Array.from({ length: effort }, (_, i) => {
               const n = i + 1;
               const isFilled = n <= progress;
               return (
                 <button
                   key={n}
-                  type="button"
+                  type='button'
                   className={`h-3 w-3 rounded-sm border ${
                     isFilled
                       ? 'border-green-500 bg-green-500'
@@ -368,15 +360,15 @@ function SimpleTodoItem({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 shrink-0"
-                aria-label="More options"
+                variant='ghost'
+                size='icon'
+                className='h-7 w-7 shrink-0'
+                aria-label='More options'
               >
-                <Ellipsis className="h-4 w-4" />
+                <Ellipsis className='h-4 w-4' />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" side="right">
+            <DropdownMenuContent align='start' side='right'>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>Set effort</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent sideOffset={8}>
@@ -399,7 +391,7 @@ function SimpleTodoItem({
                       onClick={() => onCategoryChange(cat.id)}
                     >
                       <div
-                        className="mr-2 h-3 w-3 rounded-full border"
+                        className='mr-2 h-3 w-3 rounded-full border'
                         style={{ backgroundColor: cat.color ?? '#6366f1' }}
                       />
                       {cat.name}
@@ -408,42 +400,26 @@ function SimpleTodoItem({
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
               <DropdownMenuItem
-                variant="destructive"
+                variant='destructive'
                 onClick={() => setDeleteOpen(true)}
               >
-                <Trash2 className="h-4 w-4" />
                 Delete
+                <Trash2 className='ml-auto h-4 w-4' />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Todo</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete "{todo.text}"? This action cannot
-              be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onDelete();
-                setDeleteOpen(false);
-              }}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteTodoDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        todoText={todo.text}
+        onDelete={() => {
+          onDelete();
+          setDeleteOpen(false);
+        }}
+      />
     </Reorder.Item>
   );
 }
