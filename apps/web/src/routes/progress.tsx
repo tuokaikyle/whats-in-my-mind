@@ -37,6 +37,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/progress')({
@@ -402,7 +403,7 @@ function ProgressTodoItem({
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Set effort</DropdownMenuSubTrigger>
               <DropdownMenuSubContent sideOffset={8}>
-                {[1, 2, 3, 4, 5].map((n) => (
+                {EFFORT_RANGE.map((n) => (
                   <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
                     {n}
                   </DropdownMenuItem>

@@ -70,3 +70,6 @@ export enum highChartColors {
   // Light mint teal
   Mint = '#91e8e1',
 }
+
+export const EFFORT_RANGE = [1, 2, 3, 4, 5] as const;
+export const MAX_EFFORT = 5;

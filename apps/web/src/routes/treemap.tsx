@@ -157,7 +157,15 @@ function TreemapPage() {
       },
       credits: { enabled: false },
     };
-  }, [todos, categories, isDark, textColor, mutedColor, tooltipBg, tooltipBorder]);
+  }, [
+    todos,
+    categories,
+    isDark,
+    textColor,
+    mutedColor,
+    tooltipBg,
+    tooltipBorder,
+  ]);
 
   if (loading) {
     return (

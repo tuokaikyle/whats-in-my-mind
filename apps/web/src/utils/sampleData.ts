@@ -1,4 +1,4 @@
-import { highChartColors } from './enums';
+import { EFFORT_RANGE, highChartColors, MAX_EFFORT } from './enums';
 import type { Category, Task } from './types';
 
 function createTasks(
@@ -20,7 +20,7 @@ function createTasks(
         id: id++,
         text,
         categoryId: catIdx + 1,
-        effort: Math.floor(Math.random() * 5) + 1,
+        effort: Math.floor(Math.random() * MAX_EFFORT) + EFFORT_RANGE[0],
         progress: Math.random() > 0.5 ? Math.floor(Math.random() * 101) : null,
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),

@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { sampleCategories, sampleData } from '@/utils/sampleData';
 import { queryClient, trpc, trpcClient } from '@/utils/trpc';
+import { EFFORT_RANGE } from '@/utils/enums';
 import type { Category, Task } from '@/utils/types';
 
 type RouterInputs = inferRouterInputs<AppRouter>;
@@ -27,8 +28,8 @@ function useAuthState() {
 }
 
 function normalizeTodo(todo: Task): Task {
-  if (todo.effort == null || todo.effort >= 1) return todo;
-  return { ...todo, effort: 1 };
+  if (todo.effort == null || todo.effort >= EFFORT_RANGE[0]) return todo;
+  return { ...todo, effort: EFFORT_RANGE[0] };
 }
 
 export function useTodos() {
@@ -195,6 +196,7 @@ export function useCategories() {
 
   const authQuery = useQuery({
     ...authQueryOptions,
+    staleTime: 5 * 60 * 1000,
     enabled: !sessionLoading && !isGuest,
   });
   const guestQuery = useQuery<Category[]>({

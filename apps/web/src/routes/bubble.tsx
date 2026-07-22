@@ -2,10 +2,23 @@ import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
+import { useState } from 'react';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
+import { Button } from '@/components/ui/button';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import { TodoListPanel } from '@/components/todo-list-panel';
 import { useTheme } from '@/components/theme-provider';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { EFFORT_RANGE } from '@/utils/enums';
 import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/bubble')({
@@ -18,19 +31,22 @@ function buildSeries(todos: Task[], categories: Category[]) {
     color: category.color ?? undefined,
     data: todos
       .filter((t) => t.categoryId === category.id)
-      .map((t) => ({ name: t.text, value: t.effort ?? 1 })),
+      .map((t) => ({ name: t.text, value: t.effort ?? EFFORT_RANGE[0] })),
   }));
 
   const knownIds = new Set(categories.map((c) => c.id));
   const uncategorized = todos.filter(
-    (t) => t.categoryId === null || !knownIds.has(t.categoryId),
+    (t) => t.categoryId === null || !knownIds.has(t.categoryId)
   );
 
   if (uncategorized.length > 0) {
     categorySeries.push({
       name: 'Other',
       color: '#94a3b8',
-      data: uncategorized.map((t) => ({ name: t.text, value: t.effort ?? 1 })),
+      data: uncategorized.map((t) => ({
+        name: t.text,
+        value: t.effort ?? EFFORT_RANGE[0],
+      })),
     });
   }
 
@@ -38,6 +54,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
 }
 
 function BubblePage() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const { todos, todosLoading, isGuest } = useTodos();
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
@@ -79,7 +96,8 @@ function BubblePage() {
     },
     plotOptions: {
       packedbubble: {
-        minSize: 20,
+        minSize: 40,
+        maxSize: 100,
         marker: {
           fillOpacity: isDark ? 0.75 : 0.85,
         },
@@ -97,26 +115,48 @@ function BubblePage() {
     },
     series: buildSeries(
       activeTodos,
-      categories,
+      categories
     ) as Highcharts.SeriesOptionsType[],
     credits: { enabled: false },
   };
 
   return (
-    <>
-      <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
+    <Drawer
+      modal={false}
+      direction='right'
+      open={drawerOpen}
+      onOpenChange={setDrawerOpen}
+    >
+      <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
         {isGuest && <GuestBanner />}
 
         {todosLoading ? (
-          <PageLoader size="lg" />
+          <PageLoader size='lg' />
         ) : activeTodos.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">
+          <p className='py-8 text-center text-muted-foreground'>
             No tasks yet.
           </p>
         ) : (
           <HighchartsReact highcharts={Highcharts} options={options} />
         )}
+
+        <div className='flex justify-center'>
+          <DrawerTrigger asChild>
+            <Button variant='outline'>
+              {drawerOpen ? 'Hide panel' : 'Show edit panel'}
+            </Button>
+          </DrawerTrigger>
+        </div>
       </div>
-    </>
+
+      <DrawerContent>
+        <TodoListPanel />
+        <DrawerFooter>
+          <DrawerClose asChild>
+            <Button variant='outline'>Close</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
   );
 }
