@@ -1,5 +1,6 @@
-import { Pencil, Plus } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
@@ -35,8 +36,14 @@ export function TodoListPanel({
 }) {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const { todos, todosLoading, createMutation, updateMutation, isGuest } =
-    useTodos();
+  const {
+    todos,
+    todosLoading,
+    createMutation,
+    updateMutation,
+    deleteMutation,
+    isGuest,
+  } = useTodos();
   const { categories } = useCategories();
 
   const sortedTodos = useMemo(
@@ -101,6 +108,7 @@ export function TodoListPanel({
                   onUpdate={(data) =>
                     updateMutation.mutate({ id: todo.id, ...data })
                   }
+                  onDelete={() => deleteMutation.mutate({ id: todo.id })}
                 />
               ))}
             </div>
@@ -168,6 +176,7 @@ function TodoListItem({
   enableNestedEdit,
   onEditOpenChange,
   onUpdate,
+  onDelete,
 }: {
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
@@ -179,6 +188,7 @@ function TodoListItem({
     effort?: number;
     progress?: number;
   }) => void;
+  onDelete: () => void;
 }) {
   const effort = todo.effort ?? 1;
   const category = categories.find((c) => c.id === todo.categoryId);
@@ -191,6 +201,7 @@ function TodoListItem({
   const [editProgress, setEditProgress] = useState(
     (todo.progress ?? 0).toString(),
   );
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const progressOptions = PROGRESS_RANGE.filter(
     (n) => n <= Number.parseInt(editEffort, 10),
   );
@@ -232,8 +243,12 @@ function TodoListItem({
         Number.parseInt(editEffort, 10),
       ),
     });
-    setEditOpen(false);
-    onEditOpenChange?.(false);
+  };
+
+  const handleDelete = () => {
+    onDelete();
+    setDeleteOpen(false);
+    handleEditOpenChange(false);
   };
 
   if (!enableNestedEdit) {
@@ -313,78 +328,111 @@ function TodoListItem({
       </div>
 
       <DrawerContent className="data-[vaul-drawer-direction=right]:w-72">
-        <DrawerHeader>
+        <DrawerHeader className="border-b">
           <DrawerTitle>Edit Todo</DrawerTitle>
-          <DrawerDescription>{todo.text}</DrawerDescription>
+          <DrawerDescription>Update this item's details.</DrawerDescription>
         </DrawerHeader>
-        <div className="flex-1 space-y-4 p-4">
-          <div className="space-y-2">
-            <Label htmlFor={`todo-name-${todo.id}`}>Name</Label>
-            <Input
-              id={`todo-name-${todo.id}`}
-              value={editName}
-              onChange={(event) => setEditName(event.target.value)}
-            />
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor={`todo-name-${todo.id}`}>Name</Label>
+              <Input
+                id={`todo-name-${todo.id}`}
+                value={editName}
+                onChange={(event) => setEditName(event.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">
+                    <span className="h-3 w-3 shrink-0 rounded-full border border-muted-foreground/40" />
+                    No category
+                  </SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id.toString()}>
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full border"
+                        style={{ backgroundColor: cat.color ?? '#6366f1' }}
+                      />
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Effort</Label>
+                <Select value={editEffort} onValueChange={handleEffortChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Effort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {EFFORT_RANGE.map((n) => (
+                      <SelectItem key={n} value={n.toString()}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor={`todo-progress-${todo.id}`}>Progress</Label>
+                <Select value={editProgress} onValueChange={setEditProgress}>
+                  <SelectTrigger
+                    id={`todo-progress-${todo.id}`}
+                    className="w-full"
+                  >
+                    <SelectValue placeholder="Progress" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {progressOptions.map((n) => (
+                      <SelectItem key={n} value={n.toString()}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Category</Label>
-            <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No category</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Effort</Label>
-            <Select value={editEffort} onValueChange={handleEffortChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select effort" />
-              </SelectTrigger>
-              <SelectContent>
-                {EFFORT_RANGE.map((n) => (
-                  <SelectItem key={n} value={n.toString()}>
-                    {n}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor={`todo-progress-${todo.id}`}>Progress</Label>
-            <Select value={editProgress} onValueChange={setEditProgress}>
-              <SelectTrigger id={`todo-progress-${todo.id}`} className="w-full">
-                <SelectValue placeholder="Select progress" />
-              </SelectTrigger>
-              <SelectContent>
-                {progressOptions.map((n) => (
-                  <SelectItem key={n} value={n.toString()}>
-                    {n}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="mt-6 grid grid-cols-2 gap-2 border-t pt-4">
+            <DrawerClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DrawerClose>
+            <DrawerClose asChild>
+              <Button onClick={handleSave} disabled={!editName.trim()}>
+                Save
+              </Button>
+            </DrawerClose>
           </div>
         </div>
-        <DrawerFooter>
-          <Button onClick={handleSave} disabled={!editName.trim()}>
-            Save
+        <DrawerFooter className="border-t">
+          <Button
+            variant="outline"
+            className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
           </Button>
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
+      <DeleteTodoDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        todoText={todo.text}
+        onDelete={handleDelete}
+      />
     </DrawerNested>
   );
 }

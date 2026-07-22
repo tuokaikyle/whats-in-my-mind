@@ -18,8 +18,10 @@ const REPO_URL = 'https://github.com/tuokaikyle/whats-in-my-mind';
 const text = `
 2. no show done ones; 
 3.done color and no category color; 
-5. edit others. 
 6 random guest effort set
+apply panel to other views
+raw delete on simple and progress
+bubble borders
 `;
 
 function RouteComponent() {
