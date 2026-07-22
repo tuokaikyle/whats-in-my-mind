@@ -1,16 +1,31 @@
 import { AuthUIProvider } from '@daveyplate/better-auth-ui';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { queryClient } from './utils/trpc';
 
 function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
+  const hasResolvedSessionRef = useRef(false);
+  const previousUserIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    queryClient.clear();
-  }, [session?.user?.id]);
+  useLayoutEffect(() => {
+    if (isPending) return;
+
+    const userId = session?.user?.id ?? null;
+
+    if (!hasResolvedSessionRef.current) {
+      hasResolvedSessionRef.current = true;
+      previousUserIdRef.current = userId;
+      return;
+    }
+
+    if (previousUserIdRef.current !== userId) {
+      previousUserIdRef.current = userId;
+      queryClient.clear();
+    }
+  }, [isPending, session?.user?.id]);
 
   return (
     <AuthUIProvider

@@ -1,18 +1,20 @@
-import { Check, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerNested,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -21,20 +23,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useCategories, useTodos } from '@/hooks/use-todos';
-import { EFFORT_RANGE } from '@/utils/enums';
+import { EFFORT_RANGE, PROGRESS_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
-export function TodoListPanel() {
+export function TodoListPanel({
+  enableNestedEdit = false,
+  onNestedEditOpenChange,
+}: {
+  enableNestedEdit?: boolean;
+  onNestedEditOpenChange?: (open: boolean) => void;
+}) {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const {
-    todos,
-    todosLoading,
-    createMutation,
-    updateMutation,
-    deleteMutation,
-    isGuest,
-  } = useTodos();
+  const { todos, todosLoading, createMutation, updateMutation, isGuest } =
+    useTodos();
   const { categories } = useCategories();
 
   const sortedTodos = useMemo(
@@ -46,7 +48,7 @@ export function TodoListPanel() {
         if (b.categoryId === null) return -1;
         return a.categoryId - b.categoryId;
       }),
-    [todos]
+    [todos],
   );
 
   const handleAddTodo = () => {
@@ -62,39 +64,40 @@ export function TodoListPanel() {
   };
 
   return (
-    <div className='flex h-full flex-col'>
+    <div className="flex h-full flex-col">
       {/* Header */}
-      <div className='flex items-center justify-between border-b px-4 py-3'>
-        <h2 className='font-semibold text-sm'>Todos</h2>
+      <div className="flex items-center justify-between border-b px-4 py-3">
+        <h2 className="font-semibold text-sm">Todos</h2>
       </div>
 
       {/* Content */}
-      <div className='flex-1 overflow-y-auto px-3 py-3'>
-        {isGuest && <GuestBanner className='mb-3' />}
+      <div className="flex-1 overflow-y-auto px-3 py-3">
+        {isGuest && <GuestBanner className="mb-3" />}
 
         {todosLoading ? (
           <PageLoader />
         ) : (
           <>
             {sortedTodos.length === 0 && !isAdding && (
-              <p className='py-4 text-center text-muted-foreground text-sm'>
-                No todos yet. Add one below!
+              <p className="py-4 text-center text-muted-foreground text-sm">
+                No todos yet.
               </p>
             )}
-            <div className='space-y-1.5'>
+            <div className="space-y-1.5">
               {/* Column headers */}
-              <div className='flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground/60'>
-                <span className='h-2.5 w-2.5 shrink-0' />
-                <span className='min-w-0 flex-1'>Name</span>
-                <span className='w-10 shrink-0 text-right'>Effort</span>
-                <span className='w-14 shrink-0' />
+              <div className="flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground/60">
+                <span className="h-2.5 w-2.5 shrink-0" />
+                <span className="min-w-0 flex-1">Name</span>
+                <span className="w-10 shrink-0 text-right">Effort</span>
+                <span className="w-6 shrink-0" />
               </div>
               {sortedTodos.map((todo) => (
                 <TodoListItem
                   key={todo.id}
                   todo={todo}
                   categories={categories}
-                  onDelete={() => deleteMutation.mutate({ id: todo.id })}
+                  enableNestedEdit={enableNestedEdit}
+                  onEditOpenChange={onNestedEditOpenChange}
                   onUpdate={(data) =>
                     updateMutation.mutate({ id: todo.id, ...data })
                   }
@@ -103,13 +106,13 @@ export function TodoListPanel() {
             </div>
 
             {/* Add form / button — inline below the list */}
-            <div className='mt-3'>
+            <div className="mt-4 border-t pt-3">
               {isAdding ? (
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <Input
                     value={newText}
                     onChange={(e) => setNewText(e.target.value)}
-                    placeholder='What needs to be done?'
+                    placeholder="What needs to be done?"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleAddTodo();
                       if (e.key === 'Escape') {
@@ -118,12 +121,12 @@ export function TodoListPanel() {
                       }
                     }}
                     autoFocus
-                    className='h-8 text-sm'
+                    className="h-8 text-sm"
                   />
                   <Button
-                    size='sm'
-                    variant='ghost'
-                    className='h-8 shrink-0'
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 shrink-0"
                     onClick={() => {
                       setNewText('');
                       setIsAdding(false);
@@ -132,8 +135,8 @@ export function TodoListPanel() {
                     Cancel
                   </Button>
                   <Button
-                    size='sm'
-                    className='h-8 shrink-0'
+                    size="sm"
+                    className="h-8 shrink-0"
                     onClick={handleAddTodo}
                     disabled={!newText.trim()}
                   >
@@ -142,12 +145,12 @@ export function TodoListPanel() {
                 </div>
               ) : (
                 <Button
-                  variant='outline'
-                  size='sm'
-                  className='w-full'
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
                   onClick={() => setIsAdding(true)}
                 >
-                  <Plus className='mr-1 h-4 w-4' />
+                  <Plus className="mr-1 h-4 w-4" />
                   Add item
                 </Button>
               )}
@@ -162,12 +165,14 @@ export function TodoListPanel() {
 function TodoListItem({
   todo,
   categories,
-  onDelete,
+  enableNestedEdit,
+  onEditOpenChange,
   onUpdate,
 }: {
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
-  onDelete: () => void;
+  enableNestedEdit: boolean;
+  onEditOpenChange?: (open: boolean) => void;
   onUpdate: (data: {
     text?: string;
     categoryId?: number | null;
@@ -176,162 +181,210 @@ function TodoListItem({
   }) => void;
 }) {
   const effort = todo.effort ?? 1;
-  const [editing, setEditing] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  // Edit form state
-  const [editName, setEditName] = useState(todo.text);
-  const [editEffort, setEditEffort] = useState(effort);
-
   const category = categories.find((c) => c.id === todo.categoryId);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editName, setEditName] = useState(todo.text);
+  const [editCategoryId, setEditCategoryId] = useState(
+    todo.categoryId?.toString() ?? 'none',
+  );
+  const [editEffort, setEditEffort] = useState(effort.toString());
+  const [editProgress, setEditProgress] = useState(
+    (todo.progress ?? 0).toString(),
+  );
+  const progressOptions = PROGRESS_RANGE.filter(
+    (n) => n <= Number.parseInt(editEffort, 10),
+  );
 
-  const startEditing = () => {
+  const resetForm = () => {
     setEditName(todo.text);
-    setEditEffort(effort);
-    setEditing(true);
+    setEditCategoryId(todo.categoryId?.toString() ?? 'none');
+    setEditEffort((todo.effort ?? 1).toString());
+    setEditProgress((todo.progress ?? 0).toString());
   };
 
-  const saveEdit = () => {
-    const trimmed = editName.trim();
-    if (!trimmed) return;
+  const handleEffortChange = (value: string) => {
+    setEditEffort(value);
+    setEditProgress((current) =>
+      Math.min(
+        Number.parseInt(current, 10),
+        Number.parseInt(value, 10),
+      ).toString(),
+    );
+  };
+
+  const handleEditOpenChange = (open: boolean) => {
+    if (open) resetForm();
+    setEditOpen(open);
+    onEditOpenChange?.(open);
+  };
+
+  const handleSave = () => {
+    const text = editName.trim();
+    if (!text) return;
 
     onUpdate({
-      text: trimmed,
-      effort: editEffort,
+      text,
+      categoryId:
+        editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
+      effort: Number.parseInt(editEffort, 10),
+      progress: Math.min(
+        Number.parseInt(editProgress, 10),
+        Number.parseInt(editEffort, 10),
+      ),
     });
-    setEditing(false);
+    setEditOpen(false);
+    onEditOpenChange?.(false);
   };
 
-  const cancelEdit = () => {
-    setEditing(false);
-  };
-
-  if (editing) {
+  if (!enableNestedEdit) {
     return (
-      <div className='flex items-center gap-2 rounded-md border bg-card p-1.5'>
-        {/* Name input */}
-        <Input
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') saveEdit();
-            if (e.key === 'Escape') cancelEdit();
-          }}
-          className='h-7 flex-1 text-sm'
-          autoFocus
-        />
+      <div className="group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
+        {category ? (
+          <div
+            className="h-2.5 w-2.5 shrink-0 rounded-full"
+            style={{ backgroundColor: category.color ?? '#6366f1' }}
+            title={category.name}
+          />
+        ) : (
+          <div className="h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40" />
+        )}
 
-        {/* Effort dropdown */}
-        <Select
-          value={editEffort.toString()}
-          onValueChange={(v) => setEditEffort(Number(v))}
-        >
-          <SelectTrigger className='h-7 w-16 shrink-0 text-xs'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {EFFORT_RANGE.map((n) => (
-              <SelectItem key={n} value={n.toString()}>
-                {n}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <span className="min-w-0 flex-1 truncate text-sm">{todo.text}</span>
 
-        {/* Actions */}
-        <Button
-          variant='ghost'
-          size='icon'
-          className='h-7 w-7 shrink-0'
-          onClick={cancelEdit}
-          aria-label='Cancel edit'
-        >
-          <X className='h-3.5 w-3.5' />
-        </Button>
-        <Button
-          variant='default'
-          size='icon'
-          className='h-7 w-7 shrink-0'
-          onClick={saveEdit}
-          disabled={!editName.trim()}
-          aria-label='Save edit'
-        >
-          <Check className='h-3.5 w-3.5' />
-        </Button>
+        <span className="w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
+          {effort}
+        </span>
+
+        <div className="flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={() => undefined}
+            aria-label={`Edit ${todo.text}`}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <>
-      <div className='group flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
+    <DrawerNested
+      modal={false}
+      direction="right"
+      open={editOpen}
+      onOpenChange={handleEditOpenChange}
+    >
+      <div className="group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
         {/* Category dot */}
         {category ? (
           <div
-            className='h-2.5 w-2.5 shrink-0 rounded-full'
+            className="h-2.5 w-2.5 shrink-0 rounded-full"
             style={{ backgroundColor: category.color ?? '#6366f1' }}
             title={category.name}
           />
         ) : (
-          <div className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
+          <div className="h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40" />
         )}
 
         {/* Name */}
-        <span className='min-w-0 flex-1 truncate text-sm'>{todo.text}</span>
+        <span className="min-w-0 flex-1 truncate text-sm">{todo.text}</span>
 
         {/* Effort */}
-        <span className='w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums'>
+        <span className="w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
           {effort}
         </span>
 
-        {/* Actions — visible on hover */}
-        <div className='flex shrink-0 items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-6 w-6'
-            onClick={startEditing}
-            aria-label={`Edit ${todo.text}`}
-          >
-            <Pencil className='h-3.5 w-3.5' />
-          </Button>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-6 w-6 text-destructive hover:text-destructive'
-            onClick={() => setDeleteOpen(true)}
-            aria-label={`Delete ${todo.text}`}
-          >
-            <Trash2 className='h-3.5 w-3.5' />
-          </Button>
+        {/* Action placeholder — visible on hover */}
+        <div className="flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100">
+          <DrawerTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              aria-label={`Edit ${todo.text}`}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+          </DrawerTrigger>
         </div>
       </div>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Todo</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete "{todo.text}"? This action cannot
-              be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant='outline'>Cancel</Button>
-            </DialogClose>
-            <Button
-              variant='destructive'
-              onClick={() => {
-                onDelete();
-                setDeleteOpen(false);
-              }}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+      <DrawerContent className="data-[vaul-drawer-direction=right]:w-72">
+        <DrawerHeader>
+          <DrawerTitle>Edit Todo</DrawerTitle>
+          <DrawerDescription>{todo.text}</DrawerDescription>
+        </DrawerHeader>
+        <div className="flex-1 space-y-4 p-4">
+          <div className="space-y-2">
+            <Label htmlFor={`todo-name-${todo.id}`}>Name</Label>
+            <Input
+              id={`todo-name-${todo.id}`}
+              value={editName}
+              onChange={(event) => setEditName(event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Category</Label>
+            <Select value={editCategoryId} onValueChange={setEditCategoryId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No category</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id.toString()}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Effort</Label>
+            <Select value={editEffort} onValueChange={handleEffortChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select effort" />
+              </SelectTrigger>
+              <SelectContent>
+                {EFFORT_RANGE.map((n) => (
+                  <SelectItem key={n} value={n.toString()}>
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor={`todo-progress-${todo.id}`}>Progress</Label>
+            <Select value={editProgress} onValueChange={setEditProgress}>
+              <SelectTrigger id={`todo-progress-${todo.id}`} className="w-full">
+                <SelectValue placeholder="Select progress" />
+              </SelectTrigger>
+              <SelectContent>
+                {progressOptions.map((n) => (
+                  <SelectItem key={n} value={n.toString()}>
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DrawerFooter>
+          <Button onClick={handleSave} disabled={!editName.trim()}>
+            Save
+          </Button>
+          <DrawerClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </DrawerNested>
   );
 }

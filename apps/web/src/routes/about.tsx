@@ -15,6 +15,13 @@ export const Route = createFileRoute('/about')({
 
 const REPO_URL = 'https://github.com/tuokaikyle/whats-in-my-mind';
 
+const text = `
+2. no show done ones; 
+3.done color and no category color; 
+5. edit others. 
+6 random guest effort set
+`;
+
 function RouteComponent() {
   return (
     <div className='mx-auto w-full max-w-2xl py-10 space-y-8'>

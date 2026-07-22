@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo } from 'react';
 import * as Highcharts from 'highcharts';
+import { useMemo } from 'react';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { useTodos } from '@/hooks/use-todos';
+import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/gauge')({
@@ -16,12 +17,14 @@ export const Route = createFileRoute('/gauge')({
 function buildGaugeOptions(
   todo: Task,
   isDark: boolean,
-  name: string
+  name: string,
 ): Highcharts.Options {
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
   const trackColor = isDark ? '#262626' : '#e5e5e5';
-  const progress = Math.max(0, Math.min(100, todo.progress ?? 0));
+  const effort = todo.effort ?? EFFORT_RANGE[0];
+  const rawProgress = Math.max(0, Math.min(effort, todo.progress ?? 0));
+  const progress = Math.round((rawProgress / effort) * 100);
 
   const progressColor = '#10b981';
 
@@ -166,30 +169,31 @@ function GaugePage() {
   const isDark = resolvedTheme === 'dark';
 
   const activeTodos = useMemo(
-    () => todos.filter((t) => t.progress !== 100),
-    [todos]
+    () =>
+      todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
+    [todos],
   );
 
   return (
-    <div className='mx-auto w-full max-w-6xl space-y-6 px-4 py-10'>
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-10">
       {isGuest && <GuestBanner />}
 
       {todosLoading ? (
-        <PageLoader size='lg' />
+        <PageLoader size="lg" />
       ) : activeTodos.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center'>
-          <p className='text-lg font-medium text-foreground'>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
+          <p className="text-lg font-medium text-foreground">
             No tasks in progress
           </p>
-          <p className='mt-1 text-sm text-muted-foreground'>
+          <p className="mt-1 text-sm text-muted-foreground">
             Complete some tasks or add new ones to see them here.
           </p>
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {activeTodos.map((todo) => {
             return (
-              <div key={todo.id} className='flex flex-col items-center'>
+              <div key={todo.id} className="flex flex-col items-center">
                 <HighchartsReact
                   highcharts={Highcharts}
                   options={buildGaugeOptions(todo, isDark, todo.text)}

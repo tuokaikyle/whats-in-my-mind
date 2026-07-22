@@ -3,9 +3,9 @@ import type { inferRouterInputs } from '@trpc/server';
 import type { AppRouter } from '@whats-in-my-mind/api/routers/index';
 import { useMemo } from 'react';
 import { authClient } from '@/lib/auth-client';
+import { EFFORT_RANGE, MAX_EFFORT } from '@/utils/enums';
 import { sampleCategories, sampleData } from '@/utils/sampleData';
 import { queryClient, trpc, trpcClient } from '@/utils/trpc';
-import { EFFORT_RANGE } from '@/utils/enums';
 import type { Category, Task } from '@/utils/types';
 
 type RouterInputs = inferRouterInputs<AppRouter>;
@@ -28,8 +28,23 @@ function useAuthState() {
 }
 
 function normalizeTodo(todo: Task): Task {
-  if (todo.effort == null || todo.effort >= EFFORT_RANGE[0]) return todo;
-  return { ...todo, effort: EFFORT_RANGE[0] };
+  const effort =
+    todo.effort == null || todo.effort < EFFORT_RANGE[0]
+      ? EFFORT_RANGE[0]
+      : Math.min(todo.effort, MAX_EFFORT);
+
+  if (todo.progress == null) return { ...todo, effort };
+
+  const rawProgress =
+    todo.progress > MAX_EFFORT
+      ? Math.round((todo.progress / 100) * effort)
+      : todo.progress;
+
+  return {
+    ...todo,
+    effort,
+    progress: Math.max(0, Math.min(effort, rawProgress)),
+  };
 }
 
 export function useTodos() {

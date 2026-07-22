@@ -6,7 +6,8 @@ import z from 'zod';
 import { protectedProcedure, router } from '../index';
 
 const metadataSchema = z.record(z.string(), z.unknown());
-const effortSchema = z.number().int().min(1).optional();
+const effortSchema = z.number().int().min(1).max(5).optional();
+const progressSchema = z.number().int().min(0).max(5).optional();
 
 export const todoRouter = router({
   getAll: protectedProcedure.query(async ({ ctx }) => {
@@ -31,7 +32,7 @@ export const todoRouter = router({
       z.object({
         text: z.string().min(1),
         categoryId: z.number().int().nullable().optional(),
-        progress: z.number().int().min(0).max(100).optional(),
+        progress: progressSchema,
         effort: effortSchema,
         metadata: metadataSchema.nullable().optional(),
       }),
@@ -71,7 +72,7 @@ export const todoRouter = router({
         id: z.number(),
         text: z.string().min(1).optional(),
         categoryId: z.number().int().nullable().optional(),
-        progress: z.number().int().min(0).max(100).optional(),
+        progress: progressSchema,
         effort: effortSchema,
         metadata: metadataSchema.nullable().optional(),
       }),
