@@ -1,6 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Reorder, useDragControls } from 'framer-motion';
-import { Ellipsis, GripVertical, Plus, Trash2 } from 'lucide-react';
+import {
+  Container,
+  Ellipsis,
+  Gauge,
+  GripVertical,
+  Plus,
+  Tag,
+  Trash2,
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
@@ -370,17 +378,10 @@ function SimpleTodoItem({
             </DropdownMenuTrigger>
             <DropdownMenuContent align='start' side='right'>
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Set effort</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent sideOffset={8}>
-                  {EFFORT_RANGE.map((n) => (
-                    <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
-                      {n}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Set category</DropdownMenuSubTrigger>
+                <DropdownMenuSubTrigger>
+                  <Tag className='mr-2 h-4 w-4' />
+                  Category
+                </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent sideOffset={8}>
                   <DropdownMenuItem onClick={() => onCategoryChange(null)}>
                     None
@@ -399,12 +400,25 @@ function SimpleTodoItem({
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Container className='mr-2 h-4 w-4' />
+                  Effort
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent sideOffset={8}>
+                  {EFFORT_RANGE.map((n) => (
+                    <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
+                      {n}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuItem
                 variant='destructive'
                 onClick={() => setDeleteOpen(true)}
               >
+                <Trash2 className='mr-2 h-4 w-4' />
                 Delete
-                <Trash2 className='ml-auto h-4 w-4' />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
