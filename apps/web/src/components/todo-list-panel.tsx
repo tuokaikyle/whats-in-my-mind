@@ -1,9 +1,9 @@
-import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
-import { GuestBanner } from '@/components/guest-banner';
-import { PageLoader } from '@/components/page-loader';
-import { Button } from '@/components/ui/button';
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { DeleteTodoDialog } from "@/components/delete-todo-dialog";
+import { GuestBanner } from "@/components/guest-banner";
+import { PageLoader } from "@/components/page-loader";
+import { Button } from "@/components/ui/button";
 import {
   DrawerClose,
   DrawerContent,
@@ -13,19 +13,19 @@ import {
   DrawerNested,
   DrawerTitle,
   DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useCategories, useTodos } from '@/hooks/use-todos';
-import { EFFORT_RANGE, PROGRESS_RANGE } from '@/utils/enums';
-import type { Task } from '@/utils/types';
+} from "@/components/ui/select";
+import { useCategories, useTodos } from "@/hooks/use-todos";
+import { EFFORT_RANGE, PROGRESS_RANGE } from "@/utils/enums";
+import type { Task } from "@/utils/types";
 
 export function TodoListPanel({
   enableNestedEdit = false,
@@ -34,7 +34,7 @@ export function TodoListPanel({
   enableNestedEdit?: boolean;
   onNestedEditOpenChange?: (open: boolean) => void;
 }) {
-  const [newText, setNewText] = useState('');
+  const [newText, setNewText] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const {
     todos,
@@ -66,7 +66,7 @@ export function TodoListPanel({
       progress: 0,
       effort: 3,
     });
-    setNewText('');
+    setNewText("");
     setIsAdding(false);
   };
 
@@ -122,9 +122,9 @@ export function TodoListPanel({
                     onChange={(e) => setNewText(e.target.value)}
                     placeholder="What needs to be done?"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddTodo();
-                      if (e.key === 'Escape') {
-                        setNewText('');
+                      if (e.key === "Enter") handleAddTodo();
+                      if (e.key === "Escape") {
+                        setNewText("");
                         setIsAdding(false);
                       }
                     }}
@@ -136,7 +136,7 @@ export function TodoListPanel({
                     variant="ghost"
                     className="h-8 shrink-0"
                     onClick={() => {
-                      setNewText('');
+                      setNewText("");
                       setIsAdding(false);
                     }}
                   >
@@ -146,9 +146,12 @@ export function TodoListPanel({
                     size="sm"
                     className="h-8 shrink-0"
                     onClick={handleAddTodo}
-                    disabled={!newText.trim()}
+                    disabled={!newText.trim() || createMutation.isPending}
                   >
-                    Save
+                    {createMutation.isPending && (
+                      <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                    )}
+                    Add
                   </Button>
                 </div>
               ) : (
@@ -195,7 +198,7 @@ function TodoListItem({
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState(todo.text);
   const [editCategoryId, setEditCategoryId] = useState(
-    todo.categoryId?.toString() ?? 'none',
+    todo.categoryId?.toString() ?? "none",
   );
   const [editEffort, setEditEffort] = useState(effort.toString());
   const [editProgress, setEditProgress] = useState(
@@ -208,7 +211,7 @@ function TodoListItem({
 
   const resetForm = () => {
     setEditName(todo.text);
-    setEditCategoryId(todo.categoryId?.toString() ?? 'none');
+    setEditCategoryId(todo.categoryId?.toString() ?? "none");
     setEditEffort((todo.effort ?? 1).toString());
     setEditProgress((todo.progress ?? 0).toString());
   };
@@ -236,7 +239,7 @@ function TodoListItem({
     onUpdate({
       text,
       categoryId:
-        editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
+        editCategoryId === "none" ? null : Number.parseInt(editCategoryId, 10),
       effort: Number.parseInt(editEffort, 10),
       progress: Math.min(
         Number.parseInt(editProgress, 10),
@@ -257,7 +260,7 @@ function TodoListItem({
         {category ? (
           <div
             className="h-2.5 w-2.5 shrink-0 rounded-full"
-            style={{ backgroundColor: category.color ?? '#6366f1' }}
+            style={{ backgroundColor: category.color ?? "#6366f1" }}
             title={category.name}
           />
         ) : (
@@ -297,7 +300,7 @@ function TodoListItem({
         {category ? (
           <div
             className="h-2.5 w-2.5 shrink-0 rounded-full"
-            style={{ backgroundColor: category.color ?? '#6366f1' }}
+            style={{ backgroundColor: category.color ?? "#6366f1" }}
             title={category.name}
           />
         ) : (
@@ -358,7 +361,7 @@ function TodoListItem({
                     <SelectItem key={cat.id} value={cat.id.toString()}>
                       <span
                         className="h-3 w-3 shrink-0 rounded-full border"
-                        style={{ backgroundColor: cat.color ?? '#6366f1' }}
+                        style={{ backgroundColor: cat.color ?? "#6366f1" }}
                       />
                       {cat.name}
                     </SelectItem>

@@ -1,6 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Reorder, useDragControls } from 'framer-motion';
-import { Container, Ellipsis, Gauge, Plus, Tag, Trash2 } from 'lucide-react';
+import {
+  Container,
+  Ellipsis,
+  Gauge,
+  Loader2,
+  Plus,
+  Tag,
+  Trash2,
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
@@ -262,9 +270,12 @@ function ProgressPage() {
               <Button
                 size='sm'
                 onClick={handleAddTodo}
-                disabled={!newText.trim()}
+                disabled={!newText.trim() || createMutation.isPending}
               >
-                Save
+                {createMutation.isPending && (
+                  <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
+                )}
+                Add
               </Button>
             </div>
           ) : (

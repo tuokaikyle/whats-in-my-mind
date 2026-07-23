@@ -257,7 +257,7 @@ function TodoEditorDrawerDemo() {
         className={cn(
           'data-[vaul-drawer-direction=right]:w-72',
           nestedEditorOpen &&
-            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out',
+            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
         )}
       >
         <TodoListPanel

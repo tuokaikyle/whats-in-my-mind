@@ -5,6 +5,7 @@ import {
   Ellipsis,
   Gauge,
   GripVertical,
+  Loader2,
   Plus,
   Tag,
   Trash2,
@@ -273,9 +274,12 @@ function SimplePage() {
                 <Button
                   size='sm'
                   onClick={handleAddTodo}
-                  disabled={!newText.trim()}
+                  disabled={!newText.trim() || createMutation.isPending}
                 >
-                  Save
+                  {createMutation.isPending && (
+                    <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
+                  )}
+                  Add
                 </Button>
               </div>
             ) : (
