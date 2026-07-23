@@ -3,7 +3,6 @@ import { Reorder, useDragControls } from 'framer-motion';
 import {
   Container,
   Ellipsis,
-  Gauge,
   Loader2,
   Plus,
   Tag,
@@ -161,13 +160,19 @@ function ProgressPage() {
   const handleAddTodo = () => {
     const trimmed = newText.trim();
     if (!trimmed) return;
-    createMutation.mutate({
-      text: trimmed,
-      progress: 0,
-      effort: 3,
-    });
-    setNewText('');
-    setIsAdding(false);
+    createMutation.mutate(
+      {
+        text: trimmed,
+        progress: 0,
+        effort: 3,
+      },
+      {
+        onSuccess: () => {
+          setNewText('');
+          setIsAdding(false);
+        },
+      },
+    );
   };
 
   const handleDragStart = () => {

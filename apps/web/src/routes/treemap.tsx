@@ -188,7 +188,7 @@ function TreemapPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-4xl justify-center py-20">
+      <div className='mx-auto flex w-full max-w-4xl justify-center py-20'>
         <Loader />
       </div>
     );
@@ -196,35 +196,35 @@ function TreemapPage() {
 
   if (todos.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground">
+      <div className='mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground'>
         No todo items yet. Add some to see the treemap.
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
         containerProps={{ className: 'w-full' }}
       />
 
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         <Drawer
           modal={false}
-          direction="right"
+          direction='right'
           open={listPanelOpen}
           onOpenChange={handleListPanelOpenChange}
         >
           <DrawerTrigger asChild>
-            <Button variant="secondary">Show item editor panel</Button>
+            <Button variant='secondary'>Show item editor panel</Button>
           </DrawerTrigger>
           <DrawerContent
             className={cn(
               'data-[vaul-drawer-direction=right]:w-72',
               nestedEditorOpen &&
-                'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out',
+                'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
             )}
           >
             <TodoListPanel
@@ -233,7 +233,7 @@ function TreemapPage() {
             />
             <DrawerFooter>
               <DrawerClose asChild>
-                <Button variant="outline">Close</Button>
+                <Button variant='outline'>Close</Button>
               </DrawerClose>
             </DrawerFooter>
           </DrawerContent>

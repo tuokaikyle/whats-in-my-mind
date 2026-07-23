@@ -50,13 +50,19 @@ export function TodoListPanel({
   const handleAddTodo = () => {
     const trimmed = newText.trim();
     if (!trimmed) return;
-    createMutation.mutate({
-      text: trimmed,
-      progress: 0,
-      effort: 3,
-    });
-    setNewText('');
-    setIsAdding(false);
+    createMutation.mutate(
+      {
+        text: trimmed,
+        progress: 0,
+        effort: 3,
+      },
+      {
+        onSuccess: () => {
+          setNewText('');
+          setIsAdding(false);
+        },
+      },
+    );
   };
 
   return (
