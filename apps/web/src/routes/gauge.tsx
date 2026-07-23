@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
+import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
@@ -12,11 +13,14 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { cn } from '@/lib/utils';
-import { useTodos } from '@/hooks/use-todos';
+import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
@@ -174,18 +178,41 @@ function buildGaugeOptions(
 }
 
 function GaugePage() {
-  const { todos, todosLoading, isGuest } = useTodos();
+  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } =
+    useTodos();
+  const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
-  const textColor = isDark ? '#f5f5f5' : '#171717';
-  const mutedColor = isDark ? '#a3a3a3' : '#737373';
+  const [listPanelOpen, setListPanelOpen] = useState(false);
+  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
+  const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
+
+  const onGaugeClickRef = useRef<(todoId: number) => void>(() => {});
+  onGaugeClickRef.current = useCallback((todoId: number) => {
+    setListPanelOpen(false);
+    setSelectedTodoId(todoId);
+  }, []);
+
+  const handleListPanelOpenChange = (open: boolean) => {
+    setListPanelOpen(open);
+    if (open) setSelectedTodoId(null);
+    if (!open) setNestedEditorOpen(false);
+  };
 
   const activeTodos = useMemo(
     () =>
       todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
     [todos]
   );
+
+  const selectedTodo =
+    selectedTodoId != null
+      ? todos.find((t) => t.id === selectedTodoId) ?? null
+      : null;
+
+  const textColor = isDark ? '#f5f5f5' : '#171717';
+  const mutedColor = isDark ? '#a3a3a3' : '#737373';
 
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
@@ -215,61 +242,98 @@ function GaugePage() {
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             {activeTodos.map((todo) => {
               return (
-                <div key={todo.id} className='flex flex-col items-center'>
+                <button
+                  key={todo.id}
+                  type='button'
+                  className='flex w-full cursor-pointer flex-col items-center rounded-lg p-2 text-left transition-colors hover:bg-muted/50'
+                  onClick={() => onGaugeClickRef.current(todo.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onGaugeClickRef.current(todo.id);
+                    }
+                  }}
+                >
                   <HighchartsReact
                     highcharts={Highcharts}
                     options={buildGaugeOptions(todo, isDark, todo.text)}
                   />
-                </div>
+                </button>
               );
             })}
           </div>
 
           <div className='flex justify-center'>
-            <TodoEditorDrawerDemo />
+            {/* List panel drawer */}
+            <Drawer
+              modal={false}
+              direction='right'
+              open={listPanelOpen}
+              onOpenChange={handleListPanelOpenChange}
+            >
+              <DrawerTrigger asChild>
+                <Button variant='secondary'>Show item editor panel</Button>
+              </DrawerTrigger>
+              <DrawerContent
+                className={cn(
+                  'data-[vaul-drawer-direction=right]:w-72',
+                  nestedEditorOpen &&
+                    'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
+                )}
+              >
+                <TodoListPanel
+                  enableNestedEdit
+                  onNestedEditOpenChange={setNestedEditorOpen}
+                />
+                <DrawerFooter>
+                  <DrawerClose asChild>
+                    <Button variant='outline'>Close</Button>
+                  </DrawerClose>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+
+            {/* Standalone edit drawer */}
+            <Drawer
+              modal={false}
+              direction='right'
+              open={selectedTodo != null}
+              onOpenChange={(open) => {
+                if (!open) setSelectedTodoId(null);
+              }}
+            >
+              {selectedTodo && (
+                <DrawerContent className='data-[vaul-drawer-direction=right]:w-72'>
+                  <DrawerHeader className='border-b'>
+                    <DrawerTitle>Edit Todo</DrawerTitle>
+                    <DrawerDescription>
+                      Update this item's details.
+                    </DrawerDescription>
+                  </DrawerHeader>
+                  <div className='flex-1 overflow-y-auto p-4'>
+                    <EditTodoForm
+                      key={selectedTodo.id}
+                      todo={selectedTodo}
+                      categories={categories}
+                      onUpdate={(data) =>
+                        updateMutation.mutate({
+                          id: selectedTodo.id,
+                          ...data,
+                        })
+                      }
+                      onDelete={() => {
+                        deleteMutation.mutate({ id: selectedTodo.id });
+                        setSelectedTodoId(null);
+                      }}
+                      onClose={() => setSelectedTodoId(null)}
+                    />
+                  </div>
+                </DrawerContent>
+              )}
+            </Drawer>
           </div>
         </>
       )}
     </div>
-  );
-}
-
-function TodoEditorDrawerDemo() {
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false);
-  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
-
-  const handleEditorPanelOpenChange = (open: boolean) => {
-    setEditorPanelOpen(open);
-    if (!open) setNestedEditorOpen(false);
-  };
-
-  return (
-    <Drawer
-      modal={false}
-      direction='right'
-      open={editorPanelOpen}
-      onOpenChange={handleEditorPanelOpenChange}
-    >
-      <DrawerTrigger asChild>
-        <Button variant='secondary'>Show item editor panel</Button>
-      </DrawerTrigger>
-      <DrawerContent
-        className={cn(
-          'data-[vaul-drawer-direction=right]:w-72',
-          nestedEditorOpen &&
-            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
-        )}
-      >
-        <TodoListPanel
-          enableNestedEdit
-          onNestedEditOpenChange={setNestedEditorOpen}
-        />
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant='outline'>Close</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
   );
 }

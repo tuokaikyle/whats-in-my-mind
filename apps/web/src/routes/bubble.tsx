@@ -2,7 +2,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
@@ -12,7 +13,10 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
 import { useCategories, useTodos } from '@/hooks/use-todos';
@@ -30,7 +34,11 @@ function buildSeries(todos: Task[], categories: Category[]) {
     color: category.color ?? undefined,
     data: todos
       .filter((t) => t.categoryId === category.id)
-      .map((t) => ({ name: t.text, value: t.effort ?? EFFORT_RANGE[0] })),
+      .map((t) => ({
+        name: t.text,
+        value: t.effort ?? EFFORT_RANGE[0],
+        todoId: t.id,
+      })),
   }));
 
   const knownIds = new Set(categories.map((c) => c.id));
@@ -45,6 +53,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
       data: uncategorized.map((t) => ({
         name: t.text,
         value: t.effort ?? EFFORT_RANGE[0],
+        todoId: t.id,
       })),
     });
   }
@@ -53,14 +62,37 @@ function buildSeries(todos: Task[], categories: Category[]) {
 }
 
 function BubblePage() {
-  const { todos, todosLoading, isGuest } = useTodos();
+  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } =
+    useTodos();
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
+  const [listPanelOpen, setListPanelOpen] = useState(false);
+  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
+  const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
+
+  // Store the click handler in a ref so Highcharts callbacks can access it
+  const onBubbleClickRef = useRef<(todoId: number) => void>(() => {});
+  onBubbleClickRef.current = useCallback((todoId: number) => {
+    setListPanelOpen(false);
+    setSelectedTodoId(todoId);
+  }, []);
+
+  const handleListPanelOpenChange = (open: boolean) => {
+    setListPanelOpen(open);
+    if (open) setSelectedTodoId(null);
+    if (!open) setNestedEditorOpen(false);
+  };
+
   const activeTodos = todos.filter(
     (t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])
   );
+
+  const selectedTodo =
+    selectedTodoId != null
+      ? todos.find((t) => t.id === selectedTodoId) ?? null
+      : null;
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -111,6 +143,17 @@ function BubblePage() {
             fontWeight: 'normal',
           },
         },
+        point: {
+          events: {
+            click: function () {
+              const todoId = (this as unknown as Record<string, unknown>)
+                .todoId as number | undefined;
+              if (todoId != null) {
+                onBubbleClickRef.current(todoId);
+              }
+            },
+          },
+        },
       },
     },
     series: buildSeries(
@@ -133,48 +176,71 @@ function BubblePage() {
       )}
 
       <div className='flex justify-center'>
-        <TodoEditorDrawerDemo />
+        {/* List panel drawer */}
+        <Drawer
+          modal={false}
+          direction='right'
+          open={listPanelOpen}
+          onOpenChange={handleListPanelOpenChange}
+        >
+          <DrawerTrigger asChild>
+            <Button variant='secondary'>Show item editor panel</Button>
+          </DrawerTrigger>
+          <DrawerContent
+            className={cn(
+              'data-[vaul-drawer-direction=right]:w-72',
+              nestedEditorOpen &&
+                'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
+            )}
+          >
+            <TodoListPanel
+              enableNestedEdit
+              onNestedEditOpenChange={setNestedEditorOpen}
+            />
+            <DrawerFooter>
+              <DrawerClose asChild>
+                <Button variant='outline'>Close</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+
+        {/* Standalone edit drawer */}
+        <Drawer
+          modal={false}
+          direction='right'
+          open={selectedTodo != null}
+          onOpenChange={(open) => {
+            if (!open) setSelectedTodoId(null);
+          }}
+        >
+          {selectedTodo && (
+            <DrawerContent className='data-[vaul-drawer-direction=right]:w-72'>
+              <DrawerHeader className='border-b'>
+                <DrawerTitle>Edit Todo</DrawerTitle>
+                <DrawerDescription>
+                  Update this item's details.
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className='flex-1 overflow-y-auto p-4'>
+                <EditTodoForm
+                  key={selectedTodo.id}
+                  todo={selectedTodo}
+                  categories={categories}
+                  onUpdate={(data) =>
+                    updateMutation.mutate({ id: selectedTodo.id, ...data })
+                  }
+                  onDelete={() => {
+                    deleteMutation.mutate({ id: selectedTodo.id });
+                    setSelectedTodoId(null);
+                  }}
+                  onClose={() => setSelectedTodoId(null)}
+                />
+              </div>
+            </DrawerContent>
+          )}
+        </Drawer>
       </div>
     </div>
-  );
-}
-
-function TodoEditorDrawerDemo() {
-  const [editorPanelOpen, setEditorPanelOpen] = useState(false);
-  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
-
-  const handleEditorPanelOpenChange = (open: boolean) => {
-    setEditorPanelOpen(open);
-    if (!open) setNestedEditorOpen(false);
-  };
-
-  return (
-    <Drawer
-      modal={false}
-      direction='right'
-      open={editorPanelOpen}
-      onOpenChange={handleEditorPanelOpenChange}
-    >
-      <DrawerTrigger asChild>
-        <Button variant='secondary'>Show item editor panel</Button>
-      </DrawerTrigger>
-      <DrawerContent
-        className={cn(
-          'data-[vaul-drawer-direction=right]:w-72',
-          nestedEditorOpen &&
-            'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
-        )}
-      >
-        <TodoListPanel
-          enableNestedEdit
-          onNestedEditOpenChange={setNestedEditorOpen}
-        />
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant='outline'>Close</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
   );
 }
