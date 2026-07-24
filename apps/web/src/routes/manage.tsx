@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
+import { Check, Ellipsis, Pencil, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -25,24 +25,39 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { ManageCategory } from '@/components/manage-category';
 import { useCategories } from '@/hooks/use-todos';
 import type { Category } from '@/utils/types';
 import { trpc } from '@/utils/trpc';
 import { GuestBanner } from '@/components/guest-banner';
+import { highChartColors } from '@/utils/enums';
 
 export const Route = createFileRoute('/manage')({
   component: ManagePage,
 });
 
 function ManagePage() {
-  const { categories, isLoading, deleteMutation, isGuest } = useCategories();
+  const { categories, isLoading, deleteMutation, createMutation, isGuest } =
+    useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<
     Category | undefined
   >();
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newColor, setNewColor] = useState(highChartColors.Indigo);
   const healthCheck = useQuery(trpc.healthCheck.queryOptions());
+
+  const availableColors = useMemo(() => {
+    const usedColors = new Set(
+      categories.map((c) => c.color).filter((c): c is string => c != null)
+    );
+    return Object.entries(highChartColors).filter(
+      ([name, hex]) => name !== 'SteelBlue' && !usedColors.has(hex)
+    );
+  }, [categories]);
 
   const handleDelete = () => {
     if (!deleteTarget) return;
@@ -79,14 +94,11 @@ function ManagePage() {
 
       {!isGuest && (
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between'>
-            <div>
-              <CardTitle>Categories</CardTitle>
-              <CardDescription>
-                Manage your categories for organizing entries.
-              </CardDescription>
-            </div>
-            <Button onClick={openAdd}>Add Category</Button>
+          <CardHeader>
+            <CardTitle>Manage</CardTitle>
+            <CardDescription>
+              Manage your categories for organizing entries.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {isLoading ? (
@@ -98,15 +110,15 @@ function ManagePage() {
                 No categories yet. Click "Add Category" to create one.
               </p>
             ) : (
-              <div className='border rounded-md'>
+              <div className='border rounded-md max-sm:rounded-none'>
                 <table className='w-full'>
                   <thead>
                     <tr className='border-b bg-muted/50'>
                       <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>
-                        Color
+                        Name
                       </th>
                       <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>
-                        Name
+                        Color
                       </th>
                       <th className='w-20 px-4 py-3' />
                     </tr>
@@ -117,6 +129,7 @@ function ManagePage() {
                         key={category.id}
                         className='border-b last:border-b-0'
                       >
+                        <td className='px-4 py-3 text-sm'>{category.name}</td>
                         <td className='px-4 py-3'>
                           <div
                             className='h-5 w-5 rounded-full border'
@@ -125,7 +138,6 @@ function ManagePage() {
                             }}
                           />
                         </td>
-                        <td className='px-4 py-3 text-sm'>{category.name}</td>
                         <td className='px-4 py-3'>
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -157,9 +169,133 @@ function ManagePage() {
                         </td>
                       </tr>
                     ))}
+                    {isAdding && (
+                      <tr className='border-b last:border-b-0 bg-muted/30'>
+                        <td className='px-4 py-2'>
+                          <Input
+                            autoFocus
+                            placeholder='Category name'
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && newName.trim()) {
+                                createMutation.mutate(
+                                  { name: newName.trim(), color: newColor },
+                                  {
+                                    onSuccess: () => {
+                                      toast.success('Category created');
+                                      setIsAdding(false);
+                                      setNewName('');
+                                      setNewColor(highChartColors.Indigo);
+                                    },
+                                    onError: (error) => {
+                                      toast.error(
+                                        error instanceof Error
+                                          ? error.message
+                                          : 'Failed to create category'
+                                      );
+                                    },
+                                  }
+                                );
+                              }
+                              if (e.key === 'Escape') {
+                                setIsAdding(false);
+                                setNewName('');
+                              }
+                            }}
+                          />
+                        </td>
+                        <td className='px-4 py-2'>
+                          <div className='flex flex-wrap gap-1.5'>
+                            {availableColors.map(([name, hex]) => (
+                              <button
+                                key={name}
+                                type='button'
+                                className={`h-5 w-5 rounded-full border-2 transition-all ${
+                                  newColor === hex
+                                    ? 'border-foreground scale-110'
+                                    : 'border-transparent hover:scale-105'
+                                }`}
+                                style={{ backgroundColor: hex }}
+                                title={name}
+                                onClick={() => setNewColor(hex)}
+                              >
+                                {newColor === hex && (
+                                  <Check className='h-3 w-3 text-white drop-shadow-sm m-auto' />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                        <td className='px-4 py-2'>
+                          <div className='flex items-center gap-1'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-8 w-8'
+                              disabled={
+                                !newName.trim() || createMutation.isPending
+                              }
+                              onClick={() => {
+                                if (!newName.trim()) return;
+                                createMutation.mutate(
+                                  { name: newName.trim(), color: newColor },
+                                  {
+                                    onSuccess: () => {
+                                      toast.success('Category created');
+                                      setIsAdding(false);
+                                      setNewName('');
+                                      setNewColor(highChartColors.Indigo);
+                                    },
+                                    onError: (error) => {
+                                      toast.error(
+                                        error instanceof Error
+                                          ? error.message
+                                          : 'Failed to create category'
+                                      );
+                                    },
+                                  }
+                                );
+                              }}
+                            >
+                              <Check className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              className='h-8 w-8'
+                              onClick={() => {
+                                setIsAdding(false);
+                                setNewName('');
+                              }}
+                            >
+                              <X className='h-4 w-4' />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
+            )}
+            {!isAdding && (
+              <Button
+                variant='outline'
+                size='sm'
+                className='mt-3'
+                onClick={() => {
+                  setIsAdding(true);
+                  setNewName('');
+                  setNewColor(
+                    availableColors.length > 0
+                      ? availableColors[0][1]
+                      : highChartColors.Indigo
+                  );
+                }}
+              >
+                Add Category
+              </Button>
             )}
           </CardContent>
         </Card>
@@ -193,6 +329,7 @@ function ManagePage() {
           open={categoryOpen}
           onOpenChange={setCategoryOpen}
           category={editingCategory}
+          categories={categories}
         />
       )}
 

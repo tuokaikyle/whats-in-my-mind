@@ -1,6 +1,7 @@
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
+import { ManageCategory } from '@/components/manage-category';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -46,6 +48,7 @@ export function EditTodoForm({
     (todo.progress ?? 0).toString()
   );
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [categoryOpen, setCategoryOpen] = useState(false);
 
   const progressOptions = PROGRESS_RANGE.filter(
     (n) => n <= Number.parseInt(editEffort, 10)
@@ -102,10 +105,6 @@ export function EditTodoForm({
               <SelectValue placeholder='Select category' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='none'>
-                <span className='h-3 w-3 shrink-0 rounded-full border border-muted-foreground/40' />
-                No category
-              </SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id.toString()}>
                   <span
@@ -115,6 +114,27 @@ export function EditTodoForm({
                   {cat.name}
                 </SelectItem>
               ))}
+              <SelectItem value='none'>
+                <span
+                  className='h-3 w-3 shrink-0 rounded-full'
+                  style={{ backgroundColor: '#6b8abc' }}
+                />
+                No category
+              </SelectItem>
+              <SelectSeparator />
+              <SelectItem
+                value='__add_new__'
+                onPointerUp={(e) => {
+                  e.preventDefault();
+                  setCategoryOpen(true);
+                }}
+                onSelect={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <Plus className='mr-2 h-4 w-4' />
+                Add new
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -178,6 +198,12 @@ export function EditTodoForm({
         onOpenChange={setDeleteOpen}
         todoText={todo.text}
         onDelete={handleDelete}
+      />
+
+      <ManageCategory
+        open={categoryOpen}
+        onOpenChange={setCategoryOpen}
+        categories={categories}
       />
     </>
   );

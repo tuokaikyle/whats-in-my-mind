@@ -139,7 +139,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     asChild
                     isActive={!!matchRoute({ to: item.url })}
                   >
-                    <Link to={item.url}>
+                    <Link
+                      to={item.url}
+                      onClick={() => {
+                        if (isMobile) toggleSidebar();
+                      }}
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                     </Link>

@@ -8,6 +8,7 @@ import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanel } from '@/components/todo-list-panel';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -49,7 +50,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
   if (uncategorized.length > 0) {
     categorySeries.push({
       name: 'Other',
-      color: '#94a3b8',
+      color: '#6b8abc',
       data: uncategorized.map((t) => ({
         name: t.text,
         value: t.effort ?? EFFORT_RANGE[0],
@@ -67,6 +68,7 @@ function BubblePage() {
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
+  const isMobile = useIsMobile();
 
   const [listPanelOpen, setListPanelOpen] = useState(false);
   const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
@@ -128,8 +130,8 @@ function BubblePage() {
     },
     plotOptions: {
       packedbubble: {
-        minSize: 40,
-        maxSize: 100,
+        minSize: isMobile ? 28 : 40,
+        maxSize: isMobile ? 70 : 100,
         marker: {
           fillOpacity: 0.5,
         },
@@ -207,6 +209,7 @@ function BubblePage() {
 
         {/* Standalone edit drawer */}
         <Drawer
+          key={selectedTodoId}
           modal={false}
           direction='right'
           open={selectedTodo != null}

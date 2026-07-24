@@ -5,6 +5,7 @@ import HighchartsReact from 'highcharts-react-official';
 import 'highcharts/modules/treemap';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { useTheme } from '@/components/theme-provider';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { TodoListPanel } from '@/components/todo-list-panel';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +23,7 @@ export const Route = createFileRoute('/treemap')({
   component: TreemapPage,
 });
 
-const UNCATEGORIZED_COLOR = '#9CA3AF';
+const UNCATEGORIZED_COLOR = '#6b8abc';
 
 function buildTreemapData(todos: Task[], categories: Category[]) {
   const categoryMap = new Map<number, Category>();
@@ -82,6 +83,7 @@ function TreemapPage() {
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
+  const isMobile = useIsMobile();
 
   const [listPanelOpen, setListPanelOpen] = useState(false);
   const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
@@ -104,7 +106,7 @@ function TreemapPage() {
 
     return {
       chart: {
-        height: 600,
+        ...(isMobile ? {} : { height: 600 }),
         backgroundColor: 'transparent',
         style: {
           fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
@@ -159,7 +161,7 @@ function TreemapPage() {
         },
       ],
       title: {
-        text: 'Todo Items by Effort',
+        text: 'Tree Map',
         align: 'left',
         style: { color: textColor, fontWeight: '600' },
       },
@@ -180,6 +182,7 @@ function TreemapPage() {
     todos,
     categories,
     isDark,
+    isMobile,
     textColor,
     mutedColor,
     tooltipBg,
@@ -207,7 +210,9 @@ function TreemapPage() {
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
-        containerProps={{ className: 'w-full' }}
+        containerProps={{
+          className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
+        }}
       />
 
       <div className='flex justify-center'>

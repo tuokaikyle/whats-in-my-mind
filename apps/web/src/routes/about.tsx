@@ -19,6 +19,7 @@ const text = `
 2. no show done ones; 
 3.done color and no category color; 
 6 random guest effort set
+base panel stays out
 `;
 
 function RouteComponent() {

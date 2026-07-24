@@ -8,7 +8,8 @@ export const categoryRouter = router({
     return await ctx.db
       .select({ id: category.id, name: category.name, color: category.color })
       .from(category)
-      .where(eq(category.userId, ctx.session.user.id));
+      .where(eq(category.userId, ctx.session.user.id))
+      .orderBy(category.id);
   }),
 
   create: protectedProcedure

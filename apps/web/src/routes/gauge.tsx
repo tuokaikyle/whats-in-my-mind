@@ -45,7 +45,8 @@ function buildGaugeOptions(
   return {
     chart: {
       type: 'gauge',
-      height: '240px',
+      height: 240,
+      width: 240,
       backgroundColor: 'transparent',
       style: {
         fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
@@ -233,13 +234,13 @@ function GaugePage() {
         <>
           <div className='mb-6'>
             <h1 className='text-lg font-semibold' style={{ color: textColor }}>
-              Progress Gauges
+              Gauge
             </h1>
             <p className='text-sm' style={{ color: mutedColor }}>
               Each gauge shows completion progress for an active task.
             </p>
           </div>
-          <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div className='grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
             {activeTodos.map((todo) => {
               return (
                 <button
@@ -295,6 +296,7 @@ function GaugePage() {
 
             {/* Standalone edit drawer */}
             <Drawer
+              key={selectedTodoId}
               modal={false}
               direction='right'
               open={selectedTodo != null}

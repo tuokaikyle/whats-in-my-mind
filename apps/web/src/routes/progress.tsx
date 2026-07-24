@@ -1,15 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Reorder, useDragControls } from 'framer-motion';
-import {
-  Container,
-  Ellipsis,
-  Loader2,
-  Plus,
-  Tag,
-  Trash2,
-} from 'lucide-react';
+import { Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
 import { GuestBanner } from '@/components/guest-banner';
+import { ManageCategory } from '@/components/manage-category';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import {
@@ -112,6 +107,7 @@ function ProgressPage() {
     isGuest,
   } = useTodos();
   const { categories } = useCategories();
+  const [categoryOpen, setCategoryOpen] = useState(false);
   const dragStartOrderRef = useRef<number[] | null>(null);
   const orderedIdsRef = useRef<number[]>([]);
 
@@ -171,7 +167,7 @@ function ProgressPage() {
           setNewText('');
           setIsAdding(false);
         },
-      },
+      }
     );
   };
 
@@ -200,10 +196,10 @@ function ProgressPage() {
 
   return (
     <div className='mx-auto w-full max-w-md py-10'>
-      <Card>
+      <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
           <CardTitle>Progress</CardTitle>
-          <CardDescription>Track your task progress</CardDescription>
+          <CardDescription>At least to start it</CardDescription>
         </CardHeader>
         <CardContent>
           {isGuest && <GuestBanner className='mb-4' />}
@@ -226,6 +222,7 @@ function ProgressPage() {
                   key={todo.id}
                   todo={todo}
                   categories={categories}
+                  onAddCategory={() => setCategoryOpen(true)}
                   onDragStart={handleDragStart}
                   onDragEnd={handleDragEnd}
                   onDelete={() => deleteMutation.mutate({ id: todo.id })}
@@ -296,6 +293,12 @@ function ProgressPage() {
           )}
         </CardContent>
       </Card>
+
+      <ManageCategory
+        open={categoryOpen}
+        onOpenChange={setCategoryOpen}
+        categories={categories}
+      />
     </div>
   );
 }
@@ -303,6 +306,7 @@ function ProgressPage() {
 function ProgressTodoItem({
   todo,
   categories,
+  onAddCategory,
   onDragStart,
   onDragEnd,
   onDelete,
@@ -312,6 +316,7 @@ function ProgressTodoItem({
 }: {
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
+  onAddCategory: () => void;
   onDragStart: () => void;
   onDragEnd: (id: number) => void;
   onDelete: () => void;
@@ -414,21 +419,12 @@ function ProgressTodoItem({
                 Category
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent sideOffset={8}>
-                <DropdownMenuItem onClick={() => onCategoryChange(null)}>
-                  None
-                </DropdownMenuItem>
-                {categories.map((cat) => (
-                  <DropdownMenuItem
-                    key={cat.id}
-                    onClick={() => onCategoryChange(cat.id)}
-                  >
-                    <div
-                      className='mr-2 h-3 w-3 rounded-full border'
-                      style={{ backgroundColor: cat.color ?? '#6366f1' }}
-                    />
-                    {cat.name}
-                  </DropdownMenuItem>
-                ))}
+                <CategorySubMenuContent
+                  categories={categories}
+                  selectedCategoryId={todo.categoryId}
+                  onCategoryChange={onCategoryChange}
+                  onAddCategory={onAddCategory}
+                />
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSub>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,29 +19,55 @@ interface ManageCategoryProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   category?: Category;
+  categories: Category[];
 }
 
 export function ManageCategory({
   open,
   onOpenChange,
   category,
+  categories,
 }: ManageCategoryProps) {
   const isEditing = !!category;
+
+  // Available colors: all except SteelBlue (reserved for uncategorized)
+  // and colors already used by other categories
+  const availableColors = useMemo(() => {
+    const usedColors = new Set(
+      categories
+        .filter((c) => c.id !== category?.id)
+        .map((c) => c.color)
+        .filter((c): c is string => c != null)
+    );
+    return Object.entries(highChartColors).filter(
+      ([name, hex]) => name !== 'SteelBlue' && !usedColors.has(hex)
+    );
+  }, [categories, category]);
+
+  const defaultColor =
+    availableColors.length > 0 ? availableColors[0][1] : highChartColors.Indigo;
+
   const [name, setName] = useState('');
-  const [color, setColor] = useState<string>(highChartColors.Indigo);
+  const [color, setColor] = useState<string>(defaultColor);
   const { createMutation, updateMutation } = useCategories();
 
   useEffect(() => {
     if (open) {
       if (category) {
         setName(category.name);
-        setColor(category.color ?? highChartColors.Indigo);
+        // Keep the category's current color if it's still valid,
+        // otherwise fall back to the first available
+        const currentColor = category.color ?? highChartColors.Indigo;
+        const stillAvailable = availableColors.some(
+          ([, hex]) => hex === currentColor
+        );
+        setColor(stillAvailable ? currentColor : defaultColor);
       } else {
         setName('');
-        setColor(highChartColors.Indigo);
+        setColor(defaultColor);
       }
     }
-  }, [open, category]);
+  }, [open, category, availableColors, defaultColor]);
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
@@ -114,7 +140,7 @@ export function ManageCategory({
           <div className='space-y-2'>
             <Label>Color</Label>
             <div className='flex flex-wrap gap-2'>
-              {Object.entries(highChartColors).map(([colorName, hex]) => {
+              {availableColors.map(([colorName, hex]) => {
                 const isSelected = color === hex;
                 return (
                   <button

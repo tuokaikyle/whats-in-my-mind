@@ -4,15 +4,15 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
-import {
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerNested,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
 import { Input } from '@/components/ui/input';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import type { Task } from '@/utils/types';
 
@@ -61,7 +61,7 @@ export function TodoListPanel({
           setNewText('');
           setIsAdding(false);
         },
-      },
+      }
     );
   };
 
@@ -197,79 +197,34 @@ function TodoListItem({
     onEditOpenChange?.(open);
   };
 
-  const handleFormClose = () => {
-    handleEditOpenChange(false);
-  };
-
+  const handleFormClose = () => handleEditOpenChange(false);
   const handleFormDelete = () => {
     onDelete();
     handleEditOpenChange(false);
   };
 
-  if (!enableNestedEdit) {
-    return (
-      <div className='group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
-        {category ? (
-          <div
-            className='h-2.5 w-2.5 shrink-0 rounded-full'
-            style={{ backgroundColor: category.color ?? '#6366f1' }}
-            title={category.name}
-          />
-        ) : (
-          <div className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
-        )}
+  // Extracted Row Content to prevent DRY violation
+  const RowContent = (
+    <>
+      {category ? (
+        <div
+          className='h-2.5 w-2.5 shrink-0 rounded-full'
+          style={{ backgroundColor: category.color ?? '#6366f1' }}
+          title={category.name}
+        />
+      ) : (
+        <div className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
+      )}
 
-        <span className='min-w-0 flex-1 truncate text-sm'>{todo.text}</span>
+      <span className='min-w-0 flex-1 truncate text-sm'>{todo.text}</span>
 
-        <span className='w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums'>
-          {effort}
-        </span>
+      <span className='w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums'>
+        {effort}
+      </span>
 
-        <div className='flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100'>
-          <Button
-            variant='ghost'
-            size='icon'
-            className='h-6 w-6'
-            onClick={() => undefined}
-            aria-label={`Edit ${todo.text}`}
-          >
-            <Pencil className='h-3.5 w-3.5' />
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <DrawerNested
-      modal={false}
-      direction='right'
-      open={editOpen}
-      onOpenChange={handleEditOpenChange}
-    >
-      <div className='group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
-        {/* Category dot */}
-        {category ? (
-          <div
-            className='h-2.5 w-2.5 shrink-0 rounded-full'
-            style={{ backgroundColor: category.color ?? '#6366f1' }}
-            title={category.name}
-          />
-        ) : (
-          <div className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
-        )}
-
-        {/* Name */}
-        <span className='min-w-0 flex-1 truncate text-sm'>{todo.text}</span>
-
-        {/* Effort */}
-        <span className='w-10 shrink-0 text-right text-xs text-muted-foreground tabular-nums'>
-          {effort}
-        </span>
-
-        {/* Action placeholder — visible on hover */}
-        <div className='flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100'>
-          <DrawerTrigger asChild>
+      <div className='flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100'>
+        {enableNestedEdit ? (
+          <SheetTrigger asChild>
             <Button
               variant='ghost'
               size='icon'
@@ -278,15 +233,38 @@ function TodoListItem({
             >
               <Pencil className='h-3.5 w-3.5' />
             </Button>
-          </DrawerTrigger>
-        </div>
+          </SheetTrigger>
+        ) : (
+          <div className='h-6 w-6' />
+        )}
+      </div>
+    </>
+  );
+
+  if (!enableNestedEdit) {
+    return (
+      <div className='group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
+        {RowContent}
+      </div>
+    );
+  }
+
+  return (
+    <Sheet open={editOpen} onOpenChange={handleEditOpenChange}>
+      <div className='group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
+        {RowContent}
       </div>
 
-      <DrawerContent className='data-[vaul-drawer-direction=right]:w-72'>
-        <DrawerHeader className='border-b'>
-          <DrawerTitle>Edit Todo</DrawerTitle>
-          <DrawerDescription>Update this item's details.</DrawerDescription>
-        </DrawerHeader>
+      <SheetContent
+        side='right'
+        className='w-72 p-0 flex flex-col'
+        // Prevents clicking outside on the parent drawer from closing both
+        onInteractOutside={(e) => e.preventDefault()}
+      >
+        <SheetHeader className='border-b p-4'>
+          <SheetTitle>Edit Todo</SheetTitle>
+          <SheetDescription>Update this item's details.</SheetDescription>
+        </SheetHeader>
         <div className='flex-1 overflow-y-auto p-4'>
           <EditTodoForm
             todo={todo}
@@ -296,7 +274,7 @@ function TodoListItem({
             onClose={handleFormClose}
           />
         </div>
-      </DrawerContent>
-    </DrawerNested>
+      </SheetContent>
+    </Sheet>
   );
 }
