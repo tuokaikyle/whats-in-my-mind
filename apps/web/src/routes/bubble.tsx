@@ -190,9 +190,9 @@ function BubblePage() {
           </DrawerTrigger>
           <DrawerContent
             className={cn(
-              'data-[vaul-drawer-direction=right]:w-72',
+              'data-[vaul-drawer-direction=right]:w-72 transition-transform duration-300 ease-out',
               nestedEditorOpen &&
-                'origin-right !-translate-x-5 !scale-[0.97] transition-transform duration-300 ease-out'
+                'origin-right !-translate-x-5 !scale-[0.97]'
             )}
           >
             <TodoListPanel

@@ -257,7 +257,8 @@ function TodoListItem({
 
       <SheetContent
         side='right'
-        className='w-72 p-0 flex flex-col'
+        showOverlay={false}
+        className='inset-y-3 right-3 h-[calc(100%-1.5rem)] w-72 rounded-xl border p-0 flex flex-col'
         // Prevents clicking outside on the parent drawer from closing both
         onInteractOutside={(e) => e.preventDefault()}
       >
