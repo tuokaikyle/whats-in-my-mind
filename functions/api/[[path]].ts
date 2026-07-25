@@ -8,10 +8,7 @@ export async function onRequest(context) {
   return fetch(workerUrl, {
     method: request.method,
     headers: request.headers,
-    body:
-      request.method !== 'GET' && request.method !== 'HEAD'
-        ? request.body
-        : undefined,
+    body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
     redirect: 'manual',
   });
 }

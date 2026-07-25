@@ -42,12 +42,7 @@ export const todoRouter = router({
         const cats = await ctx.db
           .select({ id: category.id })
           .from(category)
-          .where(
-            and(
-              eq(category.id, input.categoryId),
-              eq(category.userId, ctx.session.user.id),
-            ),
-          )
+          .where(and(eq(category.id, input.categoryId), eq(category.userId, ctx.session.user.id)))
           .limit(1);
         if (cats.length === 0) {
           throw new TRPCError({
@@ -82,12 +77,7 @@ export const todoRouter = router({
         const cats = await ctx.db
           .select({ id: category.id })
           .from(category)
-          .where(
-            and(
-              eq(category.id, input.categoryId),
-              eq(category.userId, ctx.session.user.id),
-            ),
-          )
+          .where(and(eq(category.id, input.categoryId), eq(category.userId, ctx.session.user.id)))
           .limit(1);
         if (cats.length === 0) {
           throw new TRPCError({
@@ -116,18 +106,10 @@ export const todoRouter = router({
         .set({
           metadata: sql`jsonb_set(coalesce(${todo.metadata}, '{}'::jsonb), '{simpleOrder}', to_jsonb(${input.simpleOrder}::double precision), true)`,
         })
-        .where(
-          and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
-        );
+        .where(and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)));
     }),
 
-  delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(todo)
-        .where(
-          and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)),
-        );
-    }),
+  delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input, ctx }) => {
+    return await ctx.db.delete(todo).where(and(eq(todo.id, input.id), eq(todo.userId, ctx.session.user.id)));
+  }),
 });

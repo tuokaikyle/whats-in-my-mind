@@ -8,16 +8,13 @@ dotenv.config({
 const dbTarget = process.env.DB_TARGET ?? 'dev';
 const migrationUrl = process.env.DATABASE_URL_MIGRATE;
 const productionUrl =
-  process.env.DATABASE_URL_PRODUCTION_DIRECT ??
-  process.env.DATABASE_URL_PRODUCTION ??
-  process.env.DATABASE_URL;
+  process.env.DATABASE_URL_PRODUCTION_DIRECT ?? process.env.DATABASE_URL_PRODUCTION ?? process.env.DATABASE_URL;
 const devUrl =
   process.env.DATABASE_URL_DEV_DIRECT ??
   process.env.DATABASE_URL_DIRECT ??
   process.env.DATABASE_URL_DEV ??
   process.env.DATABASE_URL;
-const url =
-  migrationUrl ?? (dbTarget === 'production' ? productionUrl : devUrl) ?? '';
+const url = migrationUrl ?? (dbTarget === 'production' ? productionUrl : devUrl) ?? '';
 
 if (!url) {
   throw new Error(

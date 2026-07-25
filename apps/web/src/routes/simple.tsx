@@ -1,28 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { Reorder, useDragControls } from 'framer-motion';
-import {
-  Container,
-  Ellipsis,
-  GripVertical,
-  Loader2,
-  Plus,
-  Tag,
-  Trash2,
-} from 'lucide-react';
+import { Container, Ellipsis, GripVertical, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
+import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,8 +30,7 @@ export const Route = createFileRoute('/simple')({
 const SIMPLE_ORDER_STEP = 1000;
 
 function compareByCreatedAt(a: Task, b: Task) {
-  const createdDiff =
-    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+  const createdDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 
   if (createdDiff !== 0) return createdDiff;
 
@@ -81,12 +66,8 @@ function getNextSimpleOrder({
 
   const previousTodo = todoById.get(orderedIds[index - 1]);
   const nextTodo = todoById.get(orderedIds[index + 1]);
-  const previousOrder = previousTodo
-    ? getEffectiveOrder(previousTodo, fallbackOrders)
-    : null;
-  const nextOrder = nextTodo
-    ? getEffectiveOrder(nextTodo, fallbackOrders)
-    : null;
+  const previousOrder = previousTodo ? getEffectiveOrder(previousTodo, fallbackOrders) : null;
+  const nextOrder = nextTodo ? getEffectiveOrder(nextTodo, fallbackOrders) : null;
 
   if (previousOrder !== null && nextOrder !== null) {
     if (nextOrder > previousOrder) return (previousOrder + nextOrder) / 2;
@@ -102,15 +83,8 @@ function getNextSimpleOrder({
 function SimplePage() {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const {
-    todos,
-    todosLoading,
-    createMutation,
-    updateMutation,
-    deleteMutation,
-    reorderSimpleMutation,
-    isGuest,
-  } = useTodos();
+  const { todos, todosLoading, createMutation, updateMutation, deleteMutation, reorderSimpleMutation, isGuest } =
+    useTodos();
   const { categories } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const dragStartOrderRef = useRef<number[] | null>(null);
@@ -118,17 +92,13 @@ function SimplePage() {
 
   const fallbackOrders = useMemo(() => {
     return new Map(
-      [...todos]
-        .sort(compareByCreatedAt)
-        .map((todo, index) => [todo.id, (index + 1) * SIMPLE_ORDER_STEP])
+      [...todos].sort(compareByCreatedAt).map((todo, index) => [todo.id, (index + 1) * SIMPLE_ORDER_STEP]),
     );
   }, [todos]);
 
   const sortedTodos = useMemo(() => {
     return [...todos].sort((a, b) => {
-      const orderDiff =
-        getEffectiveOrder(a, fallbackOrders) -
-        getEffectiveOrder(b, fallbackOrders);
+      const orderDiff = getEffectiveOrder(a, fallbackOrders) - getEffectiveOrder(b, fallbackOrders);
 
       if (orderDiff !== 0) return orderDiff;
 
@@ -136,14 +106,8 @@ function SimplePage() {
     });
   }, [fallbackOrders, todos]);
 
-  const todoById = useMemo(
-    () => new Map(todos.map((todo) => [todo.id, todo])),
-    [todos]
-  );
-  const sortedIds = useMemo(
-    () => sortedTodos.map((todo) => todo.id),
-    [sortedTodos]
-  );
+  const todoById = useMemo(() => new Map(todos.map((todo) => [todo.id, todo])), [todos]);
+  const sortedIds = useMemo(() => sortedTodos.map((todo) => todo.id), [sortedTodos]);
   const [orderedIds, setOrderedIds] = useState<number[]>(sortedIds);
   const isReordering = reorderSimpleMutation.isPending;
 
@@ -159,9 +123,7 @@ function SimplePage() {
     setOrderedIds(ids);
   };
 
-  const orderedTodos = orderedIds
-    .map((id) => todoById.get(id))
-    .filter((todo): todo is Task => Boolean(todo));
+  const orderedTodos = orderedIds.map((id) => todoById.get(id)).filter((todo): todo is Task => Boolean(todo));
 
   const handleAddTodo = () => {
     const trimmed = newText.trim();
@@ -177,7 +139,7 @@ function SimplePage() {
           setNewText('');
           setIsAdding(false);
         },
-      }
+      },
     );
   };
 
@@ -205,113 +167,85 @@ function SimplePage() {
   };
 
   return (
-    <>
-      <div className='mx-auto w-full max-w-md py-10'>
-        <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
-          <CardHeader>
-            <CardTitle>Simple</CardTitle>
-            <CardDescription>Manage your tasks efficiently</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isGuest && <GuestBanner className='mb-4' />}
+    <div className='mx-auto w-full max-w-md py-10'>
+      <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
+        <CardHeader>
+          <CardTitle>Simple</CardTitle>
+          <CardDescription>Manage your tasks efficiently</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isGuest && <GuestBanner className='mb-4' />}
 
-            {todosLoading ? (
-              <PageLoader />
-            ) : todos.length === 0 ? (
-              <p className='py-4 text-center text-muted-foreground'>
-                No todos yet. Use the + button to add one!
-              </p>
-            ) : (
-              <Reorder.Group
-                axis='y'
-                values={orderedIds}
-                onReorder={setNextOrderedIds}
-                className='space-y-2'
-              >
-                {orderedTodos.map((todo) => (
-                  <SimpleTodoItem
-                    key={todo.id}
-                    todo={todo}
-                    categories={categories}
-                    onAddCategory={() => setCategoryOpen(true)}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    onDelete={() => deleteMutation.mutate({ id: todo.id })}
-                    onEffortChange={(effort) =>
-                      updateMutation.mutate({
-                        id: todo.id,
-                        effort,
-                        progress: Math.min(todo.progress ?? 0, effort),
-                      })
-                    }
-                    onProgressChange={(progress) =>
-                      updateMutation.mutate({ id: todo.id, progress })
-                    }
-                    onCategoryChange={(categoryId) =>
-                      updateMutation.mutate({ id: todo.id, categoryId })
-                    }
-                  />
-                ))}
-              </Reorder.Group>
-            )}
-
-            {isAdding ? (
-              <div className='mt-2 flex items-center gap-2'>
-                <Input
-                  value={newText}
-                  onChange={(e) => setNewText(e.target.value)}
-                  placeholder='What needs to be done?'
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleAddTodo();
-                    if (e.key === 'Escape') {
-                      setNewText('');
-                      setIsAdding(false);
-                    }
-                  }}
-                  autoFocus
+          {todosLoading ? (
+            <PageLoader />
+          ) : todos.length === 0 ? (
+            <p className='py-4 text-center text-muted-foreground'>No todos yet. Use the + button to add one!</p>
+          ) : (
+            <Reorder.Group axis='y' values={orderedIds} onReorder={setNextOrderedIds} className='space-y-2'>
+              {orderedTodos.map((todo) => (
+                <SimpleTodoItem
+                  key={todo.id}
+                  todo={todo}
+                  categories={categories}
+                  onAddCategory={() => setCategoryOpen(true)}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                  onDelete={() => deleteMutation.mutate({ id: todo.id })}
+                  onEffortChange={(effort) =>
+                    updateMutation.mutate({
+                      id: todo.id,
+                      effort,
+                      progress: Math.min(todo.progress ?? 0, effort),
+                    })
+                  }
+                  onProgressChange={(progress) => updateMutation.mutate({ id: todo.id, progress })}
+                  onCategoryChange={(categoryId) => updateMutation.mutate({ id: todo.id, categoryId })}
                 />
-                <Button
-                  size='sm'
-                  variant='ghost'
-                  onClick={() => {
+              ))}
+            </Reorder.Group>
+          )}
+
+          {isAdding ? (
+            <div className='mt-2 flex items-center gap-2'>
+              <Input
+                value={newText}
+                onChange={(e) => setNewText(e.target.value)}
+                placeholder='What needs to be done?'
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddTodo();
+                  if (e.key === 'Escape') {
                     setNewText('');
                     setIsAdding(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  size='sm'
-                  onClick={handleAddTodo}
-                  disabled={!newText.trim() || createMutation.isPending}
-                >
-                  {createMutation.isPending && (
-                    <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />
-                  )}
-                  Add
-                </Button>
-              </div>
-            ) : (
+                  }
+                }}
+                autoFocus
+              />
               <Button
-                variant='ghost'
                 size='sm'
-                className='mt-2 w-full'
-                onClick={() => setIsAdding(true)}
+                variant='ghost'
+                onClick={() => {
+                  setNewText('');
+                  setIsAdding(false);
+                }}
               >
-                <Plus className='mr-1 h-4 w-4' />
-                Add item
+                Cancel
               </Button>
-            )}
-          </CardContent>
-        </Card>
+              <Button size='sm' onClick={handleAddTodo} disabled={!newText.trim() || createMutation.isPending}>
+                {createMutation.isPending && <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />}
+                Add
+              </Button>
+            </div>
+          ) : (
+            <Button variant='ghost' size='sm' className='mt-2 w-full' onClick={() => setIsAdding(true)}>
+              <Plus className='mr-1 h-4 w-4' />
+              Add item
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
-        <ManageCategory
-          open={categoryOpen}
-          onOpenChange={setCategoryOpen}
-          categories={categories}
-        />
-      </div>
-    </>
+      <ManageCategory open={categoryOpen} onOpenChange={setCategoryOpen} categories={categories} />
+    </div>
   );
 }
 
@@ -373,9 +307,7 @@ function SimpleTodoItem({
                   key={n}
                   type='button'
                   className={`h-3 w-3 rounded-sm border ${
-                    isFilled
-                      ? 'border-green-500 bg-green-500'
-                      : 'border-muted-foreground/40'
+                    isFilled ? 'border-green-500 bg-green-500' : 'border-muted-foreground/40'
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -388,12 +320,7 @@ function SimpleTodoItem({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='h-7 w-7 shrink-0'
-                aria-label='More options'
-              >
+              <Button variant='ghost' size='icon' className='h-7 w-7 shrink-0' aria-label='More options'>
                 <Ellipsis className='h-4 w-4' />
               </Button>
             </DropdownMenuTrigger>
@@ -425,10 +352,7 @@ function SimpleTodoItem({
                   ))}
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <DropdownMenuItem
-                variant='destructive'
-                onClick={() => setDeleteOpen(true)}
-              >
+              <DropdownMenuItem variant='destructive' onClick={() => setDeleteOpen(true)}>
                 <Trash2 className='mr-2 h-4 w-4' />
                 Delete
               </DropdownMenuItem>

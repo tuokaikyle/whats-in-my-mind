@@ -5,63 +5,33 @@ import { ManageCategory } from '@/components/manage-category';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectSeparator, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EFFORT_RANGE, PROGRESS_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
 interface EditTodoFormProps {
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
-  onUpdate: (data: {
-    text?: string;
-    categoryId?: number | null;
-    effort?: number;
-    progress?: number;
-  }) => void;
+  onUpdate: (data: { text?: string; categoryId?: number | null; effort?: number; progress?: number }) => void;
   onDelete: () => void;
   onClose: () => void;
   isUpdating?: boolean;
 }
 
-export function EditTodoForm({
-  todo,
-  categories,
-  onUpdate,
-  onDelete,
-  onClose,
-  isUpdating = false,
-}: EditTodoFormProps) {
+export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, isUpdating = false }: EditTodoFormProps) {
   const effort = todo.effort ?? 1;
   const [editName, setEditName] = useState(todo.text);
-  const [editCategoryId, setEditCategoryId] = useState(
-    todo.categoryId?.toString() ?? 'none'
-  );
+  const [editCategoryId, setEditCategoryId] = useState(todo.categoryId?.toString() ?? 'none');
   const [editEffort, setEditEffort] = useState(effort.toString());
-  const [editProgress, setEditProgress] = useState(
-    (todo.progress ?? 0).toString()
-  );
+  const [editProgress, setEditProgress] = useState((todo.progress ?? 0).toString());
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  const progressOptions = PROGRESS_RANGE.filter(
-    (n) => n <= Number.parseInt(editEffort, 10)
-  );
+  const progressOptions = PROGRESS_RANGE.filter((n) => n <= Number.parseInt(editEffort, 10));
 
   const handleEffortChange = (value: string) => {
     setEditEffort(value);
-    setEditProgress((current) =>
-      Math.min(
-        Number.parseInt(current, 10),
-        Number.parseInt(value, 10)
-      ).toString()
-    );
+    setEditProgress((current) => Math.min(Number.parseInt(current, 10), Number.parseInt(value, 10)).toString());
   };
 
   const handleSave = () => {
@@ -70,13 +40,9 @@ export function EditTodoForm({
 
     onUpdate({
       text,
-      categoryId:
-        editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
+      categoryId: editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
       effort: Number.parseInt(editEffort, 10),
-      progress: Math.min(
-        Number.parseInt(editProgress, 10),
-        Number.parseInt(editEffort, 10)
-      ),
+      progress: Math.min(Number.parseInt(editProgress, 10), Number.parseInt(editEffort, 10)),
     });
     onClose();
   };
@@ -91,11 +57,7 @@ export function EditTodoForm({
       <div className='space-y-4'>
         <div className='space-y-2'>
           <Label htmlFor={`todo-name-${todo.id}`}>Name</Label>
-          <Input
-            id={`todo-name-${todo.id}`}
-            value={editName}
-            onChange={(event) => setEditName(event.target.value)}
-          />
+          <Input id={`todo-name-${todo.id}`} value={editName} onChange={(event) => setEditName(event.target.value)} />
         </div>
 
         <div className='space-y-2'>
@@ -115,10 +77,7 @@ export function EditTodoForm({
                 </SelectItem>
               ))}
               <SelectItem value='none'>
-                <span
-                  className='h-3 w-3 shrink-0 rounded-full'
-                  style={{ backgroundColor: '#6b8abc' }}
-                />
+                <span className='h-3 w-3 shrink-0 rounded-full' style={{ backgroundColor: '#6b8abc' }} />
                 No category
               </SelectItem>
               <SelectSeparator />
@@ -193,18 +152,9 @@ export function EditTodoForm({
         Delete
       </Button>
 
-      <DeleteTodoDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        todoText={todo.text}
-        onDelete={handleDelete}
-      />
+      <DeleteTodoDialog open={deleteOpen} onOpenChange={setDeleteOpen} todoText={todo.text} onDelete={handleDelete} />
 
-      <ManageCategory
-        open={categoryOpen}
-        onOpenChange={setCategoryOpen}
-        categories={categories}
-      />
+      <ManageCategory open={categoryOpen} onOpenChange={setCategoryOpen} categories={categories} />
     </>
   );
 }

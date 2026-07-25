@@ -22,18 +22,11 @@ export const categoryRouter = router({
       });
     }),
 
-  delete: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(category)
-        .where(
-          and(
-            eq(category.id, input.id),
-            eq(category.userId, ctx.session.user.id),
-          ),
-        );
-    }),
+  delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input, ctx }) => {
+    return await ctx.db
+      .delete(category)
+      .where(and(eq(category.id, input.id), eq(category.userId, ctx.session.user.id)));
+  }),
 
   update: protectedProcedure
     .input(
@@ -48,8 +41,6 @@ export const categoryRouter = router({
       return await ctx.db
         .update(category)
         .set(data)
-        .where(
-          and(eq(category.id, id), eq(category.userId, ctx.session.user.id)),
-        );
+        .where(and(eq(category.id, id), eq(category.userId, ctx.session.user.id)));
     }),
 });

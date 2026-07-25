@@ -46,10 +46,7 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
   const data: any[] = [];
 
   for (const [key, group] of grouped) {
-    const catId =
-      key === 'uncategorized'
-        ? null
-        : Number.parseInt(key.replace('cat-', ''), 10);
+    const catId = key === 'uncategorized' ? null : Number.parseInt(key.replace('cat-', ''), 10);
     const cat = catId != null ? categoryMap.get(catId) : undefined;
     const name = cat?.name ?? 'Uncategorized';
     const color = group.color;
@@ -165,20 +162,11 @@ function TreemapPage() {
       },
       credits: { enabled: false },
     };
-  }, [
-    todos,
-    categories,
-    isDark,
-    isMobile,
-    textColor,
-    mutedColor,
-    tooltipBg,
-    tooltipBorder,
-  ]);
+  }, [todos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder]);
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-4xl justify-center py-20">
+      <div className='mx-auto flex w-full max-w-4xl justify-center py-20'>
         <Loader />
       </div>
     );
@@ -186,14 +174,14 @@ function TreemapPage() {
 
   if (todos.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground">
+      <div className='mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground'>
         No todo items yet. Add some to see the treemap.
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
@@ -202,19 +190,12 @@ function TreemapPage() {
         }}
       />
 
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         {/* List panel drawer (Base UI) with nested edit drawer.
              No standalone edit drawer here — clicking treemap sections
              drills down the treemap instead of opening an editor. */}
-        <BaseDrawer.Drawer
-          swipeDirection="right"
-          modal={false}
-          open={listPanelOpen}
-          onOpenChange={setListPanelOpen}
-        >
-          <BaseDrawer.DrawerTrigger
-            render={<Button variant="secondary">Show item editor panel</Button>}
-          />
+        <BaseDrawer.Drawer swipeDirection='right' modal={false} open={listPanelOpen} onOpenChange={setListPanelOpen}>
+          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
           <BaseDrawer.DrawerContent>
             <BaseDrawer.DrawerHeader>
               <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
@@ -222,13 +203,11 @@ function TreemapPage() {
                 Click an item&apos;s edit icon to open a nested drawer.
               </BaseDrawer.DrawerDescription>
             </BaseDrawer.DrawerHeader>
-            <div className="flex-1 overflow-hidden">
+            <div className='flex-1 overflow-hidden'>
               <TodoListPanelDrawer />
             </div>
             <BaseDrawer.DrawerFooter>
-              <BaseDrawer.DrawerClose
-                render={<Button variant="outline">Close</Button>}
-              />
+              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
             </BaseDrawer.DrawerFooter>
           </BaseDrawer.DrawerContent>
         </BaseDrawer.Drawer>

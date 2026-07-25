@@ -1,4 +1,4 @@
-import { createAuth, type AuthEnv } from '@whats-in-my-mind/auth';
+import { type AuthEnv, createAuth } from '@whats-in-my-mind/auth';
 import { getDb } from '@whats-in-my-mind/db';
 import type { Context as HonoContext } from 'hono';
 

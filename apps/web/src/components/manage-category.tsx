@@ -1,19 +1,13 @@
+import { Check } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCategories } from '@/hooks/use-todos';
-import type { Category } from '@/utils/types';
 import { highChartColors } from '@/utils/enums';
+import type { Category } from '@/utils/types';
 
 interface ManageCategoryProps {
   open: boolean;
@@ -22,12 +16,7 @@ interface ManageCategoryProps {
   categories: Category[];
 }
 
-export function ManageCategory({
-  open,
-  onOpenChange,
-  category,
-  categories,
-}: ManageCategoryProps) {
+export function ManageCategory({ open, onOpenChange, category, categories }: ManageCategoryProps) {
   const isEditing = !!category;
 
   // Available colors: all except SteelBlue (reserved for uncategorized)
@@ -37,15 +26,12 @@ export function ManageCategory({
       categories
         .filter((c) => c.id !== category?.id)
         .map((c) => c.color)
-        .filter((c): c is string => c != null)
+        .filter((c): c is string => c != null),
     );
-    return Object.entries(highChartColors).filter(
-      ([name, hex]) => name !== 'SteelBlue' && !usedColors.has(hex)
-    );
+    return Object.entries(highChartColors).filter(([name, hex]) => name !== 'SteelBlue' && !usedColors.has(hex));
   }, [categories, category]);
 
-  const defaultColor =
-    availableColors.length > 0 ? availableColors[0][1] : highChartColors.Indigo;
+  const defaultColor = availableColors.length > 0 ? availableColors[0][1] : highChartColors.Indigo;
 
   const [name, setName] = useState('');
   const [color, setColor] = useState<string>(defaultColor);
@@ -58,9 +44,7 @@ export function ManageCategory({
         // Keep the category's current color if it's still valid,
         // otherwise fall back to the first available
         const currentColor = category.color ?? highChartColors.Indigo;
-        const stillAvailable = availableColors.some(
-          ([, hex]) => hex === currentColor
-        );
+        const stillAvailable = availableColors.some(([, hex]) => hex === currentColor);
         setColor(stillAvailable ? currentColor : defaultColor);
       } else {
         setName('');
@@ -84,13 +68,9 @@ export function ManageCategory({
             onOpenChange(false);
           },
           onError: (error) => {
-            toast.error(
-              error instanceof Error
-                ? error.message
-                : 'Failed to update category'
-            );
+            toast.error(error instanceof Error ? error.message : 'Failed to update category');
           },
-        }
+        },
       );
     } else {
       createMutation.mutate(
@@ -101,13 +81,9 @@ export function ManageCategory({
             onOpenChange(false);
           },
           onError: (error) => {
-            toast.error(
-              error instanceof Error
-                ? error.message
-                : 'Failed to create category'
-            );
+            toast.error(error instanceof Error ? error.message : 'Failed to create category');
           },
-        }
+        },
       );
     }
   };
@@ -116,13 +92,9 @@ export function ManageCategory({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? 'Edit Category' : 'Add New Category'}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Category' : 'Add New Category'}</DialogTitle>
           <DialogDescription>
-            {isEditing
-              ? 'Update the category name or color.'
-              : 'Create a new category to organize your entries.'}
+            {isEditing ? 'Update the category name or color.' : 'Create a new category to organize your entries.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='space-y-4'>
@@ -162,28 +134,16 @@ export function ManageCategory({
                     onClick={() => setColor(hex)}
                     disabled={isPending}
                   >
-                    {isSelected && (
-                      <Check
-                        className='h-3 w-3 text-white drop-shadow-sm'
-                        strokeWidth={3}
-                      />
-                    )}
+                    {isSelected && <Check className='h-3 w-3 text-white drop-shadow-sm' strokeWidth={3} />}
                   </button>
                 );
               })}
             </div>
-            <p className='text-muted-foreground text-sm'>
-              Choose a color to identify this category
-            </p>
+            <p className='text-muted-foreground text-sm'>Choose a color to identify this category</p>
           </div>
 
           <div className='flex justify-end space-x-2 pt-4'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
+            <Button type='button' variant='outline' onClick={() => onOpenChange(false)} disabled={isPending}>
               Cancel
             </Button>
             <Button type='submit' disabled={isPending || !name.trim()}>
@@ -192,8 +152,8 @@ export function ManageCategory({
                   ? 'Updating...'
                   : 'Creating...'
                 : isEditing
-                ? 'Update Category'
-                : 'Create Category'}
+                  ? 'Update Category'
+                  : 'Create Category'}
             </Button>
           </div>
         </form>

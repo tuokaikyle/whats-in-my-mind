@@ -1,14 +1,7 @@
-import {
-  EFFORT_RANGE,
-  highChartColors,
-  MAX_EFFORT,
-  PROGRESS_RANGE,
-} from './enums';
+import { EFFORT_RANGE, highChartColors, MAX_EFFORT, PROGRESS_RANGE } from './enums';
 import type { Category, Task } from './types';
 
-function createTasks(
-  input: { category: string; color: string; tasks: string[] }[],
-) {
+function createTasks(input: { category: string; color: string; tasks: string[] }[]) {
   const categories: Category[] = input.map((c, i) => ({
     id: i + 1,
     name: c.category,
@@ -28,10 +21,7 @@ function createTasks(
         text,
         categoryId: catIdx + 1,
         effort,
-        progress:
-          Math.random() > 0.5
-            ? PROGRESS_RANGE[Math.floor(Math.random() * (effort + 1))]
-            : null,
+        progress: Math.random() > 0.5 ? PROGRESS_RANGE[Math.floor(Math.random() * (effort + 1))] : null,
         createdAt: now.toISOString(),
         updatedAt: now.toISOString(),
       });

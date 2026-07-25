@@ -1,13 +1,5 @@
 import { relations } from 'drizzle-orm';
-import {
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { user } from './auth';
 import { category } from './category';
 

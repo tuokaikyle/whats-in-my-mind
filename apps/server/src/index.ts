@@ -6,7 +6,7 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
 import { trpcServer } from '@hono/trpc-server';
 import { createContext } from '@whats-in-my-mind/api/context';
 import { appRouter } from '@whats-in-my-mind/api/routers/index';
-import { createAuth, type AuthEnv } from '@whats-in-my-mind/auth';
+import { type AuthEnv, createAuth } from '@whats-in-my-mind/auth';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';

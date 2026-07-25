@@ -33,9 +33,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
   }));
 
   const knownIds = new Set(categories.map((c) => c.id));
-  const uncategorized = todos.filter(
-    (t) => t.categoryId === null || !knownIds.has(t.categoryId),
-  );
+  const uncategorized = todos.filter((t) => t.categoryId === null || !knownIds.has(t.categoryId));
 
   if (uncategorized.length > 0) {
     categorySeries.push({
@@ -53,8 +51,7 @@ function buildSeries(todos: Task[], categories: Category[]) {
 }
 
 function BubblePage() {
-  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } =
-    useTodos();
+  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } = useTodos();
   const { categories } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -77,14 +74,9 @@ function BubblePage() {
     if (open) setEditDrawerOpen(false);
   };
 
-  const activeTodos = todos.filter(
-    (t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0]),
-  );
+  const activeTodos = todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0]));
 
-  const selectedTodo =
-    selectedTodoId != null
-      ? (todos.find((t) => t.id === selectedTodoId) ?? null)
-      : null;
+  const selectedTodo = selectedTodoId != null ? (todos.find((t) => t.id === selectedTodoId) ?? null) : null;
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -138,8 +130,7 @@ function BubblePage() {
         point: {
           events: {
             click: function () {
-              const todoId = (this as unknown as Record<string, unknown>)
-                .todoId as number | undefined;
+              const todoId = (this as unknown as Record<string, unknown>).todoId as number | undefined;
               if (todoId != null) {
                 onBubbleClickRef.current(todoId);
               }
@@ -148,36 +139,31 @@ function BubblePage() {
         },
       },
     },
-    series: buildSeries(
-      activeTodos,
-      categories,
-    ) as Highcharts.SeriesOptionsType[],
+    series: buildSeries(activeTodos, categories) as Highcharts.SeriesOptionsType[],
     credits: { enabled: false },
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
+    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
       {isGuest && <GuestBanner />}
 
       {todosLoading ? (
-        <PageLoader size="lg" />
+        <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <p className="py-8 text-center text-muted-foreground">No tasks yet.</p>
+        <p className='py-8 text-center text-muted-foreground'>No tasks yet.</p>
       ) : (
         <HighchartsReact highcharts={Highcharts} options={options} />
       )}
 
-      <div className="flex justify-center">
+      <div className='flex justify-center'>
         {/* List panel drawer (Base UI) with nested edit drawer */}
         <BaseDrawer.Drawer
-          swipeDirection="right"
+          swipeDirection='right'
           modal={false}
           open={listPanelOpen}
           onOpenChange={handleListPanelOpenChange}
         >
-          <BaseDrawer.DrawerTrigger
-            render={<Button variant="secondary">Show item editor panel</Button>}
-          />
+          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
           <BaseDrawer.DrawerContent>
             <BaseDrawer.DrawerHeader>
               <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
@@ -185,20 +171,18 @@ function BubblePage() {
                 Click an item&apos;s edit icon to open a nested drawer.
               </BaseDrawer.DrawerDescription>
             </BaseDrawer.DrawerHeader>
-            <div className="flex-1 overflow-hidden">
+            <div className='flex-1 overflow-hidden'>
               <TodoListPanelDrawer />
             </div>
             <BaseDrawer.DrawerFooter>
-              <BaseDrawer.DrawerClose
-                render={<Button variant="outline">Close</Button>}
-              />
+              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
             </BaseDrawer.DrawerFooter>
           </BaseDrawer.DrawerContent>
         </BaseDrawer.Drawer>
 
         {/* Standalone edit drawer (Base UI) */}
         <BaseDrawer.Drawer
-          swipeDirection="right"
+          swipeDirection='right'
           modal={false}
           open={editDrawerOpen}
           onOpenChange={setEditDrawerOpen}
@@ -208,20 +192,16 @@ function BubblePage() {
         >
           {selectedTodo && (
             <BaseDrawer.DrawerContent>
-              <BaseDrawer.DrawerHeader className="border-b">
+              <BaseDrawer.DrawerHeader className='border-b'>
                 <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
-                <BaseDrawer.DrawerDescription>
-                  Update this item&apos;s details.
-                </BaseDrawer.DrawerDescription>
+                <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
               </BaseDrawer.DrawerHeader>
-              <div className="flex-1 overflow-y-auto p-4">
+              <div className='flex-1 overflow-y-auto p-4'>
                 <EditTodoForm
                   key={selectedTodo.id}
                   todo={selectedTodo}
                   categories={categories}
-                  onUpdate={(data) =>
-                    updateMutation.mutate({ id: selectedTodo.id, ...data })
-                  }
+                  onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
                   onDelete={() => {
                     deleteMutation.mutate({ id: selectedTodo.id });
                     setEditDrawerOpen(false);

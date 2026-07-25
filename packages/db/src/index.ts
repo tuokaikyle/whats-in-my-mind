@@ -1,6 +1,6 @@
 import { neon, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
 import type { NeonHttpDatabase } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/neon-http';
 
 // Configure for edge environments (Cloudflare Workers, Vercel Edge, etc.)
 if (typeof WebSocket === 'undefined') {
@@ -24,22 +24,22 @@ let currentDatabaseUrl: string | null = null;
 export const getDb = (databaseUrl?: string) => {
   // Use provided URL or fall back to process.env (for local development)
   const dbUrl = databaseUrl || process.env.DATABASE_URL_DEV || process.env.DATABASE_URL;
-  
+
   if (!dbUrl) {
     throw new Error('DATABASE_URL environment variable is not set');
   }
-  
+
   // Recreate connection if URL changed (for multi-tenant scenarios)
   if (dbInstance && currentDatabaseUrl !== dbUrl) {
     dbInstance = null;
   }
-  
+
   if (!dbInstance) {
     currentDatabaseUrl = dbUrl;
     const sql = neon(dbUrl);
     dbInstance = drizzle(sql);
   }
-  
+
   return dbInstance;
 };
 

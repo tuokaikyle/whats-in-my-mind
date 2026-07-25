@@ -29,7 +29,8 @@
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "lineWidth": 120
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
@@ -55,7 +56,8 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single"
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "single"
     }
   },
   "css": {

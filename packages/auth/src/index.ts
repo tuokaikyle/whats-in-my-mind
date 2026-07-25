@@ -40,7 +40,12 @@ export function createAuth(env: AuthEnv) {
     }),
     secret,
     baseURL,
-    trustedOrigins: corsOrigin ? corsOrigin.split(',').map((o) => o.trim()).filter(Boolean) : [],
+    trustedOrigins: corsOrigin
+      ? corsOrigin
+          .split(',')
+          .map((o) => o.trim())
+          .filter(Boolean)
+      : [],
     emailAndPassword: {
       enabled: true,
     },

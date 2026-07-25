@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ExternalLink, GitBranch, MessageSquare } from 'lucide-react';
+import { ExternalLink, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export const Route = createFileRoute('/about')({
   component: RouteComponent,
@@ -15,21 +9,12 @@ export const Route = createFileRoute('/about')({
 
 const REPO_URL = 'https://github.com/tuokaikyle/whats-in-my-mind';
 
-const text = `
-2. no show done ones; 
-3.done color and no category color; 
-6 random guest effort set
-base panel stays out
-`;
-
 function RouteComponent() {
   return (
     <div className='mx-auto w-full max-w-2xl py-10 space-y-8'>
       <div className='space-y-2'>
         <h1 className='text-3xl font-bold tracking-tight'>About</h1>
-        <p className='text-muted-foreground text-lg'>
-          One model, multiple views.
-        </p>
+        <p className='text-muted-foreground text-lg'>One model, multiple views.</p>
       </div>
 
       <Card>
@@ -38,64 +23,46 @@ function RouteComponent() {
         </CardHeader>
         <CardContent className='space-y-3 text-muted-foreground'>
           <p>
-            <strong>What's in my mind</strong> is a task management app that
-            lets you capture your thoughts and visualize them in different ways
-            — all from the same underlying data.
+            <strong>What's in my mind</strong> is a task management app that lets you capture your thoughts and
+            visualize them in different ways — all from the same underlying data.
           </p>
           <p>
-            Instead of forcing you into a single view, it offers multiple
-            perspectives so you can work the way you think:
+            Instead of forcing you into a single view, it offers multiple perspectives so you can work the way you
+            think:
           </p>
           <ul className='list-disc pl-5 space-y-1'>
             <li>
-              <Link
-                to='/simple'
-                className='text-primary hover:underline font-medium'
-              >
+              <Link to='/simple' className='text-primary hover:underline font-medium'>
                 Simple
               </Link>{' '}
               — A clean, draggable checklist for quick capture and reordering.
             </li>
             <li>
-              <Link
-                to='/progress'
-                className='text-primary hover:underline font-medium'
-              >
+              <Link to='/progress' className='text-primary hover:underline font-medium'>
                 Progress
               </Link>{' '}
               — Track effort and completion with progress bars.
             </li>
             <li>
-              <Link
-                to='/bubble'
-                className='text-primary hover:underline font-medium'
-              >
+              <Link to='/bubble' className='text-primary hover:underline font-medium'>
                 Bubble
               </Link>{' '}
               — See your tasks as a bubble chart by category and effort.
             </li>
             <li>
-              <Link
-                to='/gauge'
-                className='text-primary hover:underline font-medium'
-              >
+              <Link to='/gauge' className='text-primary hover:underline font-medium'>
                 Gauge
               </Link>{' '}
               — At-a-glance radial gauge showing overall progress.
             </li>
             <li>
-              <Link
-                to='/treemap'
-                className='text-primary hover:underline font-medium'
-              >
+              <Link to='/treemap' className='text-primary hover:underline font-medium'>
                 Tree Map
               </Link>{' '}
               — Explore tasks organized by category in a space-filling layout.
             </li>
           </ul>
-          <p>
-            Same tasks, different lenses. No duplication, no switching tools.
-          </p>
+          <p>Same tasks, different lenses. No duplication, no switching tools.</p>
         </CardContent>
       </Card>
 
