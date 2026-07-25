@@ -7,19 +7,9 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
-import { TodoListPanel } from '@/components/todo-list-panel';
+import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
-import { cn } from '@/lib/utils';
+import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
@@ -31,7 +21,7 @@ export const Route = createFileRoute('/gauge')({
 function buildGaugeOptions(
   todo: Task,
   isDark: boolean,
-  name: string
+  name: string,
 ): Highcharts.Options {
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -186,67 +176,67 @@ function GaugePage() {
   const isDark = resolvedTheme === 'dark';
 
   const [listPanelOpen, setListPanelOpen] = useState(false);
-  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
+  const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
   const onGaugeClickRef = useRef<(todoId: number) => void>(() => {});
   onGaugeClickRef.current = useCallback((todoId: number) => {
     setListPanelOpen(false);
     setSelectedTodoId(todoId);
+    setEditDrawerOpen(true);
   }, []);
 
   const handleListPanelOpenChange = (open: boolean) => {
     setListPanelOpen(open);
-    if (open) setSelectedTodoId(null);
-    if (!open) setNestedEditorOpen(false);
+    if (open) setEditDrawerOpen(false);
   };
 
   const activeTodos = useMemo(
     () =>
       todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
-    [todos]
+    [todos],
   );
 
   const selectedTodo =
     selectedTodoId != null
-      ? todos.find((t) => t.id === selectedTodoId) ?? null
+      ? (todos.find((t) => t.id === selectedTodoId) ?? null)
       : null;
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
 
   return (
-    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
       {isGuest && <GuestBanner />}
 
       {todosLoading ? (
-        <PageLoader size='lg' />
+        <PageLoader size="lg" />
       ) : activeTodos.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center'>
-          <p className='text-lg font-medium text-foreground'>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center">
+          <p className="text-lg font-medium text-foreground">
             No tasks in progress
           </p>
-          <p className='mt-1 text-sm text-muted-foreground'>
+          <p className="mt-1 text-sm text-muted-foreground">
             Complete some tasks or add new ones to see them here.
           </p>
         </div>
       ) : (
         <>
-          <div className='mb-6'>
-            <h1 className='text-lg font-semibold' style={{ color: textColor }}>
+          <div className="mb-6">
+            <h1 className="text-lg font-semibold" style={{ color: textColor }}>
               Gauge
             </h1>
-            <p className='text-sm' style={{ color: mutedColor }}>
+            <p className="text-sm" style={{ color: mutedColor }}>
               Each gauge shows completion progress for an active task.
             </p>
           </div>
-          <div className='grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {activeTodos.map((todo) => {
               return (
                 <button
                   key={todo.id}
-                  type='button'
-                  className='flex w-full cursor-pointer flex-col items-center rounded-lg p-2 text-left transition-colors hover:bg-muted/50'
+                  type="button"
+                  className="flex w-full cursor-pointer flex-col items-center rounded-lg p-2 text-left transition-colors hover:bg-muted/50"
                   onClick={() => onGaugeClickRef.current(todo.id)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -264,75 +254,73 @@ function GaugePage() {
             })}
           </div>
 
-          <div className='flex justify-center'>
-            {/* List panel drawer */}
-            <Drawer
+          <div className="flex justify-center">
+            {/* List panel drawer (Base UI) with nested edit drawer */}
+            <BaseDrawer.Drawer
+              swipeDirection="right"
               modal={false}
-              direction='right'
               open={listPanelOpen}
               onOpenChange={handleListPanelOpenChange}
             >
-              <DrawerTrigger asChild>
-                <Button variant='secondary'>Show item editor panel</Button>
-              </DrawerTrigger>
-              <DrawerContent
-                className={cn(
-                  'data-[vaul-drawer-direction=right]:w-72 transition-transform duration-300 ease-out',
-                  nestedEditorOpen &&
-                    'origin-right !-translate-x-5 !scale-[0.97]'
-                )}
-              >
-                <TodoListPanel
-                  enableNestedEdit
-                  onNestedEditOpenChange={setNestedEditorOpen}
-                />
-                <DrawerFooter>
-                  <DrawerClose asChild>
-                    <Button variant='outline'>Close</Button>
-                  </DrawerClose>
-                </DrawerFooter>
-              </DrawerContent>
-            </Drawer>
+              <BaseDrawer.DrawerTrigger
+                render={
+                  <Button variant="secondary">Show item editor panel</Button>
+                }
+              />
+              <BaseDrawer.DrawerContent>
+                <BaseDrawer.DrawerHeader>
+                  <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+                  <BaseDrawer.DrawerDescription>
+                    Click an item&apos;s edit icon to open a nested drawer.
+                  </BaseDrawer.DrawerDescription>
+                </BaseDrawer.DrawerHeader>
+                <div className="flex-1 overflow-hidden">
+                  <TodoListPanelDrawer />
+                </div>
+                <BaseDrawer.DrawerFooter>
+                  <BaseDrawer.DrawerClose
+                    render={<Button variant="outline">Close</Button>}
+                  />
+                </BaseDrawer.DrawerFooter>
+              </BaseDrawer.DrawerContent>
+            </BaseDrawer.Drawer>
 
-            {/* Standalone edit drawer */}
-            <Drawer
-              key={selectedTodoId}
+            {/* Standalone edit drawer (Base UI) */}
+            <BaseDrawer.Drawer
+              swipeDirection="right"
               modal={false}
-              direction='right'
-              open={selectedTodo != null}
-              onOpenChange={(open) => {
+              open={editDrawerOpen}
+              onOpenChange={setEditDrawerOpen}
+              onOpenChangeComplete={(open) => {
                 if (!open) setSelectedTodoId(null);
               }}
             >
               {selectedTodo && (
-                <DrawerContent className='data-[vaul-drawer-direction=right]:w-72'>
-                  <DrawerHeader className='border-b'>
-                    <DrawerTitle>Edit Todo</DrawerTitle>
-                    <DrawerDescription>
-                      Update this item's details.
-                    </DrawerDescription>
-                  </DrawerHeader>
-                  <div className='flex-1 overflow-y-auto p-4'>
+                <BaseDrawer.DrawerContent>
+                  <BaseDrawer.DrawerHeader className="border-b">
+                    <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
+                    <BaseDrawer.DrawerDescription>
+                      Update this item&apos;s details.
+                    </BaseDrawer.DrawerDescription>
+                  </BaseDrawer.DrawerHeader>
+                  <div className="flex-1 overflow-y-auto p-4">
                     <EditTodoForm
                       key={selectedTodo.id}
                       todo={selectedTodo}
                       categories={categories}
                       onUpdate={(data) =>
-                        updateMutation.mutate({
-                          id: selectedTodo.id,
-                          ...data,
-                        })
+                        updateMutation.mutate({ id: selectedTodo.id, ...data })
                       }
                       onDelete={() => {
                         deleteMutation.mutate({ id: selectedTodo.id });
-                        setSelectedTodoId(null);
+                        setEditDrawerOpen(false);
                       }}
-                      onClose={() => setSelectedTodoId(null)}
+                      onClose={() => setEditDrawerOpen(false)}
                     />
                   </div>
-                </DrawerContent>
+                </BaseDrawer.DrawerContent>
               )}
-            </Drawer>
+            </BaseDrawer.Drawer>
           </div>
         </>
       )}

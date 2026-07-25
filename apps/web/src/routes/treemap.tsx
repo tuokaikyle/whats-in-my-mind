@@ -1,22 +1,15 @@
-import { useMemo, useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
+import { useMemo, useState } from 'react';
 import 'highcharts/modules/treemap';
-import { useCategories, useTodos } from '@/hooks/use-todos';
-import { useTheme } from '@/components/theme-provider';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { TodoListPanel } from '@/components/todo-list-panel';
-import { Button } from '@/components/ui/button';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
-import { cn } from '@/lib/utils';
 import Loader from '@/components/loader';
+import { useTheme } from '@/components/theme-provider';
+import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
+import { Button } from '@/components/ui/button';
+import * as BaseDrawer from '@/components/ui/drawer-base';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useCategories, useTodos } from '@/hooks/use-todos';
 import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/treemap')({
@@ -86,12 +79,6 @@ function TreemapPage() {
   const isMobile = useIsMobile();
 
   const [listPanelOpen, setListPanelOpen] = useState(false);
-  const [nestedEditorOpen, setNestedEditorOpen] = useState(false);
-
-  const handleListPanelOpenChange = (open: boolean) => {
-    setListPanelOpen(open);
-    if (!open) setNestedEditorOpen(false);
-  };
 
   const loading = todosLoading || categoriesLoading;
 
@@ -191,7 +178,7 @@ function TreemapPage() {
 
   if (loading) {
     return (
-      <div className='mx-auto flex w-full max-w-4xl justify-center py-20'>
+      <div className="mx-auto flex w-full max-w-4xl justify-center py-20">
         <Loader />
       </div>
     );
@@ -199,14 +186,14 @@ function TreemapPage() {
 
   if (todos.length === 0) {
     return (
-      <div className='mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground'>
+      <div className="mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground">
         No todo items yet. Add some to see the treemap.
       </div>
     );
   }
 
   return (
-    <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
+    <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-10">
       <HighchartsReact
         highcharts={Highcharts}
         options={options}
@@ -215,34 +202,36 @@ function TreemapPage() {
         }}
       />
 
-      <div className='flex justify-center'>
-        <Drawer
+      <div className="flex justify-center">
+        {/* List panel drawer (Base UI) with nested edit drawer.
+             No standalone edit drawer here — clicking treemap sections
+             drills down the treemap instead of opening an editor. */}
+        <BaseDrawer.Drawer
+          swipeDirection="right"
           modal={false}
-          direction='right'
           open={listPanelOpen}
-          onOpenChange={handleListPanelOpenChange}
+          onOpenChange={setListPanelOpen}
         >
-          <DrawerTrigger asChild>
-            <Button variant='secondary'>Show item editor panel</Button>
-          </DrawerTrigger>
-          <DrawerContent
-            className={cn(
-              'data-[vaul-drawer-direction=right]:w-72 transition-transform duration-300 ease-out',
-              nestedEditorOpen &&
-                'origin-right !-translate-x-5 !scale-[0.97]'
-            )}
-          >
-            <TodoListPanel
-              enableNestedEdit
-              onNestedEditOpenChange={setNestedEditorOpen}
-            />
-            <DrawerFooter>
-              <DrawerClose asChild>
-                <Button variant='outline'>Close</Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
+          <BaseDrawer.DrawerTrigger
+            render={<Button variant="secondary">Show item editor panel</Button>}
+          />
+          <BaseDrawer.DrawerContent>
+            <BaseDrawer.DrawerHeader>
+              <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+              <BaseDrawer.DrawerDescription>
+                Click an item&apos;s edit icon to open a nested drawer.
+              </BaseDrawer.DrawerDescription>
+            </BaseDrawer.DrawerHeader>
+            <div className="flex-1 overflow-hidden">
+              <TodoListPanelDrawer />
+            </div>
+            <BaseDrawer.DrawerFooter>
+              <BaseDrawer.DrawerClose
+                render={<Button variant="outline">Close</Button>}
+              />
+            </BaseDrawer.DrawerFooter>
+          </BaseDrawer.DrawerContent>
+        </BaseDrawer.Drawer>
       </div>
     </div>
   );
