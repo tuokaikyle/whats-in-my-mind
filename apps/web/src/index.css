@@ -19,6 +19,35 @@ body {
   }
 }
 
+.ring-progress-arc {
+  stroke-dasharray: 0 var(--ring-circumference);
+  animation: ring-progress-in 0.8s ease-out forwards;
+}
+
+@keyframes ring-progress-in {
+  from {
+    stroke-dasharray: 0 var(--ring-circumference);
+  }
+  to {
+    stroke-dasharray: var(--ring-progress) var(--ring-circumference);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress-arc {
+    animation: none;
+    stroke-dasharray: var(--ring-progress) var(--ring-circumference);
+  }
+
+  .ring-segment {
+    transition: none;
+  }
+}
+
+.ring-segment--hovered .ring-progress-arc {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 45%, transparent));
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);

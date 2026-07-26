@@ -56,6 +56,12 @@ function RouteComponent() {
               — At-a-glance radial gauge showing overall progress.
             </li>
             <li>
+              <Link to='/ring' className='text-primary hover:underline font-medium'>
+                Ring
+              </Link>{' '}
+              — Active tasks as a ring; arc length is effort, fill is progress.
+            </li>
+            <li>
               <Link to='/treemap' className='text-primary hover:underline font-medium'>
                 Tree Map
               </Link>{' '}
