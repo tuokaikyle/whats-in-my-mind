@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { EFFORT_RANGE } from '@/utils/enums';
 import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/treemap')({
@@ -17,6 +18,14 @@ export const Route = createFileRoute('/treemap')({
 });
 
 const UNCATEGORIZED_COLOR = '#6b8abc';
+
+/** Maps stored effort (1–5) to Fibonacci weights for treemap area sizing. */
+const EFFORT_TO_TREEMAP = [1, 2, 3, 5, 8] as const;
+
+function treemapWeight(effort: number): number {
+  const index = Math.max(0, Math.min(EFFORT_TO_TREEMAP.length - 1, effort - 1));
+  return EFFORT_TO_TREEMAP[index];
+}
 
 function buildTreemapData(todos: Task[], categories: Category[]) {
   const categoryMap = new Map<number, Category>();
@@ -56,10 +65,12 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
 
     // Leaf nodes: each todo item
     for (const todo of group.todos) {
+      const effort = todo.effort ?? EFFORT_RANGE[0];
       data.push({
         name: todo.text,
         parent: key,
-        value: todo.effort ?? 0,
+        value: treemapWeight(effort),
+        effort,
         color,
       });
     }
@@ -101,6 +112,7 @@ function TreemapPage() {
           type: 'treemap',
           name: 'Todos by Effort',
           allowTraversingTree: true,
+          interactByLeaf: true,
           alternateStartingDirection: true,
           dataLabels: {
             format: '{point.name}',
@@ -150,12 +162,24 @@ function TreemapPage() {
         style: { color: textColor, fontWeight: '600' },
       },
       subtitle: {
-        text: 'Grouped by category — rectangle size represents effort',
+        text: 'Grouped by category — rectangle size reflects relative effort',
         align: 'left',
         style: { color: mutedColor },
       },
       tooltip: {
-        pointFormat: '<b>{point.name}</b><br/>Effort: <b>{point.value}</b>',
+        headerFormat: '',
+        pointFormatter: function (this: Highcharts.Point & { effort?: number }) {
+          if (this.effort != null) {
+            const category = this.node?.parentNode?.name;
+            let html = `<b>${this.name}</b>`;
+            if (category) {
+              html += `<br/>Category: <b>${category}</b>`;
+            }
+            html += `<br/>Effort: <b>${this.effort}</b>`;
+            return html;
+          }
+          return `<b>${this.name}</b>`;
+        },
         backgroundColor: tooltipBg,
         borderColor: tooltipBorder,
         style: { color: textColor },
