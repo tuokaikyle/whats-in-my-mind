@@ -1,6 +1,6 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useMatchRoute } from '@tanstack/react-router';
-import { Bubbles, Command, FileCheck, Gauge, Info, LayoutGrid, PanelLeft, Settings2, TrendingUp } from 'lucide-react';
+import { Bubbles, ChartPie, Command, FileCheck, Gauge, Info, LayoutGrid, PanelLeft, Settings2, TrendingUp } from 'lucide-react';
 import type * as React from 'react';
 import {
   Sidebar,
@@ -64,6 +64,12 @@ export const sidebarData: {
       title: 'Tree Map',
       url: '/treemap',
       icon: LayoutGrid,
+      group: 'Views',
+    },
+    {
+      title: 'Ring',
+      url: '/ring',
+      icon: ChartPie,
       group: 'Views',
     },
     {

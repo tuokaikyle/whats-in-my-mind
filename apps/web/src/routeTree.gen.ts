@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TreemapRouteImport } from './routes/treemap'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as RingRouteImport } from './routes/ring'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ManageRouteImport } from './routes/manage'
 import { Route as GaugeRouteImport } from './routes/gauge'
@@ -27,6 +28,11 @@ const TreemapRoute = TreemapRouteImport.update({
 const SimpleRoute = SimpleRouteImport.update({
   id: '/simple',
   path: '/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RingRoute = RingRouteImport.update({
+  id: '/ring',
+  path: '/ring',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressRoute = ProgressRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
+  '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
+  '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
+  '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/gauge'
     | '/manage'
     | '/progress'
+    | '/ring'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/gauge'
     | '/manage'
     | '/progress'
+    | '/ring'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/gauge'
     | '/manage'
     | '/progress'
+    | '/ring'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   GaugeRoute: typeof GaugeRoute
   ManageRoute: typeof ManageRoute
   ProgressRoute: typeof ProgressRoute
+  RingRoute: typeof RingRoute
   SimpleRoute: typeof SimpleRoute
   TreemapRoute: typeof TreemapRoute
   AuthPathRoute: typeof AuthPathRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/simple'
       fullPath: '/simple'
       preLoaderRoute: typeof SimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ring': {
+      id: '/ring'
+      path: '/ring'
+      fullPath: '/ring'
+      preLoaderRoute: typeof RingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progress': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   GaugeRoute: GaugeRoute,
   ManageRoute: ManageRoute,
   ProgressRoute: ProgressRoute,
+  RingRoute: RingRoute,
   SimpleRoute: SimpleRoute,
   TreemapRoute: TreemapRoute,
   AuthPathRoute: AuthPathRoute,
