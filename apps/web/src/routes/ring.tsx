@@ -6,6 +6,7 @@ import { PageLoader } from '@/components/page-loader';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
 import * as BaseDrawer from '@/components/ui/drawer-base';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { cn } from '@/lib/utils';
 import { EFFORT_RANGE } from '@/utils/enums';
@@ -93,6 +94,7 @@ function RouteComponent() {
   const { todos, todosLoading, isGuest, updateMutation, deleteMutation } =
     useTodos();
   const { categories, isLoading: categoriesLoading } = useCategories();
+  const isMobile = useIsMobile();
 
   const activeTodos = useMemo(
     () =>
@@ -170,6 +172,9 @@ function RouteComponent() {
   const [replayKey, setReplayKey] = useState(0);
   const [baseGrey, setBaseGrey] = useState(false);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  const hitStrokeWidth = isMobile ? HIT_STROKE_WIDTH + 14 : HIT_STROKE_WIDTH;
 
   // Drawer state
   const [listPanelOpen, setListPanelOpen] = useState(false);
@@ -187,16 +192,31 @@ function RouteComponent() {
     setEditDrawerOpen(true);
   };
 
+  const handleSegmentActivate = (id: number) => {
+    if (isMobile) {
+      if (activeId === id) {
+        handleSegmentClick(id);
+        return;
+      }
+      setActiveId(id);
+      return;
+    }
+
+    handleSegmentClick(id);
+  };
+
   const handleListPanelOpenChange = (open: boolean) => {
     setListPanelOpen(open);
     if (open) setEditDrawerOpen(false);
   };
 
-  const hoveredSegment =
-    hoveredId != null
-      ? segments.find((seg) => seg.id === hoveredId) ?? null
+  const displayId = hoveredId ?? activeId;
+  const displaySegment =
+    displayId != null
+      ? segments.find((seg) => seg.id === displayId) ?? null
       : null;
 
+  const isSegmentHighlighted = (id: number) => hoveredId === id || activeId === id;
   const highlightSegment = (id: number) => setHoveredId(id);
   const clearHighlight = () => setHoveredId(null);
   const handleHoverLeave = (event: React.MouseEvent) => {
@@ -259,16 +279,17 @@ function RouteComponent() {
                     height={viewBoxSize}
                     fill='transparent'
                     onMouseEnter={clearHighlight}
+                    onClick={() => setActiveId(null)}
                   />
                   {segments.map((seg) => {
-                    const isHovered = hoveredId === seg.id;
+                    const isHighlighted = isSegmentHighlighted(seg.id);
 
                     return (
                       <g
                         key={seg.id}
                         className={cn(
                           'ring-segment transition-[opacity,filter] duration-150',
-                          isHovered && 'ring-segment--hovered'
+                          isHighlighted && 'ring-segment--hovered'
                         )}
                       >
                         {/* Base arc: full effort, lighter */}
@@ -278,7 +299,7 @@ function RouteComponent() {
                           r={radius}
                           fill='none'
                           stroke={baseGrey ? BASE_GREY : seg.color}
-                          strokeOpacity={isHovered ? 0.45 : 0.2}
+                          strokeOpacity={isHighlighted ? 0.45 : 0.2}
                           strokeWidth={strokeWidth}
                           strokeLinecap={segmentStyle.strokeLinecap}
                           strokeDasharray={`${seg.dashLength} ${circumference}`}
@@ -294,7 +315,7 @@ function RouteComponent() {
                           fill='none'
                           stroke={seg.color}
                           strokeWidth={
-                            isHovered
+                            isHighlighted
                               ? strokeWidth + RING_HOVER_STROKE_BOOST
                               : strokeWidth
                           }
@@ -316,16 +337,16 @@ function RouteComponent() {
                           r={radius}
                           fill='none'
                           stroke='transparent'
-                          strokeWidth={HIT_STROKE_WIDTH}
+                          strokeWidth={hitStrokeWidth}
                           strokeLinecap={segmentStyle.strokeLinecap}
                           strokeDasharray={`${seg.dashLength} ${circumference}`}
                           strokeDashoffset={seg.dashOffset}
-                          className='cursor-pointer'
+                          className='cursor-pointer touch-manipulation'
                           pointerEvents='stroke'
                           data-ring-segment-hit={seg.id}
                           onMouseEnter={() => highlightSegment(seg.id)}
                           onMouseLeave={handleHoverLeave}
-                          onClick={() => handleSegmentClick(seg.id)}
+                          onClick={() => handleSegmentActivate(seg.id)}
                           aria-label={`${seg.text}, ${seg.progress} of ${seg.effort} complete`}
                         />
                       </g>
@@ -333,23 +354,28 @@ function RouteComponent() {
                   })}
                 </svg>
 
-                <div className='pointer-events-none absolute inset-0 flex items-center justify-center px-8'>
-                  <div className='max-w-[12rem] text-center'>
-                    {hoveredSegment ? (
+                <div className='pointer-events-none absolute inset-0 flex items-center justify-center px-6 sm:px-8'>
+                  <div className='max-w-[min(100%,14rem)] text-center'>
+                    {displaySegment ? (
                       <>
                         <p className='truncate text-sm font-semibold text-foreground'>
-                          {hoveredSegment.text}
+                          {displaySegment.text}
                         </p>
                         <p className='mt-0.5 text-xs text-muted-foreground'>
-                          {hoveredSegment.categoryName}
+                          {displaySegment.categoryName}
                         </p>
                         <p className='mt-2 text-2xl font-bold tabular-nums tracking-tight text-foreground'>
-                          {formatProgressPercent(hoveredSegment.progressRatio)}
+                          {formatProgressPercent(displaySegment.progressRatio)}
                         </p>
                         <p className='text-xs text-muted-foreground'>
-                          {hoveredSegment.progress} / {hoveredSegment.effort}{' '}
+                          {displaySegment.progress} / {displaySegment.effort}{' '}
                           effort
                         </p>
+                        {isMobile && activeId === displaySegment.id && (
+                          <p className='mt-2 text-[11px] text-muted-foreground'>
+                            Tap again to edit
+                          </p>
+                        )}
                       </>
                     ) : (
                       <>
@@ -374,9 +400,9 @@ function RouteComponent() {
               </div>
 
               {/* Legend */}
-              <div className='flex flex-wrap justify-center gap-x-2 gap-y-2'>
+              <div className='flex w-full flex-wrap justify-center gap-x-2 gap-y-2 px-1'>
                 {segments.map((seg) => {
-                  const isHovered = hoveredId === seg.id;
+                  const isHighlighted = isSegmentHighlighted(seg.id);
 
                   return (
                     <button
@@ -384,8 +410,9 @@ function RouteComponent() {
                       type='button'
                       data-ring-legend-item={seg.id}
                       className={cn(
-                        'flex items-center gap-1.5 rounded-md px-2 py-1 text-sm transition-colors',
-                        isHovered
+                        'flex items-center gap-1.5 rounded-md text-sm transition-colors touch-manipulation',
+                        isMobile ? 'min-h-11 px-3 py-2' : 'px-2 py-1',
+                        isHighlighted
                           ? 'bg-muted text-foreground'
                           : 'text-muted-foreground hover:bg-muted/60'
                       )}
@@ -393,11 +420,15 @@ function RouteComponent() {
                       onMouseLeave={handleHoverLeave}
                       onFocus={() => highlightSegment(seg.id)}
                       onBlur={clearHighlight}
+                      onClick={() => {
+                        if (isMobile) handleSegmentActivate(seg.id);
+                      }}
+                      aria-pressed={activeId === seg.id}
                     >
                       <span
                         className={cn(
                           'inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-background transition-transform',
-                          isHovered
+                          isHighlighted
                             ? 'scale-110 ring-current'
                             : 'ring-transparent'
                         )}

@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
@@ -83,65 +83,76 @@ function BubblePage() {
   const tooltipBg = isDark ? '#262626' : '#ffffff';
   const tooltipBorder = isDark ? '#404040' : '#e5e5e5';
 
-  const options: Highcharts.Options = {
-    chart: {
-      type: 'packedbubble',
-      height: '80%',
-      backgroundColor: 'transparent',
-      style: {
-        fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
+  const options = useMemo<Highcharts.Options>(
+    () => ({
+      chart: {
+        type: 'packedbubble',
+        ...(isMobile ? {} : { height: 600 }),
+        backgroundColor: 'transparent',
+        style: {
+          fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
+        },
       },
-    },
-    title: {
-      text: "What's in my mind",
-      style: { color: textColor, fontWeight: '600' },
-    },
-    subtitle: {
-      text: 'Grouped by category. Bubble size reflects effort.',
-      style: { color: mutedColor },
-    },
-    tooltip: {
-      pointFormat: '<b>{point.name}</b><br/>Effort: {point.value}',
-      backgroundColor: tooltipBg,
-      borderColor: tooltipBorder,
-      style: { color: textColor },
-    },
-    legend: {
-      itemStyle: { color: textColor, fontWeight: 'normal' },
-      itemHoverStyle: { color: textColor },
-    },
-    plotOptions: {
-      packedbubble: {
-        minSize: isMobile ? 28 : 40,
-        maxSize: isMobile ? 70 : 100,
-        marker: {
-          fillOpacity: 0.5,
+      title: {
+        text: "What's in my mind",
+        style: { color: textColor, fontWeight: '600', fontSize: isMobile ? '15px' : '18px' },
+      },
+      subtitle: {
+        text: 'Grouped by category. Bubble size reflects effort.',
+        style: { color: mutedColor, fontSize: isMobile ? '11px' : '12px' },
+      },
+      tooltip: {
+        pointFormat: '<b>{point.name}</b><br/>Effort: {point.value}',
+        backgroundColor: tooltipBg,
+        borderColor: tooltipBorder,
+        style: { color: textColor },
+      },
+      legend: {
+        layout: 'horizontal',
+        align: 'center',
+        verticalAlign: 'bottom',
+        itemDistance: isMobile ? 6 : 12,
+        itemStyle: {
+          color: textColor,
+          fontWeight: 'normal',
+          fontSize: isMobile ? '10px' : '12px',
         },
-        dataLabels: {
-          enabled: true,
-          format: '{point.name}',
-          style: {
-            color: isDark ? '#e5e5e5' : '#171717',
-            fontSize: '11px',
-            textOutline: 'none',
-            fontWeight: 'normal',
+        itemHoverStyle: { color: textColor },
+      },
+      plotOptions: {
+        packedbubble: {
+          minSize: isMobile ? 32 : 40,
+          maxSize: isMobile ? 72 : 100,
+          marker: {
+            fillOpacity: 0.5,
           },
-        },
-        point: {
-          events: {
-            click: function () {
-              const todoId = (this as unknown as Record<string, unknown>).todoId as number | undefined;
-              if (todoId != null) {
-                onBubbleClickRef.current(todoId);
-              }
+          dataLabels: {
+            enabled: true,
+            format: '{point.name}',
+            style: {
+              color: isDark ? '#e5e5e5' : '#171717',
+              fontSize: isMobile ? '10px' : '11px',
+              textOutline: 'none',
+              fontWeight: 'normal',
+            },
+          },
+          point: {
+            events: {
+              click: function () {
+                const todoId = (this as unknown as Record<string, unknown>).todoId as number | undefined;
+                if (todoId != null) {
+                  onBubbleClickRef.current(todoId);
+                }
+              },
             },
           },
         },
       },
-    },
-    series: buildSeries(activeTodos, categories) as Highcharts.SeriesOptionsType[],
-    credits: { enabled: false },
-  };
+      series: buildSeries(activeTodos, categories) as Highcharts.SeriesOptionsType[],
+      credits: { enabled: false },
+    }),
+    [activeTodos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder],
+  );
 
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
@@ -152,7 +163,13 @@ function BubblePage() {
       ) : activeTodos.length === 0 ? (
         <p className='py-8 text-center text-muted-foreground'>No tasks yet.</p>
       ) : (
-        <HighchartsReact highcharts={Highcharts} options={options} />
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={options}
+          containerProps={{
+            className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
+          }}
+        />
       )}
 
       <div className='flex justify-center'>
