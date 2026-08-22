@@ -104,12 +104,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isMobile = useIsMobile();
 
   // Group items by their 'group' property
-  const groupedNavMain = sidebarData.navMain.reduce((acc, item) => {
-    const group = item.group || 'Other';
-    if (!acc[group]) acc[group] = [];
-    acc[group].push(item);
-    return acc;
-  }, {} as Record<string, typeof sidebarData.navMain>);
+  const groupedNavMain = sidebarData.navMain.reduce(
+    (acc, item) => {
+      const group = item.group || 'Other';
+      if (!acc[group]) acc[group] = [];
+      acc[group].push(item);
+      return acc;
+    },
+    {} as Record<string, typeof sidebarData.navMain>,
+  );
 
   return (
     <Sidebar collapsible='icon' {...props}>
@@ -122,12 +125,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className='size-4' />
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-medium'>
-                    What's in my mind
-                  </span>
-                  <span className='truncate text-xs'>
-                    Present ideas differently
-                  </span>
+                  <span className='truncate font-medium'>What's in my mind</span>
+                  <span className='truncate text-xs'>Present ideas differently</span>
                 </div>
                 <PanelLeft className='size-4' />
               </div>
@@ -142,10 +141,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={!!matchRoute({ to: item.url })}
-                  >
+                  <SidebarMenuButton asChild isActive={!!matchRoute({ to: item.url })}>
                     <Link
                       to={item.url}
                       onClick={() => {

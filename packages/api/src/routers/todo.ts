@@ -60,9 +60,7 @@ export const todoRouter = router({
         metadata: input.metadata,
         userId: ctx.session.user.id,
         completedAt:
-          input.effort != null && input.effort > 0 && (input.progress ?? 0) >= input.effort
-            ? new Date()
-            : null,
+          input.effort != null && input.effort > 0 && (input.progress ?? 0) >= input.effort ? new Date() : null,
       });
     }),
 
@@ -104,9 +102,7 @@ export const todoRouter = router({
       const nextProgress = input.progress ?? current?.progress ?? null;
       const isCompleted = nextEffort != null && nextEffort > 0 && nextProgress != null && nextProgress >= nextEffort;
 
-      const completedAt = isCompleted
-        ? current?.completedAt ?? new Date()
-        : null;
+      const completedAt = isCompleted ? (current?.completedAt ?? new Date()) : null;
 
       return await ctx.db
         .update(todo)

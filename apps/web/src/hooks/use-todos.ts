@@ -97,8 +97,7 @@ export function useTodos() {
             metadata: input.metadata ?? null,
             createdAt: now,
             updatedAt: now,
-            completedAt:
-              effort != null && effort > 0 && progress >= effort ? now : null,
+            completedAt: effort != null && effort > 0 && progress >= effort ? now : null,
           } satisfies Task;
         }
       : (input) => trpcClient.todo.create.mutate(input),
@@ -115,9 +114,7 @@ export function useTodos() {
       const prev = snapshot();
       setCache((list) =>
         list.map((t) =>
-          t.id === v.id
-            ? { ...t, ...(v as Partial<Task>), completedAt: computeCompletedAt(t, v as Partial<Task>) }
-            : t,
+          t.id === v.id ? { ...t, ...(v as Partial<Task>), completedAt: computeCompletedAt(t, v as Partial<Task>) } : t,
         ),
       );
       return { prev };
