@@ -12,12 +12,12 @@ const REPO_URL = 'https://github.com/tuokaikyle/whats-in-my-mind';
 function RouteComponent() {
   return (
     <div className='mx-auto w-full max-w-2xl py-10 space-y-8'>
-      <div className='space-y-2'>
+      <div className='space-y-2 max-sm:px-6'>
         <h1 className='text-3xl font-bold tracking-tight'>About</h1>
         <p className='text-muted-foreground text-lg'>One model, multiple views.</p>
       </div>
 
-      <Card>
+      <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
           <CardTitle>What is this?</CardTitle>
         </CardHeader>
@@ -72,7 +72,7 @@ function RouteComponent() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
             <GitBranch className='h-5 w-5' />

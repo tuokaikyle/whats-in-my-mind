@@ -98,7 +98,7 @@ function ManagePage() {
       {isGuest && <GuestBanner />}
 
       {!isGuest && (
-        <Card>
+        <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
           <CardHeader>
             <CardTitle>Categories</CardTitle>
             <CardDescription>Manage your categories for organizing entries.</CardDescription>
@@ -275,7 +275,9 @@ function ManagePage() {
         </Card>
       )}
 
-      <Card className={isGuest ? '' : 'mt-6'}>
+      <Card
+        className={`max-sm:rounded-none max-sm:border-0 max-sm:shadow-none ${isGuest ? '' : 'mt-6'}`}
+      >
         <CardHeader>
           <CardTitle>Completed Todos</CardTitle>
           <CardDescription>
@@ -359,7 +361,7 @@ function ManagePage() {
         </CardContent>
       </Card>
 
-      <Card className='mt-6'>
+      <Card className='mt-6 max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
           <CardTitle>Network Status</CardTitle>
           <CardDescription>Application health check</CardDescription>

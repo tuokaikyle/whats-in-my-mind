@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible='icon' {...props}>
-      <SidebarHeader>
+      <SidebarHeader className='border-b'>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size='lg' onClick={toggleSidebar} asChild>
