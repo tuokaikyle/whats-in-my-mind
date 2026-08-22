@@ -65,12 +65,12 @@ export const sidebarData: {
       icon: Bubbles,
       group: 'Views',
     },
-    {
-      title: 'Gauge',
-      url: '/gauge',
-      icon: Gauge,
-      group: 'Views',
-    },
+    // {
+    //   title: 'Gauge',
+    //   url: '/gauge',
+    //   icon: Gauge,
+    //   group: 'Views',
+    // },
     {
       title: 'Tree Map',
       url: '/treemap',
