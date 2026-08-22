@@ -4,6 +4,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
 import { EditTodoForm } from '@/components/edit-todo-form';
+import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
@@ -172,7 +173,7 @@ function GaugePage() {
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
-  const onGaugeClickRef = useRef<(todoId: number) => void>(() => { });
+  const onGaugeClickRef = useRef<(todoId: number) => void>(() => {});
   onGaugeClickRef.current = useCallback((todoId: number) => {
     setListPanelOpen(false);
     setSelectedTodoId(todoId);
@@ -198,10 +199,10 @@ function GaugePage() {
       {todosLoading ? (
         <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <div className='flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center'>
-          <p className='text-lg font-medium text-foreground'>No tasks in progress</p>
-          <p className='mt-1 text-sm text-muted-foreground'>Complete some tasks or add new ones to see them here.</p>
-        </div>
+        <EmptyState
+          title={todos.length === 0 ? 'No todos yet' : 'No tasks in progress'}
+          description='Add items in the Simple view to see them here.'
+        />
       ) : (
         <>
           <div className='mb-6'>

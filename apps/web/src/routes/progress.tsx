@@ -4,6 +4,7 @@ import { Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
+import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
 import { PageLoader } from '@/components/page-loader';
@@ -173,7 +174,7 @@ function ProgressPage() {
           {todosLoading ? (
             <PageLoader />
           ) : todos.length === 0 ? (
-            <p className='py-4 text-center text-muted-foreground'>No todos yet. Use the + button to add one!</p>
+            <EmptyState title='No todos yet' description='Use the + button below to add one.' className='py-8' />
           ) : (
             <Reorder.Group axis='y' values={orderedIds} onReorder={setNextOrderedIds} className='space-y-2'>
               {orderedTodos.map((todo) => (

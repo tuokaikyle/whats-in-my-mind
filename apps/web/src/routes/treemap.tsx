@@ -3,7 +3,9 @@ import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 import { useMemo, useState } from 'react';
 import 'highcharts/modules/treemap';
-import Loader from '@/components/loader';
+import { EmptyState } from '@/components/empty-state';
+import { GuestBanner } from '@/components/guest-banner';
+import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -80,7 +82,7 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
 }
 
 function TreemapPage() {
-  const { todos, todosLoading } = useTodos();
+  const { todos, todosLoading, isGuest } = useTodos();
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -90,10 +92,7 @@ function TreemapPage() {
 
   const loading = todosLoading || categoriesLoading;
 
-  const activeTodos = useMemo(
-    () => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
-    [todos],
-  );
+  const activeTodos = useMemo(() => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])), [todos]);
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
@@ -193,54 +192,56 @@ function TreemapPage() {
     };
   }, [activeTodos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder]);
 
-  if (loading) {
-    return (
-      <div className='mx-auto flex w-full max-w-4xl justify-center py-20'>
-        <Loader />
-      </div>
-    );
-  }
-
-  if (activeTodos.length === 0) {
-    return (
-      <div className='mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground'>
-        No active todo items. Add some to see the treemap.
-      </div>
-    );
-  }
-
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={options}
-        containerProps={{
-          className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
-        }}
-      />
+      {isGuest && <GuestBanner />}
 
-      <div className='flex justify-center'>
-        {/* List panel drawer (Base UI) with nested edit drawer.
+      {loading ? (
+        <PageLoader size='lg' />
+      ) : activeTodos.length === 0 ? (
+        <EmptyState
+          title={todos.length === 0 ? 'No todos yet' : 'No tasks in progress'}
+          description='Add items in the Simple view to see them here.'
+        />
+      ) : (
+        <>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+            containerProps={{
+              className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
+            }}
+          />
+
+          <div className='flex justify-center'>
+            {/* List panel drawer (Base UI) with nested edit drawer.
              No standalone edit drawer here — clicking treemap sections
              drills down the treemap instead of opening an editor. */}
-        <BaseDrawer.Drawer swipeDirection='right' modal={false} open={listPanelOpen} onOpenChange={setListPanelOpen}>
-          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
-          <BaseDrawer.DrawerContent>
-            <BaseDrawer.DrawerHeader>
-              <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
-              <BaseDrawer.DrawerDescription>
-                Click an item&apos;s edit icon to open a nested drawer.
-              </BaseDrawer.DrawerDescription>
-            </BaseDrawer.DrawerHeader>
-            <div className='flex-1 overflow-hidden'>
-              <TodoListPanelDrawer />
-            </div>
-            <BaseDrawer.DrawerFooter>
-              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
-            </BaseDrawer.DrawerFooter>
-          </BaseDrawer.DrawerContent>
-        </BaseDrawer.Drawer>
-      </div>
+            <BaseDrawer.Drawer
+              swipeDirection='right'
+              modal={false}
+              open={listPanelOpen}
+              onOpenChange={setListPanelOpen}
+            >
+              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+              <BaseDrawer.DrawerContent>
+                <BaseDrawer.DrawerHeader>
+                  <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+                  <BaseDrawer.DrawerDescription>
+                    Click an item&apos;s edit icon to open a nested drawer.
+                  </BaseDrawer.DrawerDescription>
+                </BaseDrawer.DrawerHeader>
+                <div className='flex-1 overflow-hidden'>
+                  <TodoListPanelDrawer />
+                </div>
+                <BaseDrawer.DrawerFooter>
+                  <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
+                </BaseDrawer.DrawerFooter>
+              </BaseDrawer.DrawerContent>
+            </BaseDrawer.Drawer>
+          </div>
+        </>
+      )}
     </div>
   );
 }

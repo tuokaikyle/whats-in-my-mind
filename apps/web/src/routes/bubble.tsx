@@ -4,6 +4,7 @@ import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { EditTodoForm } from '@/components/edit-todo-form';
+import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
@@ -62,7 +63,7 @@ function BubblePage() {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
   // Store the click handler in a ref so Highcharts callbacks can access it
-  const onBubbleClickRef = useRef<(todoId: number) => void>(() => { });
+  const onBubbleClickRef = useRef<(todoId: number) => void>(() => {});
   onBubbleClickRef.current = useCallback((todoId: number) => {
     setListPanelOpen(false);
     setSelectedTodoId(todoId);
@@ -161,75 +162,80 @@ function BubblePage() {
       {todosLoading ? (
         <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <p className='py-8 text-center text-muted-foreground'>No tasks yet.</p>
-      ) : (
-        <HighchartsReact
-          highcharts={Highcharts}
-          options={options}
-          containerProps={{
-            className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
-          }}
+        <EmptyState
+          title={todos.length === 0 ? 'No todos yet' : 'No tasks in progress'}
+          description='Add items in the Simple view to see them here.'
         />
+      ) : (
+        <>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+            containerProps={{
+              className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
+            }}
+          />
+
+          <div className='flex justify-center'>
+            {/* List panel drawer (Base UI) with nested edit drawer */}
+            <BaseDrawer.Drawer
+              swipeDirection='right'
+              modal={false}
+              open={listPanelOpen}
+              onOpenChange={handleListPanelOpenChange}
+            >
+              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+              <BaseDrawer.DrawerContent>
+                <BaseDrawer.DrawerHeader>
+                  <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+                  <BaseDrawer.DrawerDescription>
+                    Click an item&apos;s edit icon to open a nested drawer.
+                  </BaseDrawer.DrawerDescription>
+                </BaseDrawer.DrawerHeader>
+                <div className='flex-1 overflow-hidden'>
+                  <TodoListPanelDrawer />
+                </div>
+                <BaseDrawer.DrawerFooter>
+                  <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
+                </BaseDrawer.DrawerFooter>
+              </BaseDrawer.DrawerContent>
+            </BaseDrawer.Drawer>
+
+            {/* Standalone edit drawer (Base UI) */}
+            <BaseDrawer.Drawer
+              swipeDirection='right'
+              modal={false}
+              open={editDrawerOpen}
+              onOpenChange={setEditDrawerOpen}
+              onOpenChangeComplete={(open) => {
+                if (!open) setSelectedTodoId(null);
+              }}
+            >
+              {selectedTodo && (
+                <BaseDrawer.DrawerContent>
+                  <BaseDrawer.DrawerHeader className='border-b'>
+                    <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
+                    <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
+                  </BaseDrawer.DrawerHeader>
+                  <div className='flex-1 overflow-y-auto p-4'>
+                    <EditTodoForm
+                      key={selectedTodo.id}
+                      todo={selectedTodo}
+                      categories={categories}
+                      onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
+                      onDelete={() => {
+                        deleteMutation.mutate({ id: selectedTodo.id });
+                        setEditDrawerOpen(false);
+                      }}
+                      onClose={() => setEditDrawerOpen(false)}
+                    />
+                  </div>
+                </BaseDrawer.DrawerContent>
+              )}
+            </BaseDrawer.Drawer>
+          </div>
+        </>
       )}
-
-      <div className='flex justify-center'>
-        {/* List panel drawer (Base UI) with nested edit drawer */}
-        <BaseDrawer.Drawer
-          swipeDirection='right'
-          modal={false}
-          open={listPanelOpen}
-          onOpenChange={handleListPanelOpenChange}
-        >
-          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
-          <BaseDrawer.DrawerContent>
-            <BaseDrawer.DrawerHeader>
-              <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
-              <BaseDrawer.DrawerDescription>
-                Click an item&apos;s edit icon to open a nested drawer.
-              </BaseDrawer.DrawerDescription>
-            </BaseDrawer.DrawerHeader>
-            <div className='flex-1 overflow-hidden'>
-              <TodoListPanelDrawer />
-            </div>
-            <BaseDrawer.DrawerFooter>
-              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
-            </BaseDrawer.DrawerFooter>
-          </BaseDrawer.DrawerContent>
-        </BaseDrawer.Drawer>
-
-        {/* Standalone edit drawer (Base UI) */}
-        <BaseDrawer.Drawer
-          swipeDirection='right'
-          modal={false}
-          open={editDrawerOpen}
-          onOpenChange={setEditDrawerOpen}
-          onOpenChangeComplete={(open) => {
-            if (!open) setSelectedTodoId(null);
-          }}
-        >
-          {selectedTodo && (
-            <BaseDrawer.DrawerContent>
-              <BaseDrawer.DrawerHeader className='border-b'>
-                <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
-                <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
-              </BaseDrawer.DrawerHeader>
-              <div className='flex-1 overflow-y-auto p-4'>
-                <EditTodoForm
-                  key={selectedTodo.id}
-                  todo={selectedTodo}
-                  categories={categories}
-                  onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
-                  onDelete={() => {
-                    deleteMutation.mutate({ id: selectedTodo.id });
-                    setEditDrawerOpen(false);
-                  }}
-                  onClose={() => setEditDrawerOpen(false)}
-                />
-              </div>
-            </BaseDrawer.DrawerContent>
-          )}
-        </BaseDrawer.Drawer>
-      </div>
     </div>
   );
 }

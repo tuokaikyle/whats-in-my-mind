@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { EditTodoForm } from '@/components/edit-todo-form';
+import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
@@ -33,11 +34,7 @@ type RingSegmentStyle = {
   strokeLinecap: 'round' | 'butt';
 };
 
-function getRingSegmentStyle(
-  todoCount: number,
-  circumference: number,
-  strokeWidth: number
-): RingSegmentStyle {
+function getRingSegmentStyle(todoCount: number, circumference: number, strokeWidth: number): RingSegmentStyle {
   const useRoundedCaps = todoCount <= ROUNDED_SEGMENT_TODO_LIMIT;
   const avgArcLength = circumference / Math.max(todoCount, 1);
   // Round caps bulge ~half the stroke width into each adjacent gap.
@@ -45,26 +42,15 @@ function getRingSegmentStyle(
   const maxRoundGap = strokeWidth * 2.1;
 
   if (useRoundedCaps) {
-    const gap = Math.min(
-      maxRoundGap,
-      Math.max(minRoundGap, avgArcLength * 0.24)
-    );
+    const gap = Math.min(maxRoundGap, Math.max(minRoundGap, avgArcLength * 0.24));
     return { gap, strokeLinecap: 'round' };
   }
 
-  const gap = Math.min(
-    Math.max(SEGMENT_GAP.compact, strokeWidth * 0.18),
-    avgArcLength * 0.08
-  );
+  const gap = Math.min(Math.max(SEGMENT_GAP.compact, strokeWidth * 0.18), avgArcLength * 0.08);
   return { gap, strokeLinecap: 'butt' };
 }
 
-function segmentDashLength(
-  effort: number,
-  totalEffort: number,
-  circumference: number,
-  gap: number
-) {
+function segmentDashLength(effort: number, totalEffort: number, circumference: number, gap: number) {
   return Math.max(0, (effort / totalEffort) * circumference - gap);
 }
 
@@ -72,14 +58,10 @@ function formatProgressPercent(ratio: number) {
   return `${Math.round(ratio * 100)}%`;
 }
 
-const RING_HOVER_TARGET_SELECTOR =
-  '[data-ring-segment-hit], [data-ring-legend-item]';
+const RING_HOVER_TARGET_SELECTOR = '[data-ring-segment-hit], [data-ring-legend-item]';
 
 function isRingHoverTarget(target: EventTarget | null) {
-  return (
-    target instanceof Element &&
-    Boolean(target.closest(RING_HOVER_TARGET_SELECTOR))
-  );
+  return target instanceof Element && Boolean(target.closest(RING_HOVER_TARGET_SELECTOR));
 }
 
 function shouldClearRingHighlight(event: React.MouseEvent) {
@@ -91,21 +73,15 @@ export const Route = createFileRoute('/ring')({
 });
 
 function RouteComponent() {
-  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } =
-    useTodos();
+  const { todos, todosLoading, isGuest, updateMutation, deleteMutation } = useTodos();
   const { categories, isLoading: categoriesLoading } = useCategories();
   const isMobile = useIsMobile();
 
-  const activeTodos = useMemo(
-    () =>
-      todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
-    [todos]
-  );
+  const activeTodos = useMemo(() => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])), [todos]);
 
   const totalEffort = useMemo(
-    () =>
-      activeTodos.reduce((sum, t) => sum + (t.effort ?? EFFORT_RANGE[0]), 0),
-    [activeTodos]
+    () => activeTodos.reduce((sum, t) => sum + (t.effort ?? EFFORT_RANGE[0]), 0),
+    [activeTodos],
   );
 
   const radius = RING_RADIUS;
@@ -116,7 +92,7 @@ function RouteComponent() {
 
   const segmentStyle = useMemo(
     () => getRingSegmentStyle(activeTodos.length, circumference, strokeWidth),
-    [activeTodos.length, circumference, strokeWidth]
+    [activeTodos.length, circumference, strokeWidth],
   );
 
   const segments = useMemo(() => {
@@ -133,12 +109,7 @@ function RouteComponent() {
         const effort = t.effort ?? EFFORT_RANGE[0];
         const progress = t.progress ?? 0;
         const progressRatio = Math.min(progress / effort, 1);
-        const dashLength = segmentDashLength(
-          effort,
-          totalEffort,
-          circumference,
-          gap
-        );
+        const dashLength = segmentDashLength(effort, totalEffort, circumference, gap);
         const progressLength = dashLength * progressRatio;
         const offset = -accumulated;
         accumulated += dashLength + gap;
@@ -181,10 +152,7 @@ function RouteComponent() {
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
-  const selectedTodo =
-    selectedTodoId != null
-      ? todos.find((t) => t.id === selectedTodoId) ?? null
-      : null;
+  const selectedTodo = selectedTodoId != null ? (todos.find((t) => t.id === selectedTodoId) ?? null) : null;
 
   const handleSegmentClick = (id: number) => {
     setListPanelOpen(false);
@@ -211,10 +179,7 @@ function RouteComponent() {
   };
 
   const displayId = hoveredId ?? activeId;
-  const displaySegment =
-    displayId != null
-      ? segments.find((seg) => seg.id === displayId) ?? null
-      : null;
+  const displaySegment = displayId != null ? (segments.find((seg) => seg.id === displayId) ?? null) : null;
 
   const isSegmentHighlighted = (id: number) => hoveredId === id || activeId === id;
   const highlightSegment = (id: number) => setHoveredId(id);
@@ -230,46 +195,35 @@ function RouteComponent() {
       {todosLoading || categoriesLoading ? (
         <PageLoader size='lg' />
       ) : activeTodos.length === 0 ? (
-        <p className='text-center text-muted-foreground'>
-          {todos.length === 0 ? 'No todos yet.' : 'No tasks in progress.'}
-        </p>
+        <EmptyState
+          title={todos.length === 0 ? 'No todos yet' : 'No tasks in progress'}
+          description='Add items in the Simple view to see them here.'
+        />
       ) : (
         <>
           <div className='mb-6 w-full'>
             <h1 className='text-lg font-semibold text-foreground'>Ring</h1>
-            <p className='text-sm text-muted-foreground'>
-              Each arc is a task; length is effort, fill is progress.
-            </p>
+            <p className='text-sm text-muted-foreground'>Each arc is a task; length is effort, fill is progress.</p>
           </div>
 
           <div className='flex flex-col items-center gap-6'>
             <div className='flex items-center gap-2'>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => setBaseGrey((v) => !v)}
-              >
+              <Button variant='outline' size='sm' onClick={() => setBaseGrey((v) => !v)}>
                 {baseGrey ? 'Show colors' : 'Grey base'}
               </Button>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => setReplayKey((k) => k + 1)}
-              >
+              <Button variant='outline' size='sm' onClick={() => setReplayKey((k) => k + 1)}>
                 Replay
               </Button>
             </div>
 
-            <div
-              className='flex w-full flex-col items-center gap-6'
-              onMouseLeave={handleHoverLeave}
-            >
+            <div className='flex w-full flex-col items-center gap-6' onMouseLeave={handleHoverLeave}>
               <div className='relative aspect-square w-full max-w-[40rem]'>
                 <svg
                   viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
                   className='size-full -rotate-90'
-                  aria-label={`Ring chart: ${activeTodos.length} active todo${activeTodos.length === 1 ? '' : 's'
-                    }, ${totalEffort} total effort`}
+                  aria-label={`Ring chart: ${activeTodos.length} active todo${
+                    activeTodos.length === 1 ? '' : 's'
+                  }, ${totalEffort} total effort`}
                 >
                   <rect
                     x={0}
@@ -288,7 +242,7 @@ function RouteComponent() {
                         key={seg.id}
                         className={cn(
                           'ring-segment transition-[opacity,filter] duration-150',
-                          isHighlighted && 'ring-segment--hovered'
+                          isHighlighted && 'ring-segment--hovered',
                         )}
                       >
                         {/* Base arc: full effort, lighter */}
@@ -313,11 +267,7 @@ function RouteComponent() {
                           r={radius}
                           fill='none'
                           stroke={seg.color}
-                          strokeWidth={
-                            isHighlighted
-                              ? strokeWidth + RING_HOVER_STROKE_BOOST
-                              : strokeWidth
-                          }
+                          strokeWidth={isHighlighted ? strokeWidth + RING_HOVER_STROKE_BOOST : strokeWidth}
                           strokeLinecap={segmentStyle.strokeLinecap}
                           strokeDashoffset={seg.dashOffset}
                           className='ring-progress-arc pointer-events-none'
@@ -357,30 +307,21 @@ function RouteComponent() {
                   <div className='max-w-[min(100%,14rem)] text-center'>
                     {displaySegment ? (
                       <>
-                        <p className='truncate text-sm font-semibold text-foreground'>
-                          {displaySegment.text}
-                        </p>
-                        <p className='mt-0.5 text-xs text-muted-foreground'>
-                          {displaySegment.categoryName}
-                        </p>
+                        <p className='truncate text-sm font-semibold text-foreground'>{displaySegment.text}</p>
+                        <p className='mt-0.5 text-xs text-muted-foreground'>{displaySegment.categoryName}</p>
                         <p className='mt-2 text-2xl font-bold tabular-nums tracking-tight text-foreground'>
                           {formatProgressPercent(displaySegment.progressRatio)}
                         </p>
                         <p className='text-xs text-muted-foreground'>
-                          {displaySegment.progress} / {displaySegment.effort}{' '}
-                          effort
+                          {displaySegment.progress} / {displaySegment.effort} effort
                         </p>
                         {isMobile && activeId === displaySegment.id && (
-                          <p className='mt-2 text-[11px] text-muted-foreground'>
-                            Tap again to edit
-                          </p>
+                          <p className='mt-2 text-[11px] text-muted-foreground'>Tap again to edit</p>
                         )}
                       </>
                     ) : (
                       <>
-                        <p className='text-sm font-medium text-muted-foreground'>
-                          Overall
-                        </p>
+                        <p className='text-sm font-medium text-muted-foreground'>Overall</p>
                         <p className='mt-1 text-2xl font-bold tabular-nums tracking-tight text-foreground'>
                           {formatProgressPercent(ringSummary.overallRatio)}
                         </p>
@@ -388,9 +329,7 @@ function RouteComponent() {
                           {ringSummary.totalProgress} / {totalEffort} effort
                         </p>
                         <p className='text-xs text-muted-foreground'>
-                          {ringSummary.todoCount}{' '}
-                          {ringSummary.todoCount === 1 ? 'todo' : 'todos'} in
-                          progress
+                          {ringSummary.todoCount} {ringSummary.todoCount === 1 ? 'todo' : 'todos'} in progress
                         </p>
                       </>
                     )}
@@ -411,9 +350,7 @@ function RouteComponent() {
                       className={cn(
                         'flex items-center gap-1.5 rounded-md text-sm transition-colors touch-manipulation',
                         isMobile ? 'min-h-11 px-3 py-2' : 'px-2 py-1',
-                        isHighlighted
-                          ? 'bg-muted text-foreground'
-                          : 'text-muted-foreground hover:bg-muted/60'
+                        isHighlighted ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/60',
                       )}
                       onMouseEnter={() => highlightSegment(seg.id)}
                       onMouseLeave={handleHoverLeave}
@@ -427,9 +364,7 @@ function RouteComponent() {
                       <span
                         className={cn(
                           'inline-block h-3 w-3 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-background transition-transform',
-                          isHighlighted
-                            ? 'scale-110 ring-current'
-                            : 'ring-transparent'
+                          isHighlighted ? 'scale-110 ring-current' : 'ring-transparent',
                         )}
                         style={{ backgroundColor: seg.color, color: seg.color }}
                       />
@@ -451,11 +386,7 @@ function RouteComponent() {
               open={listPanelOpen}
               onOpenChange={handleListPanelOpenChange}
             >
-              <BaseDrawer.DrawerTrigger
-                render={
-                  <Button variant='secondary'>Show item editor panel</Button>
-                }
-              />
+              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
               <BaseDrawer.DrawerContent>
                 <BaseDrawer.DrawerHeader>
                   <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
@@ -467,9 +398,7 @@ function RouteComponent() {
                   <TodoListPanelDrawer />
                 </div>
                 <BaseDrawer.DrawerFooter>
-                  <BaseDrawer.DrawerClose
-                    render={<Button variant='outline'>Close</Button>}
-                  />
+                  <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
                 </BaseDrawer.DrawerFooter>
               </BaseDrawer.DrawerContent>
             </BaseDrawer.Drawer>
@@ -487,18 +416,14 @@ function RouteComponent() {
                 <BaseDrawer.DrawerContent>
                   <BaseDrawer.DrawerHeader className='border-b'>
                     <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
-                    <BaseDrawer.DrawerDescription>
-                      Update this item&apos;s details.
-                    </BaseDrawer.DrawerDescription>
+                    <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
                   </BaseDrawer.DrawerHeader>
                   <div className='flex-1 overflow-y-auto p-4'>
                     <EditTodoForm
                       key={selectedTodo.id}
                       todo={selectedTodo}
                       categories={categories}
-                      onUpdate={(data) =>
-                        updateMutation.mutate({ id: selectedTodo.id, ...data })
-                      }
+                      onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
                       onDelete={() => {
                         deleteMutation.mutate({ id: selectedTodo.id });
                         setEditDrawerOpen(false);

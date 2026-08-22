@@ -4,8 +4,10 @@ import { Check, CheckCircle2, Ellipsis, Pencil, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
+import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
+import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -16,13 +18,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import * as BaseDrawer from '@/components/ui/drawer-base';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import * as BaseDrawer from '@/components/ui/drawer-base';
 import { Input } from '@/components/ui/input';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { highChartColors } from '@/utils/enums';
@@ -46,12 +48,9 @@ function ManagePage() {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const healthCheck = useQuery(trpc.healthCheck.queryOptions());
 
-  const selectedTodo = editTodoId != null ? todos.find((t) => t.id === editTodoId) ?? null : null;
+  const selectedTodo = editTodoId != null ? (todos.find((t) => t.id === editTodoId) ?? null) : null;
 
-  const categoryById = useMemo(
-    () => new Map(categories.map((c) => [c.id, c])),
-    [categories],
-  );
+  const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   const completedTodos = useMemo(() => {
     return todos
@@ -106,11 +105,13 @@ function ManagePage() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <p className='text-muted-foreground text-sm py-4'>Loading categories...</p>
+              <PageLoader size='sm' />
             ) : categories.length === 0 ? (
-              <p className='text-muted-foreground text-sm py-4'>
-                No categories yet. Click "Add Category" to create one.
-              </p>
+              <EmptyState
+                title='No categories yet'
+                description='Use the Add Category button below to create one.'
+                className='py-8'
+              />
             ) : (
               <div className='border rounded-md max-sm:rounded-none'>
                 <table className='w-full'>
@@ -196,10 +197,11 @@ function ManagePage() {
                               <button
                                 key={name}
                                 type='button'
-                                className={`h-5 w-5 rounded-full border-2 transition-all ${newColor === hex
-                                  ? 'border-foreground scale-110'
-                                  : 'border-transparent hover:scale-105'
-                                  }`}
+                                className={`h-5 w-5 rounded-full border-2 transition-all ${
+                                  newColor === hex
+                                    ? 'border-foreground scale-110'
+                                    : 'border-transparent hover:scale-105'
+                                }`}
                                 style={{ backgroundColor: hex }}
                                 title={name}
                                 onClick={() => setNewColor(hex)}
@@ -284,12 +286,13 @@ function ManagePage() {
         </CardHeader>
         <CardContent>
           {todosLoading ? (
-            <p className='text-muted-foreground text-sm py-4'>Loading completed todos...</p>
+            <PageLoader size='sm' />
           ) : completedTodos.length === 0 ? (
-            <div className='flex flex-col items-center gap-2 py-6 text-center'>
-              <CheckCircle2 className='h-8 w-8 text-muted-foreground/40' />
-              <p className='text-muted-foreground text-sm'>No completed todos yet.</p>
-            </div>
+            <EmptyState
+              title='No completed todos yet'
+              description='Finished tasks will appear here.'
+              className='py-8'
+            />
           ) : (
             <div className='border rounded-md max-sm:rounded-none'>
               <table className='w-full'>
