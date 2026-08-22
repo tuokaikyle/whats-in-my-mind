@@ -11,15 +11,20 @@
   "type": "module",
   "scripts": {},
   "devDependencies": {
+    "@types/react": "^19.2.18",
     "@whats-in-my-mind/config": "workspace:*"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@react-email/components": "^1.0.12",
+    "@react-email/render": "^2.1.0",
+    "@whats-in-my-mind/db": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "zod": "catalog:",
-    "@whats-in-my-mind/db": "workspace:*"
+    "react": "19.1.2",
+    "resend": "^6.22.0",
+    "zod": "catalog:"
   }
 }
