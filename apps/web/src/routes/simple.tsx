@@ -180,7 +180,7 @@ function SimplePage() {
           {todosLoading ? (
             <PageLoader />
           ) : todos.length === 0 ? (
-            <EmptyState title='No todos yet' description='Use the + button below to add one.' className='py-8' />
+            <EmptyState title='No todos yet' description='Use the + button below to add one.' size='sm' />
           ) : (
             <Reorder.Group axis='y' values={orderedIds} onReorder={setNextOrderedIds} className='space-y-2'>
               {orderedTodos.map((todo) => (

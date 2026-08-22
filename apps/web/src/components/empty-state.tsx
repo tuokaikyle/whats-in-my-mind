@@ -3,16 +3,20 @@ import { cn } from '@/lib/utils';
 export function EmptyState({
   title,
   description,
+  size = 'lg',
   className,
 }: {
   title: string;
   description?: string;
+  /** 'lg' for full-page views, 'sm' inside cards. */
+  size?: 'sm' | 'lg';
   className?: string;
 }) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center',
+        'flex flex-col items-center justify-center rounded-xl border border-dashed text-center',
+        size === 'lg' ? 'py-16' : 'py-8',
         className,
       )}
     >

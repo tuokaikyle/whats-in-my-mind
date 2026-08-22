@@ -20,26 +20,43 @@ export const Route = createFileRoute('/bubble')({
   component: BubblePage,
 });
 
+function readableTextColor(bg: string | undefined): string {
+  if (!bg) return '#171717';
+  const hex = bg.replace('#', '');
+  if (hex.length !== 6) return '#171717';
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return lum > 0.6 ? '#171717' : '#f5f5f5';
+}
+
 function buildSeries(todos: Task[], categories: Category[]) {
-  const categorySeries = categories.map((category) => ({
-    name: category.name,
-    color: category.color ?? undefined,
-    data: todos
-      .filter((t) => t.categoryId === category.id)
-      .map((t) => ({
-        name: t.text,
-        value: t.effort ?? EFFORT_RANGE[0],
-        todoId: t.id,
-      })),
-  }));
+  const categorySeries = categories.map((category) => {
+    const color = category.color ?? undefined;
+    return {
+      name: category.name,
+      color,
+      dataLabels: { color: readableTextColor(color) },
+      data: todos
+        .filter((t) => t.categoryId === category.id)
+        .map((t) => ({
+          name: t.text,
+          value: t.effort ?? EFFORT_RANGE[0],
+          todoId: t.id,
+        })),
+    };
+  });
 
   const knownIds = new Set(categories.map((c) => c.id));
   const uncategorized = todos.filter((t) => t.categoryId === null || !knownIds.has(t.categoryId));
 
   if (uncategorized.length > 0) {
+    const otherColor = '#6b8abc';
     categorySeries.push({
       name: 'Other',
-      color: '#6b8abc',
+      color: otherColor,
+      dataLabels: { color: readableTextColor(otherColor) },
       data: uncategorized.map((t) => ({
         name: t.text,
         value: t.effort ?? EFFORT_RANGE[0],
@@ -129,7 +146,12 @@ function BubblePage() {
           },
           dataLabels: {
             enabled: true,
-            format: '{point.name}',
+            allowOverlap: false,
+            formatter: function () {
+              const name = String(this.name ?? '');
+              const max = 14;
+              return name.length > max ? `${name.slice(0, max - 1)}…` : name;
+            },
             style: {
               color: isDark ? '#e5e5e5' : '#171717',
               fontSize: isMobile ? '10px' : '11px',
@@ -167,75 +189,73 @@ function BubblePage() {
           description='Add items in the Simple view to see them here.'
         />
       ) : (
-        <>
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={options}
-            containerProps={{
-              className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
-            }}
-          />
-
-          <div className='flex justify-center'>
-            {/* List panel drawer (Base UI) with nested edit drawer */}
-            <BaseDrawer.Drawer
-              swipeDirection='right'
-              modal={false}
-              open={listPanelOpen}
-              onOpenChange={handleListPanelOpenChange}
-            >
-              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
-              <BaseDrawer.DrawerContent>
-                <BaseDrawer.DrawerHeader>
-                  <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
-                  <BaseDrawer.DrawerDescription>
-                    Click an item&apos;s edit icon to open a nested drawer.
-                  </BaseDrawer.DrawerDescription>
-                </BaseDrawer.DrawerHeader>
-                <div className='flex-1 overflow-hidden'>
-                  <TodoListPanelDrawer />
-                </div>
-                <BaseDrawer.DrawerFooter>
-                  <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
-                </BaseDrawer.DrawerFooter>
-              </BaseDrawer.DrawerContent>
-            </BaseDrawer.Drawer>
-
-            {/* Standalone edit drawer (Base UI) */}
-            <BaseDrawer.Drawer
-              swipeDirection='right'
-              modal={false}
-              open={editDrawerOpen}
-              onOpenChange={setEditDrawerOpen}
-              onOpenChangeComplete={(open) => {
-                if (!open) setSelectedTodoId(null);
-              }}
-            >
-              {selectedTodo && (
-                <BaseDrawer.DrawerContent>
-                  <BaseDrawer.DrawerHeader className='border-b'>
-                    <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
-                    <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
-                  </BaseDrawer.DrawerHeader>
-                  <div className='flex-1 overflow-y-auto p-4'>
-                    <EditTodoForm
-                      key={selectedTodo.id}
-                      todo={selectedTodo}
-                      categories={categories}
-                      onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
-                      onDelete={() => {
-                        deleteMutation.mutate({ id: selectedTodo.id });
-                        setEditDrawerOpen(false);
-                      }}
-                      onClose={() => setEditDrawerOpen(false)}
-                    />
-                  </div>
-                </BaseDrawer.DrawerContent>
-              )}
-            </BaseDrawer.Drawer>
-          </div>
-        </>
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={options}
+          containerProps={{
+            className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
+          }}
+        />
       )}
+
+      <div className='flex justify-center'>
+        {/* List panel drawer (Base UI) with nested edit drawer */}
+        <BaseDrawer.Drawer
+          swipeDirection='right'
+          modal={false}
+          open={listPanelOpen}
+          onOpenChange={handleListPanelOpenChange}
+        >
+          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+          <BaseDrawer.DrawerContent>
+            <BaseDrawer.DrawerHeader>
+              <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+              <BaseDrawer.DrawerDescription>
+                Click an item&apos;s edit icon to open a nested drawer.
+              </BaseDrawer.DrawerDescription>
+            </BaseDrawer.DrawerHeader>
+            <div className='flex-1 overflow-hidden'>
+              <TodoListPanelDrawer />
+            </div>
+            <BaseDrawer.DrawerFooter>
+              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
+            </BaseDrawer.DrawerFooter>
+          </BaseDrawer.DrawerContent>
+        </BaseDrawer.Drawer>
+
+        {/* Standalone edit drawer (Base UI) */}
+        <BaseDrawer.Drawer
+          swipeDirection='right'
+          modal={false}
+          open={editDrawerOpen}
+          onOpenChange={setEditDrawerOpen}
+          onOpenChangeComplete={(open) => {
+            if (!open) setSelectedTodoId(null);
+          }}
+        >
+          {selectedTodo && (
+            <BaseDrawer.DrawerContent>
+              <BaseDrawer.DrawerHeader className='border-b'>
+                <BaseDrawer.DrawerTitle>Edit Todo</BaseDrawer.DrawerTitle>
+                <BaseDrawer.DrawerDescription>Update this item&apos;s details.</BaseDrawer.DrawerDescription>
+              </BaseDrawer.DrawerHeader>
+              <div className='flex-1 overflow-y-auto p-4'>
+                <EditTodoForm
+                  key={selectedTodo.id}
+                  todo={selectedTodo}
+                  categories={categories}
+                  onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
+                  onDelete={() => {
+                    deleteMutation.mutate({ id: selectedTodo.id });
+                    setEditDrawerOpen(false);
+                  }}
+                  onClose={() => setEditDrawerOpen(false)}
+                />
+              </div>
+            </BaseDrawer.DrawerContent>
+          )}
+        </BaseDrawer.Drawer>
+      </div>
     </div>
   );
 }

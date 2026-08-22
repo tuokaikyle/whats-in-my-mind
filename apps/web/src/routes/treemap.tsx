@@ -172,7 +172,7 @@ function TreemapPage() {
       },
       tooltip: {
         headerFormat: '',
-        pointFormatter: function (this: Highcharts.Point & { effort?: number }) {
+        pointFormatter: function (this: Highcharts.Point & { effort?: number; node?: { parentNode?: { name?: string } } }) {
           if (this.effort != null) {
             const category = this.node?.parentNode?.name;
             let html = `<b>${this.name}</b>`;
@@ -204,44 +204,42 @@ function TreemapPage() {
           description='Add items in the Simple view to see them here.'
         />
       ) : (
-        <>
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={options}
-            containerProps={{
-              className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
-            }}
-          />
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={options}
+          containerProps={{
+            className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
+          }}
+        />
+      )}
 
-          <div className='flex justify-center'>
-            {/* List panel drawer (Base UI) with nested edit drawer.
+      <div className='flex justify-center'>
+        {/* List panel drawer (Base UI) with nested edit drawer.
              No standalone edit drawer here — clicking treemap sections
              drills down the treemap instead of opening an editor. */}
-            <BaseDrawer.Drawer
-              swipeDirection='right'
-              modal={false}
-              open={listPanelOpen}
-              onOpenChange={setListPanelOpen}
-            >
-              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
-              <BaseDrawer.DrawerContent>
-                <BaseDrawer.DrawerHeader>
-                  <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
-                  <BaseDrawer.DrawerDescription>
-                    Click an item&apos;s edit icon to open a nested drawer.
-                  </BaseDrawer.DrawerDescription>
-                </BaseDrawer.DrawerHeader>
-                <div className='flex-1 overflow-hidden'>
-                  <TodoListPanelDrawer />
-                </div>
-                <BaseDrawer.DrawerFooter>
-                  <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
-                </BaseDrawer.DrawerFooter>
-              </BaseDrawer.DrawerContent>
-            </BaseDrawer.Drawer>
-          </div>
-        </>
-      )}
+        <BaseDrawer.Drawer
+          swipeDirection='right'
+          modal={false}
+          open={listPanelOpen}
+          onOpenChange={setListPanelOpen}
+        >
+          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+          <BaseDrawer.DrawerContent>
+            <BaseDrawer.DrawerHeader>
+              <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
+              <BaseDrawer.DrawerDescription>
+                Click an item&apos;s edit icon to open a nested drawer.
+              </BaseDrawer.DrawerDescription>
+            </BaseDrawer.DrawerHeader>
+            <div className='flex-1 overflow-hidden'>
+              <TodoListPanelDrawer />
+            </div>
+            <BaseDrawer.DrawerFooter>
+              <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
+            </BaseDrawer.DrawerFooter>
+          </BaseDrawer.DrawerContent>
+        </BaseDrawer.Drawer>
+      </div>
     </div>
   );
 }

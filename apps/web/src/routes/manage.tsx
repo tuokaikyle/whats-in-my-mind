@@ -110,7 +110,7 @@ function ManagePage() {
               <EmptyState
                 title='No categories yet'
                 description='Use the Add Category button below to create one.'
-                className='py-8'
+                size='sm'
               />
             ) : (
               <div className='border rounded-md max-sm:rounded-none'>
@@ -288,11 +288,7 @@ function ManagePage() {
           {todosLoading ? (
             <PageLoader size='sm' />
           ) : completedTodos.length === 0 ? (
-            <EmptyState
-              title='No completed todos yet'
-              description='Finished tasks will appear here.'
-              className='py-8'
-            />
+            <EmptyState title='No completed todos yet' description='Finished tasks will appear here.' size='sm' />
           ) : (
             <div className='border rounded-md max-sm:rounded-none'>
               <table className='w-full'>
