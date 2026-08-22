@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import 'highcharts/highcharts-more';
 import HighchartsReact from 'highcharts-react-official';
 import { EditTodoForm } from '@/components/edit-todo-form';
@@ -280,7 +281,17 @@ function GaugePage() {
                       key={selectedTodo.id}
                       todo={selectedTodo}
                       categories={categories}
-                      onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
+                      isUpdating={updateMutation.isPending}
+                      onUpdate={(data) =>
+                        updateMutation.mutate(
+                          { id: selectedTodo.id, ...data },
+                          {
+                            onSuccess: () => setEditDrawerOpen(false),
+                            onError: (error) =>
+                              toast.error(error instanceof Error ? error.message : 'Failed to update todo'),
+                          },
+                        )
+                      }
                       onDelete={() => {
                         deleteMutation.mutate({ id: selectedTodo.id });
                         setEditDrawerOpen(false);

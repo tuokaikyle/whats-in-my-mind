@@ -295,7 +295,7 @@ function ManagePage() {
                 <thead>
                   <tr className='border-b bg-muted/50'>
                     <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Task</th>
-                    <th className='text-center px-4 py-3 text-sm font-medium text-muted-foreground'>Category</th>
+                    <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Category</th>
                     <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Completed</th>
                     <th className='w-12 px-4 py-3' />
                   </tr>
@@ -313,7 +313,7 @@ function ManagePage() {
                           </div>
                         </td>
                         <td className='px-4 py-3'>
-                          <div className='flex items-center justify-center gap-2'>
+                          <div className='flex items-center gap-2'>
                             {category ? (
                               <>
                                 <div
@@ -422,7 +422,16 @@ function ManagePage() {
                 key={selectedTodo.id}
                 todo={selectedTodo}
                 categories={categories}
-                onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
+                isUpdating={updateMutation.isPending}
+                onUpdate={(data) =>
+                  updateMutation.mutate(
+                    { id: selectedTodo.id, ...data },
+                    {
+                      onSuccess: () => setEditDrawerOpen(false),
+                      onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to update todo'),
+                    },
+                  )
+                }
                 onDelete={() => {
                   deleteTodoMutation.mutate({ id: selectedTodo.id });
                   setEditDrawerOpen(false);

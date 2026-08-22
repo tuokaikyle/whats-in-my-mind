@@ -172,7 +172,9 @@ function TreemapPage() {
       },
       tooltip: {
         headerFormat: '',
-        pointFormatter: function (this: Highcharts.Point & { effort?: number; node?: { parentNode?: { name?: string } } }) {
+        pointFormatter: function (
+          this: Highcharts.Point & { effort?: number; node?: { parentNode?: { name?: string } } },
+        ) {
           if (this.effort != null) {
             const category = this.node?.parentNode?.name;
             let html = `<b>${this.name}</b>`;
@@ -217,12 +219,7 @@ function TreemapPage() {
         {/* List panel drawer (Base UI) with nested edit drawer.
              No standalone edit drawer here — clicking treemap sections
              drills down the treemap instead of opening an editor. */}
-        <BaseDrawer.Drawer
-          swipeDirection='right'
-          modal={false}
-          open={listPanelOpen}
-          onOpenChange={setListPanelOpen}
-        >
+        <BaseDrawer.Drawer swipeDirection='right' modal={false} open={listPanelOpen} onOpenChange={setListPanelOpen}>
           <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
           <BaseDrawer.DrawerContent>
             <BaseDrawer.DrawerHeader>

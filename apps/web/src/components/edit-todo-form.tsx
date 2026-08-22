@@ -44,7 +44,8 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
       effort: Number.parseInt(editEffort, 10),
       progress: Math.min(Number.parseInt(editProgress, 10), Number.parseInt(editEffort, 10)),
     });
-    onClose();
+    // The parent closes the drawer on success. Staying mounted lets the
+    // spinner show via isUpdating and lets the user retry on failure.
   };
 
   const handleMarkAsDone = () => {
@@ -56,7 +57,6 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
       effort: effortValue,
       progress: effortValue,
     });
-    onClose();
   };
 
   const handleDelete = () => {
@@ -145,36 +145,42 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
         </div>
       </div>
 
-      <div className='mt-6 grid grid-cols-2 gap-2 border-t pt-4'>
-        <Button variant='outline' onClick={onClose}>
-          Cancel
-        </Button>
-        <Button onClick={handleSave} disabled={!editName.trim() || isUpdating}>
-          {isUpdating && <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />}
-          Save
+      <div className='mt-6 space-y-3'>
+        {/* Mark as Done — dominant completion action, shown only while in progress */}
+        {Number.parseInt(editEffort, 10) !== Number.parseInt(editProgress, 10) && (
+          <Button
+            variant='outline'
+            className='w-full border-green-500/40 text-green-600 hover:bg-green-500/10 hover:text-green-600 dark:text-green-400 dark:hover:text-green-400'
+            onClick={handleMarkAsDone}
+            disabled={isUpdating}
+          >
+            {isUpdating ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <CheckCircle2 className='mr-2 h-4 w-4' />}
+            Mark as Done
+          </Button>
+        )}
+
+        {/* Primary form actions */}
+        <div className='grid grid-cols-2 gap-2 border-t pt-4'>
+          <Button variant='outline' onClick={onClose} disabled={isUpdating}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={!editName.trim() || isUpdating}>
+            {isUpdating && <Loader2 className='mr-1 h-3.5 w-3.5 animate-spin' />}
+            Save
+          </Button>
+        </div>
+
+        {/* Delete — intentionally low-emphasis; destructive only on hover */}
+        <Button
+          variant='ghost'
+          size='sm'
+          className='w-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive'
+          onClick={() => setDeleteOpen(true)}
+        >
+          <Trash2 className='mr-2 h-4 w-4' />
+          Delete
         </Button>
       </div>
-
-      {Number.parseInt(editEffort, 10) !== Number.parseInt(editProgress, 10) && (
-        <Button
-          variant='outline'
-          className='mt-2 w-full border-green-500/30 text-green-600 hover:bg-green-500/10 hover:text-green-600'
-          onClick={handleMarkAsDone}
-          disabled={isUpdating}
-        >
-          {isUpdating ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <CheckCircle2 className='mr-2 h-4 w-4' />}
-          Mark as Done
-        </Button>
-      )}
-
-      <Button
-        variant='outline'
-        className='mt-4 w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive'
-        onClick={() => setDeleteOpen(true)}
-      >
-        <Trash2 className='mr-2 h-4 w-4' />
-        Delete
-      </Button>
 
       <DeleteTodoDialog open={deleteOpen} onOpenChange={setDeleteOpen} todoText={todo.text} onDelete={handleDelete} />
 

@@ -1,5 +1,6 @@
 import { Loader2, Pencil, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
@@ -12,7 +13,7 @@ import type { Category, Task } from '@/utils/types';
 export function TodoListPanelDrawer() {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const { todos, todosLoading, createMutation, updateMutation, deleteMutation, isGuest } = useTodos();
+  const { todos, todosLoading, createMutation, isGuest } = useTodos();
   const { categories } = useCategories();
 
   const sortedTodos = useMemo(
@@ -74,13 +75,7 @@ export function TodoListPanelDrawer() {
                 <span className='w-6 shrink-0' />
               </div>
               {sortedTodos.map((todo) => (
-                <TodoListItemDrawer
-                  key={todo.id}
-                  todo={todo}
-                  categories={categories}
-                  onUpdate={(data) => updateMutation.mutate({ id: todo.id, ...data })}
-                  onDelete={() => deleteMutation.mutate({ id: todo.id })}
-                />
+                <TodoListItemDrawer key={todo.id} todo={todo} categories={categories} />
               ))}
             </div>
 
@@ -136,17 +131,8 @@ export function TodoListPanelDrawer() {
   );
 }
 
-function TodoListItemDrawer({
-  todo,
-  categories,
-  onUpdate,
-  onDelete,
-}: {
-  todo: Task;
-  categories: Category[];
-  onUpdate: (data: { text?: string; categoryId?: number | null; effort?: number; progress?: number }) => void;
-  onDelete: () => void;
-}) {
+function TodoListItemDrawer({ todo, categories }: { todo: Task; categories: Category[] }) {
+  const { updateMutation, deleteMutation } = useTodos();
   const effort = todo.effort ?? 1;
   const category = categories.find((c) => c.id === todo.categoryId);
   const [editOpen, setEditOpen] = useState(false);
@@ -187,9 +173,18 @@ function TodoListItemDrawer({
             key={todo.id}
             todo={todo}
             categories={categories}
-            onUpdate={onUpdate}
+            isUpdating={updateMutation.isPending}
+            onUpdate={(data) =>
+              updateMutation.mutate(
+                { id: todo.id, ...data },
+                {
+                  onSuccess: () => setEditOpen(false),
+                  onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to update todo'),
+                },
+              )
+            }
             onDelete={() => {
-              onDelete();
+              deleteMutation.mutate({ id: todo.id });
               setEditOpen(false);
             }}
             onClose={() => setEditOpen(false)}

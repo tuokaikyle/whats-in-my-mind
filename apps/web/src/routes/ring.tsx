@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
@@ -423,7 +424,17 @@ function RouteComponent() {
                       key={selectedTodo.id}
                       todo={selectedTodo}
                       categories={categories}
-                      onUpdate={(data) => updateMutation.mutate({ id: selectedTodo.id, ...data })}
+                      isUpdating={updateMutation.isPending}
+                      onUpdate={(data) =>
+                        updateMutation.mutate(
+                          { id: selectedTodo.id, ...data },
+                          {
+                            onSuccess: () => setEditDrawerOpen(false),
+                            onError: (error) =>
+                              toast.error(error instanceof Error ? error.message : 'Failed to update todo'),
+                          },
+                        )
+                      }
                       onDelete={() => {
                         deleteMutation.mutate({ id: selectedTodo.id });
                         setEditDrawerOpen(false);
