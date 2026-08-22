@@ -62,7 +62,7 @@ function BubblePage() {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
   // Store the click handler in a ref so Highcharts callbacks can access it
-  const onBubbleClickRef = useRef<(todoId: number) => void>(() => {});
+  const onBubbleClickRef = useRef<(todoId: number) => void>(() => { });
   onBubbleClickRef.current = useCallback((todoId: number) => {
     setListPanelOpen(false);
     setSelectedTodoId(todoId);

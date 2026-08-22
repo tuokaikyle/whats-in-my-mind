@@ -21,6 +21,7 @@ export const todoRouter = router({
         metadata: todo.metadata,
         createdAt: todo.createdAt,
         updatedAt: todo.updatedAt,
+        completedAt: todo.completedAt,
       })
       .from(todo)
       .where(eq(todo.userId, ctx.session.user.id))
@@ -58,6 +59,10 @@ export const todoRouter = router({
         effort: input.effort,
         metadata: input.metadata,
         userId: ctx.session.user.id,
+        completedAt:
+          input.effort != null && input.effort > 0 && (input.progress ?? 0) >= input.effort
+            ? new Date()
+            : null,
       });
     }),
 
@@ -87,9 +92,25 @@ export const todoRouter = router({
         }
       }
       const { id, ...rest } = input;
+
+      const existing = await ctx.db
+        .select({ progress: todo.progress, effort: todo.effort, completedAt: todo.completedAt })
+        .from(todo)
+        .where(and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)))
+        .limit(1);
+      const current = existing[0];
+
+      const nextEffort = input.effort ?? current?.effort ?? null;
+      const nextProgress = input.progress ?? current?.progress ?? null;
+      const isCompleted = nextEffort != null && nextEffort > 0 && nextProgress != null && nextProgress >= nextEffort;
+
+      const completedAt = isCompleted
+        ? current?.completedAt ?? new Date()
+        : null;
+
       return await ctx.db
         .update(todo)
-        .set(rest)
+        .set({ ...rest, completedAt })
         .where(and(eq(todo.id, id), eq(todo.userId, ctx.session.user.id)));
     }),
 

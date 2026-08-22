@@ -15,15 +15,19 @@ function createTasks(input: { category: string; color: string; tasks: string[] }
     for (const text of cat.tasks) {
       const now = new Date();
       const effort = Math.floor(Math.random() * MAX_EFFORT) + EFFORT_RANGE[0];
+      const progress = Math.random() > 0.5 ? PROGRESS_RANGE[Math.floor(Math.random() * (effort + 1))] : null;
+      const isCompleted = progress != null && progress >= effort;
+      const nowIso = now.toISOString();
 
       tasks.push({
         id: id++,
         text,
         categoryId: catIdx + 1,
         effort,
-        progress: Math.random() > 0.5 ? PROGRESS_RANGE[Math.floor(Math.random() * (effort + 1))] : null,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
+        progress,
+        createdAt: nowIso,
+        updatedAt: nowIso,
+        completedAt: isCompleted ? nowIso : null,
       });
     }
   }

@@ -1,4 +1,4 @@
-import { Loader2, Plus, Trash2 } from 'lucide-react';
+import { CheckCircle2, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { ManageCategory } from '@/components/manage-category';
@@ -43,6 +43,18 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
       categoryId: editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
       effort: Number.parseInt(editEffort, 10),
       progress: Math.min(Number.parseInt(editProgress, 10), Number.parseInt(editEffort, 10)),
+    });
+    onClose();
+  };
+
+  const handleMarkAsDone = () => {
+    const effortValue = Number.parseInt(editEffort, 10);
+    setEditProgress(effortValue.toString());
+    onUpdate({
+      text: editName.trim() || todo.text,
+      categoryId: editCategoryId === 'none' ? null : Number.parseInt(editCategoryId, 10),
+      effort: effortValue,
+      progress: effortValue,
     });
     onClose();
   };
@@ -142,6 +154,18 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
           Save
         </Button>
       </div>
+
+      {Number.parseInt(editEffort, 10) !== Number.parseInt(editProgress, 10) && (
+        <Button
+          variant='outline'
+          className='mt-2 w-full border-green-500/30 text-green-600 hover:bg-green-500/10 hover:text-green-600'
+          onClick={handleMarkAsDone}
+          disabled={isUpdating}
+        >
+          {isUpdating ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : <CheckCircle2 className='mr-2 h-4 w-4' />}
+          Mark as Done
+        </Button>
+      )}
 
       <Button
         variant='outline'

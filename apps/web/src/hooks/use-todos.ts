@@ -42,6 +42,15 @@ function normalizeTodo(todo: Task): Task {
   };
 }
 
+function computeCompletedAt(todo: Task, patch: Partial<Pick<Task, 'effort' | 'progress'>>): string | null {
+  const effort = patch.effort ?? todo.effort;
+  const progress = patch.progress ?? todo.progress;
+  if (effort != null && effort > 0 && progress != null && progress >= effort) {
+    return todo.completedAt ?? new Date().toISOString();
+  }
+  return null;
+}
+
 export function useTodos() {
   const { isGuest, sessionLoading } = useAuthState();
 
@@ -77,15 +86,19 @@ export function useTodos() {
     mutationFn: isGuest
       ? async (input) => {
           const now = new Date().toISOString();
+          const effort = input.effort ?? null;
+          const progress = input.progress ?? 0;
           return {
             id: Date.now(),
             text: input.text,
             categoryId: input.categoryId ?? null,
-            effort: input.effort ?? null,
-            progress: input.progress ?? 0,
+            effort,
+            progress,
             metadata: input.metadata ?? null,
             createdAt: now,
             updatedAt: now,
+            completedAt:
+              effort != null && effort > 0 && progress >= effort ? now : null,
           } satisfies Task;
         }
       : (input) => trpcClient.todo.create.mutate(input),
@@ -100,7 +113,13 @@ export function useTodos() {
     onMutate: async (v) => {
       await queryClient.cancelQueries({ queryKey });
       const prev = snapshot();
-      setCache((list) => list.map((t) => (t.id === v.id ? { ...t, ...(v as Partial<Task>) } : t)));
+      setCache((list) =>
+        list.map((t) =>
+          t.id === v.id
+            ? { ...t, ...(v as Partial<Task>), completedAt: computeCompletedAt(t, v as Partial<Task>) }
+            : t,
+        ),
+      );
       return { prev };
     },
     onError: (_e, _v, ctx) => restore(ctx?.prev),

@@ -268,9 +268,8 @@ function RouteComponent() {
                 <svg
                   viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
                   className='size-full -rotate-90'
-                  aria-label={`Ring chart: ${activeTodos.length} active todo${
-                    activeTodos.length === 1 ? '' : 's'
-                  }, ${totalEffort} total effort`}
+                  aria-label={`Ring chart: ${activeTodos.length} active todo${activeTodos.length === 1 ? '' : 's'
+                    }, ${totalEffort} total effort`}
                 >
                   <rect
                     x={0}

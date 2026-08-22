@@ -172,7 +172,7 @@ function GaugePage() {
   const [selectedTodoId, setSelectedTodoId] = useState<number | null>(null);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
 
-  const onGaugeClickRef = useRef<(todoId: number) => void>(() => {});
+  const onGaugeClickRef = useRef<(todoId: number) => void>(() => { });
   onGaugeClickRef.current = useCallback((todoId: number) => {
     setListPanelOpen(false);
     setSelectedTodoId(todoId);

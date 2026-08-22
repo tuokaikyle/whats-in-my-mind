@@ -90,6 +90,11 @@ function TreemapPage() {
 
   const loading = todosLoading || categoriesLoading;
 
+  const activeTodos = useMemo(
+    () => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])),
+    [todos],
+  );
+
   const textColor = isDark ? '#f5f5f5' : '#171717';
   const mutedColor = isDark ? '#a3a3a3' : '#737373';
   const tooltipBg = isDark ? '#262626' : '#ffffff';
@@ -97,7 +102,7 @@ function TreemapPage() {
 
   // biome-ignore lint/suspicious/noExplicitAny: Highcharts v12 types are missing some treemap level options
   const options = useMemo<any>(() => {
-    const data = buildTreemapData(todos, categories);
+    const data = buildTreemapData(activeTodos, categories);
 
     return {
       chart: {
@@ -186,7 +191,7 @@ function TreemapPage() {
       },
       credits: { enabled: false },
     };
-  }, [todos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder]);
+  }, [activeTodos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder]);
 
   if (loading) {
     return (
@@ -196,10 +201,10 @@ function TreemapPage() {
     );
   }
 
-  if (todos.length === 0) {
+  if (activeTodos.length === 0) {
     return (
       <div className='mx-auto w-full max-w-4xl py-20 text-center text-muted-foreground'>
-        No todo items yet. Add some to see the treemap.
+        No active todo items. Add some to see the treemap.
       </div>
     );
   }

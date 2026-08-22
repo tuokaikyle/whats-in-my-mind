@@ -9,6 +9,7 @@ export type Task = {
   metadata?: TodoMetadata | null;
   createdAt: string;
   updatedAt: string;
+  completedAt: string | null;
 };
 
 export type Category = {

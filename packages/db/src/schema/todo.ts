@@ -22,6 +22,7 @@ export const todo = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    completedAt: timestamp('completed_at'),
   },
   (table) => [index('todo_userId_idx').on(table.userId)],
 );

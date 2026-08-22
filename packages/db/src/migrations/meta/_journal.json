@@ -36,6 +36,13 @@
       "when": 1783233869277,
       "tag": "0004_mean_retro_girl",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787380824528,
+      "tag": "0005_blushing_wendigo",
+      "breakpoints": true
     }
   ]
 }

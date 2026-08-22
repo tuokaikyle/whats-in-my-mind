@@ -21,7 +21,17 @@ export function TodoListPanelDrawer() {
         if (a.categoryId === null && b.categoryId === null) return 0;
         if (a.categoryId === null) return 1;
         if (b.categoryId === null) return -1;
-        return a.categoryId - b.categoryId;
+        if (a.categoryId !== b.categoryId) return a.categoryId - b.categoryId;
+
+        // Secondary: completedAt — incomplete (null) first, then oldest completion first.
+        if (a.completedAt !== b.completedAt) {
+          if (a.completedAt == null) return -1;
+          if (b.completedAt == null) return 1;
+          return new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime();
+        }
+
+        // Tertiary: first character of the text.
+        return a.text.charAt(0).localeCompare(b.text.charAt(0));
       }),
     [todos],
   );
