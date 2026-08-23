@@ -5,7 +5,7 @@ import {
   CircleDashed,
   Command,
   FileCheck,
-  Gauge,
+  Grid2X2,
   Info,
   LayoutGrid,
   PanelLeft,
@@ -83,6 +83,13 @@ export const sidebarData: {
       icon: CircleDashed,
       group: 'Views',
     },
+    {
+      title: 'Matrix',
+      url: '/matrix',
+      icon: Grid2X2,
+      group: 'Views',
+    },
+    // General group
     {
       title: 'Manage',
       url: '/manage',

@@ -67,6 +67,12 @@ function RouteComponent() {
               </Link>{' '}
               — Explore tasks organized by category in a space-filling layout.
             </li>
+            <li>
+              <Link to='/matrix' className='text-primary hover:underline font-medium'>
+                Matrix
+              </Link>{' '}
+              — Tasks as bouncing dots in an effort grid; color shows category.
+            </li>
           </ul>
           <p>Same tasks, different lenses. No duplication, no switching tools.</p>
         </CardContent>
