@@ -13,6 +13,7 @@ import { Route as TreemapRouteImport } from './routes/treemap'
 import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as RingRouteImport } from './routes/ring'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as MatrixRouteImport } from './routes/matrix'
 import { Route as ManageRouteImport } from './routes/manage'
 import { Route as GaugeRouteImport } from './routes/gauge'
 import { Route as BubbleRouteImport } from './routes/bubble'
@@ -38,6 +39,11 @@ const RingRoute = RingRouteImport.update({
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatrixRoute = MatrixRouteImport.update({
+  id: '/matrix',
+  path: '/matrix',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ManageRoute = ManageRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
   '/manage': typeof ManageRoute
+  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/gauge'
     | '/manage'
+    | '/matrix'
     | '/progress'
     | '/ring'
     | '/simple'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/gauge'
     | '/manage'
+    | '/matrix'
     | '/progress'
     | '/ring'
     | '/simple'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/gauge'
     | '/manage'
+    | '/matrix'
     | '/progress'
     | '/ring'
     | '/simple'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   BubbleRoute: typeof BubbleRoute
   GaugeRoute: typeof GaugeRoute
   ManageRoute: typeof ManageRoute
+  MatrixRoute: typeof MatrixRoute
   ProgressRoute: typeof ProgressRoute
   RingRoute: typeof RingRoute
   SimpleRoute: typeof SimpleRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matrix': {
+      id: '/matrix'
+      path: '/matrix'
+      fullPath: '/matrix'
+      preLoaderRoute: typeof MatrixRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/manage': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   BubbleRoute: BubbleRoute,
   GaugeRoute: GaugeRoute,
   ManageRoute: ManageRoute,
+  MatrixRoute: MatrixRoute,
   ProgressRoute: ProgressRoute,
   RingRoute: RingRoute,
   SimpleRoute: SimpleRoute,

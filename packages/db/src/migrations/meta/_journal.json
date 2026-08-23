@@ -43,6 +43,13 @@
       "when": 1787380824528,
       "tag": "0005_blushing_wendigo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787461512954,
+      "tag": "0006_fibonacci_effort",
+      "breakpoints": true
     }
   ]
 }

@@ -21,14 +21,6 @@ export const Route = createFileRoute('/treemap')({
 
 const UNCATEGORIZED_COLOR = '#6b8abc';
 
-/** Maps stored effort (1–5) to Fibonacci weights for treemap area sizing. */
-const EFFORT_TO_TREEMAP = [1, 2, 3, 5, 8] as const;
-
-function treemapWeight(effort: number): number {
-  const index = Math.max(0, Math.min(EFFORT_TO_TREEMAP.length - 1, effort - 1));
-  return EFFORT_TO_TREEMAP[index];
-}
-
 function buildTreemapData(todos: Task[], categories: Category[]) {
   const categoryMap = new Map<number, Category>();
   for (const cat of categories) {
@@ -71,7 +63,7 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
       data.push({
         name: todo.text,
         parent: key,
-        value: treemapWeight(effort),
+        value: effort,
         effort,
         color,
       });

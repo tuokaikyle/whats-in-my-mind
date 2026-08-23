@@ -6,7 +6,11 @@ import z from 'zod';
 import { protectedProcedure, router } from '../index';
 
 const metadataSchema = z.record(z.string(), z.unknown());
-const effortSchema = z.number().int().min(1).max(5).optional();
+const effortSchema = z
+  .number()
+  .int()
+  .refine((v) => v === 1 || v === 2 || v === 3 || v === 5, { message: 'effort must be 1, 2, 3, or 5' })
+  .optional();
 const progressSchema = z.number().int().min(0).max(5).optional();
 
 export const todoRouter = router({
@@ -60,9 +64,7 @@ export const todoRouter = router({
         metadata: input.metadata,
         userId: ctx.session.user.id,
         completedAt:
-          input.effort != null && input.effort > 0 && (input.progress ?? 0) >= input.effort
-            ? new Date()
-            : null,
+          input.effort != null && input.effort > 0 && (input.progress ?? 0) >= input.effort ? new Date() : null,
       });
     }),
 
@@ -104,9 +106,7 @@ export const todoRouter = router({
       const nextProgress = input.progress ?? current?.progress ?? null;
       const isCompleted = nextEffort != null && nextEffort > 0 && nextProgress != null && nextProgress >= nextEffort;
 
-      const completedAt = isCompleted
-        ? current?.completedAt ?? new Date()
-        : null;
+      const completedAt = isCompleted ? (current?.completedAt ?? new Date()) : null;
 
       return await ctx.db
         .update(todo)

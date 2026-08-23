@@ -1,1 +1,1 @@
-ALTER TABLE "todo" ADD COLUMN "completed_at" timestamp;
+ALTER TABLE "todo" ADD COLUMN IF NOT EXISTS "completed_at" timestamp;

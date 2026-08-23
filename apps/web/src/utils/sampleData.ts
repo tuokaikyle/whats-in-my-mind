@@ -1,4 +1,4 @@
-import { EFFORT_RANGE, highChartColors, MAX_EFFORT, PROGRESS_RANGE } from './enums';
+import { EFFORT_RANGE, highChartColors, PROGRESS_RANGE } from './enums';
 import type { Category, Task } from './types';
 
 function createTasks(input: { category: string; color: string; tasks: string[] }[]) {
@@ -14,7 +14,7 @@ function createTasks(input: { category: string; color: string; tasks: string[] }
   for (const [catIdx, cat] of input.entries()) {
     for (const text of cat.tasks) {
       const now = new Date();
-      const effort = Math.floor(Math.random() * MAX_EFFORT) + EFFORT_RANGE[0];
+      const effort = EFFORT_RANGE[Math.floor(Math.random() * EFFORT_RANGE.length)];
       const progress = Math.random() > 0.5 ? PROGRESS_RANGE[Math.floor(Math.random() * (effort + 1))] : null;
       const isCompleted = progress != null && progress >= effort;
       const nowIso = now.toISOString();
