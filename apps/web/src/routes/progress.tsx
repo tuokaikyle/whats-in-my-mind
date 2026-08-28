@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ArrowUpDown, Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpDown, Container, Ellipsis, Gauge, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
@@ -75,6 +75,7 @@ function ProgressPage() {
   const { categories } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('earliest');
+  const [replayKey, setReplayKey] = useState(0);
 
   const sortedTodos = useMemo(() => {
     switch (sortMode) {
@@ -116,22 +117,33 @@ function ProgressPage() {
               <CardTitle>Progress</CardTitle>
               <CardDescription className='mt-2'>At least to start it</CardDescription>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='outline' size='sm' className='shrink-0'>
-                  <ArrowUpDown className='mr-1 h-4 w-4' />
-                  Sort: {SORT_LABELS[sortMode]}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-                  <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='high-effort'>High effort</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='low-effort'>Low effort</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className='flex items-center gap-2'>
+              <Button
+                variant='outline'
+                size='icon'
+                className='shrink-0'
+                aria-label='Replay gauge animation'
+                onClick={() => setReplayKey((k) => k + 1)}
+              >
+                <Gauge className='h-4 w-4' />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='outline' size='sm' className='shrink-0'>
+                    <ArrowUpDown className='mr-1 h-4 w-4' />
+                    Sort: {SORT_LABELS[sortMode]}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+                    <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='high-effort'>High effort</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='low-effort'>Low effort</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -148,6 +160,7 @@ function ProgressPage() {
                   key={todo.id}
                   todo={todo}
                   categories={categories}
+                  replayKey={replayKey}
                   onAddCategory={() => setCategoryOpen(true)}
                   onDelete={() => deleteMutation.mutate({ id: todo.id })}
                   onEffortChange={(effort) =>
@@ -234,6 +247,8 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
 
   const [arcOffset, setArcOffset] = useState(100);
   const [needleAngle, setNeedleAngle] = useState(GAUGE_START);
+  const [displayed, setDisplayed] = useState(0);
+  const displayedRef = useRef(0);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -242,6 +257,24 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
     });
     return () => cancelAnimationFrame(id);
   }, [percent, valueAngle]);
+
+  useEffect(() => {
+    const duration = 700;
+    const startTime = performance.now();
+    const from = displayedRef.current;
+    const to = percent;
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const val = from + (to - from) * eased;
+      displayedRef.current = val;
+      setDisplayed(val);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [percent]);
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={cn('shrink-0', className)}>
@@ -285,7 +318,7 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
         className='fill-foreground font-semibold'
         style={{ fontSize: size * 0.19 }}
       >
-        {percent}%
+        {Math.round(displayed)}%
       </text>
     </svg>
   );
@@ -294,6 +327,7 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
 function ProgressTodoItem({
   todo,
   categories,
+  replayKey,
   onAddCategory,
   onDelete,
   onEffortChange,
@@ -302,6 +336,7 @@ function ProgressTodoItem({
 }: {
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
+  replayKey: number;
   onAddCategory: () => void;
   onDelete: () => void;
   onEffortChange: (effort: number) => void;
@@ -340,7 +375,7 @@ function ProgressTodoItem({
 
   return (
     <div className='relative flex items-stretch gap-3 rounded-md border bg-card p-3'>
-      <ProgressGauge percent={progressPercent} className='self-center' />
+      <ProgressGauge key={replayKey} percent={progressPercent} className='self-center' />
       <div className='flex min-w-0 flex-1 flex-col gap-2'>
         <div className='flex items-center justify-between gap-2'>
           <Tooltip>
