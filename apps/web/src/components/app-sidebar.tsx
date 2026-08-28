@@ -5,6 +5,7 @@ import {
   CircleDashed,
   Command,
   FileCheck,
+  Gauge,
   Grid2X2,
   Info,
   LayoutGrid,
@@ -87,6 +88,12 @@ export const sidebarData: {
       title: 'Matrix',
       url: '/matrix',
       icon: Grid2X2,
+      group: 'Views',
+    },
+    {
+      title: 'Kpi Gauge',
+      url: '/kpigauge',
+      icon: Gauge,
       group: 'Views',
     },
     // General group

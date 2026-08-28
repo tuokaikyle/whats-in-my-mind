@@ -15,6 +15,7 @@ import { Route as RingRouteImport } from './routes/ring'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as MatrixRouteImport } from './routes/matrix'
 import { Route as ManageRouteImport } from './routes/manage'
+import { Route as KpigaugeRouteImport } from './routes/kpigauge'
 import { Route as GaugeRouteImport } from './routes/gauge'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
@@ -51,6 +52,11 @@ const ManageRoute = ManageRouteImport.update({
   path: '/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KpigaugeRoute = KpigaugeRouteImport.update({
+  id: '/kpigauge',
+  path: '/kpigauge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GaugeRoute = GaugeRouteImport.update({
   id: '/gauge',
   path: '/gauge',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
+  '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
+  '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
   '/gauge': typeof GaugeRoute
+  '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/gauge'
+    | '/kpigauge'
     | '/manage'
     | '/matrix'
     | '/progress'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/gauge'
+    | '/kpigauge'
     | '/manage'
     | '/matrix'
     | '/progress'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/bubble'
     | '/gauge'
+    | '/kpigauge'
     | '/manage'
     | '/matrix'
     | '/progress'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
   GaugeRoute: typeof GaugeRoute
+  KpigaugeRoute: typeof KpigaugeRoute
   ManageRoute: typeof ManageRoute
   MatrixRoute: typeof MatrixRoute
   ProgressRoute: typeof ProgressRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ManageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kpigauge': {
+      id: '/kpigauge'
+      path: '/kpigauge'
+      fullPath: '/kpigauge'
+      preLoaderRoute: typeof KpigaugeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gauge': {
       id: '/gauge'
       path: '/gauge'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
   GaugeRoute: GaugeRoute,
+  KpigaugeRoute: KpigaugeRoute,
   ManageRoute: ManageRoute,
   MatrixRoute: MatrixRoute,
   ProgressRoute: ProgressRoute,
