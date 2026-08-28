@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Reorder, useDragControls } from 'framer-motion';
-import { Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowUpDown, Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
@@ -14,6 +13,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -29,7 +30,14 @@ export const Route = createFileRoute('/progress')({
   component: ProgressPage,
 });
 
-const PROGRESS_ORDER_STEP = 1000;
+type SortMode = 'earliest' | 'latest' | 'high-effort' | 'low-effort';
+
+const SORT_LABELS: Record<SortMode, string> = {
+  earliest: 'Earliest',
+  latest: 'Latest',
+  'high-effort': 'High effort',
+  'low-effort': 'Low effort',
+};
 
 function compareByCreatedAt(a: Task, b: Task) {
   const createdDiff = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
@@ -37,88 +45,49 @@ function compareByCreatedAt(a: Task, b: Task) {
   return a.id - b.id;
 }
 
-function getProgressOrder(todo: Task) {
-  const value = todo.metadata?.simpleOrder;
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+function compareByEffort(a: Task, b: Task) {
+  const effortDiff = (a.effort ?? EFFORT_RANGE[0]) - (b.effort ?? EFFORT_RANGE[0]);
+  if (effortDiff !== 0) return effortDiff;
+  return a.id - b.id;
 }
 
-function getEffectiveOrder(todo: Task, fallbackOrders: Map<number, number>) {
-  return getProgressOrder(todo) ?? fallbackOrders.get(todo.id) ?? todo.id;
+function daysBetween(a: Date, b: Date) {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const startA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const startB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.floor((startB - startA) / msPerDay);
 }
 
-function sameOrder(a: number[], b: number[]) {
-  return a.length === b.length && a.every((id, index) => id === b[index]);
-}
-
-function getNextProgressOrder({
-  movedId,
-  orderedIds,
-  todoById,
-  fallbackOrders,
-}: {
-  movedId: number;
-  orderedIds: number[];
-  todoById: Map<number, Task>;
-  fallbackOrders: Map<number, number>;
-}) {
-  const index = orderedIds.indexOf(movedId);
-  if (index === -1) return null;
-
-  const previousTodo = todoById.get(orderedIds[index - 1]);
-  const nextTodo = todoById.get(orderedIds[index + 1]);
-  const previousOrder = previousTodo ? getEffectiveOrder(previousTodo, fallbackOrders) : null;
-  const nextOrder = nextTodo ? getEffectiveOrder(nextTodo, fallbackOrders) : null;
-
-  if (previousOrder !== null && nextOrder !== null) {
-    if (nextOrder > previousOrder) return (previousOrder + nextOrder) / 2;
-    return (index + 1) * PROGRESS_ORDER_STEP;
-  }
-
-  if (previousOrder !== null) return previousOrder + PROGRESS_ORDER_STEP;
-  if (nextOrder !== null) return nextOrder - PROGRESS_ORDER_STEP;
-
-  return (index + 1) * PROGRESS_ORDER_STEP;
+function formatCreatedAgo(createdAt: string) {
+  const created = new Date(createdAt);
+  const now = new Date();
+  const days = daysBetween(created, now);
+  if (days <= 0) return 'created today';
+  if (days === 1) return 'created yesterday';
+  return `created ${days} days ago`;
 }
 
 function ProgressPage() {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const { todos, todosLoading, createMutation, updateMutation, deleteMutation, reorderSimpleMutation, isGuest } =
-    useTodos();
+  const { todos, todosLoading, createMutation, updateMutation, deleteMutation, isGuest } = useTodos();
   const { categories } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
-  const dragStartOrderRef = useRef<number[] | null>(null);
-  const orderedIdsRef = useRef<number[]>([]);
-
-  const fallbackOrders = useMemo(() => {
-    return new Map(
-      [...todos].sort(compareByCreatedAt).map((todo, index) => [todo.id, (index + 1) * PROGRESS_ORDER_STEP]),
-    );
-  }, [todos]);
+  const [sortMode, setSortMode] = useState<SortMode>('earliest');
 
   const sortedTodos = useMemo(() => {
-    return [...todos].sort((a, b) => {
-      const orderDiff = getEffectiveOrder(a, fallbackOrders) - getEffectiveOrder(b, fallbackOrders);
-      if (orderDiff !== 0) return orderDiff;
-      return compareByCreatedAt(a, b);
-    });
-  }, [fallbackOrders, todos]);
-
-  const todoById = useMemo(() => new Map(todos.map((todo) => [todo.id, todo])), [todos]);
-  const sortedIds = useMemo(() => sortedTodos.map((todo) => todo.id), [sortedTodos]);
-  const [orderedIds, setOrderedIds] = useState<number[]>(sortedIds);
-
-  useEffect(() => {
-    orderedIdsRef.current = sortedIds;
-    setOrderedIds(sortedIds);
-  }, [sortedIds]);
-
-  const setNextOrderedIds = (ids: number[]) => {
-    orderedIdsRef.current = ids;
-    setOrderedIds(ids);
-  };
-
-  const orderedTodos = orderedIds.map((id) => todoById.get(id)).filter((todo): todo is Task => Boolean(todo));
+    switch (sortMode) {
+      case 'latest':
+        return [...todos].sort(compareByCreatedAt).reverse();
+      case 'high-effort':
+        return [...todos].sort(compareByEffort).reverse();
+      case 'low-effort':
+        return [...todos].sort(compareByEffort);
+      case 'earliest':
+      default:
+        return [...todos].sort(compareByCreatedAt);
+    }
+  }, [todos, sortMode]);
 
   const handleAddTodo = () => {
     const trimmed = newText.trim();
@@ -138,35 +107,32 @@ function ProgressPage() {
     );
   };
 
-  const handleDragStart = () => {
-    dragStartOrderRef.current = orderedIdsRef.current;
-  };
-
-  const handleDragEnd = (todoId: number) => {
-    const startOrder = dragStartOrderRef.current;
-    const nextOrder = orderedIdsRef.current;
-    dragStartOrderRef.current = null;
-
-    if (!startOrder || sameOrder(startOrder, nextOrder)) return;
-
-    const progressOrder = getNextProgressOrder({
-      movedId: todoId,
-      orderedIds: nextOrder,
-      todoById,
-      fallbackOrders,
-    });
-
-    if (progressOrder === null) return;
-
-    reorderSimpleMutation.mutate({ id: todoId, simpleOrder: progressOrder });
-  };
-
   return (
     <div className='mx-auto w-full max-w-md py-10'>
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <CardTitle>Progress</CardTitle>
-          <CardDescription>At least to start it</CardDescription>
+          <div className='flex items-center justify-between gap-2'>
+            <div>
+              <CardTitle>Progress</CardTitle>
+              <CardDescription>At least to start it</CardDescription>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='outline' size='sm' className='shrink-0'>
+                  <ArrowUpDown className='mr-1 h-4 w-4' />
+                  Sort: {SORT_LABELS[sortMode]}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='end'>
+                <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+                  <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value='high-effort'>High effort</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value='low-effort'>Low effort</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </CardHeader>
         <CardContent>
           {isGuest && <GuestBanner className='mb-4' />}
@@ -176,15 +142,13 @@ function ProgressPage() {
           ) : todos.length === 0 ? (
             <EmptyState title='No todos yet' description='Use the + button below to add one.' size='sm' />
           ) : (
-            <Reorder.Group axis='y' values={orderedIds} onReorder={setNextOrderedIds} className='space-y-2'>
-              {orderedTodos.map((todo) => (
+            <div className='space-y-2'>
+              {sortedTodos.map((todo) => (
                 <ProgressTodoItem
                   key={todo.id}
                   todo={todo}
                   categories={categories}
                   onAddCategory={() => setCategoryOpen(true)}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
                   onDelete={() => deleteMutation.mutate({ id: todo.id })}
                   onEffortChange={(effort) =>
                     updateMutation.mutate({
@@ -197,7 +161,7 @@ function ProgressPage() {
                   onCategoryChange={(categoryId) => updateMutation.mutate({ id: todo.id, categoryId })}
                 />
               ))}
-            </Reorder.Group>
+            </div>
           )}
 
           {isAdding ? (
@@ -248,8 +212,6 @@ function ProgressTodoItem({
   todo,
   categories,
   onAddCategory,
-  onDragStart,
-  onDragEnd,
   onDelete,
   onEffortChange,
   onProgressChange,
@@ -258,14 +220,11 @@ function ProgressTodoItem({
   todo: Task;
   categories: { id: number; name: string; color: string | null }[];
   onAddCategory: () => void;
-  onDragStart: () => void;
-  onDragEnd: (id: number) => void;
   onDelete: () => void;
   onEffortChange: (effort: number) => void;
   onProgressChange: (progress: number) => void;
   onCategoryChange: (categoryId: number | null) => void;
 }) {
-  const dragControls = useDragControls();
   const effort = todo.effort ?? 1;
   const progress = Math.max(0, Math.min(effort, todo.progress ?? 0));
   const steps = Array.from({ length: effort }, (_, i) => i + 1);
@@ -297,91 +256,82 @@ function ProgressTodoItem({
   };
 
   return (
-    <Reorder.Item
-      value={todo.id}
-      dragControls={dragControls}
-      dragListener={false}
-      onDragStart={onDragStart}
-      onDragEnd={() => onDragEnd(todo.id)}
-      className='relative rounded-md border bg-card p-3'
-      whileDrag={{ scale: 1.02 }}
-    >
-      <div className='flex items-center gap-2'>
+    <div className='relative rounded-md border bg-card p-3'>
+      <div className='flex items-center justify-between gap-2'>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span
-              className='w-28 shrink-0 cursor-grab select-none truncate text-sm font-medium active:cursor-grabbing'
-              onPointerDown={(event) => dragControls.start(event)}
-            >
-              {todo.text}
-            </span>
+            <span className='truncate text-sm font-medium'>{todo.text}</span>
           </TooltipTrigger>
           <TooltipContent side='top'>{todo.text}</TooltipContent>
         </Tooltip>
-        <div
-          className='flex h-5 flex-1 cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-          onClick={handleBarClick}
-          onKeyDown={handleBarKeyDown}
-          role='slider'
-          tabIndex={0}
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={effort}
-          aria-valuetext={`${progress} of ${effort} steps complete (${progressPercent}%)`}
-          aria-label={`${todo.text} progress`}
-        >
-          {steps.map((n) => {
-            const isFilled = progress >= n;
-            return (
-              <div
-                key={n}
-                className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${
-                  isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
-                }`}
-              />
-            );
-          })}
+        <div className='flex shrink-0 items-center gap-2'>
+          <span className='text-xs text-muted-foreground'>{formatCreatedAgo(todo.createdAt)}</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' size='icon' className='h-7 w-7 shrink-0' aria-label='More options'>
+                <Ellipsis className='h-4 w-4' />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align='start' side='right'>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Tag className='mr-2 h-4 w-4' />
+                  Category
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent sideOffset={8}>
+                  <CategorySubMenuContent
+                    categories={categories}
+                    selectedCategoryId={todo.categoryId}
+                    onCategoryChange={onCategoryChange}
+                    onAddCategory={onAddCategory}
+                  />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Container className='mr-2 h-4 w-4' />
+                  Effort
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent sideOffset={8}>
+                  {EFFORT_RANGE.map((n) => (
+                    <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
+                      {n}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem variant='destructive' onClick={() => setDeleteOpen(true)}>
+                <Trash2 className='mr-2 h-4 w-4' />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' size='icon' className='h-7 w-7 shrink-0' aria-label='More options'>
-              <Ellipsis className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='start' side='right'>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Tag className='mr-2 h-4 w-4' />
-                Category
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent sideOffset={8}>
-                <CategorySubMenuContent
-                  categories={categories}
-                  selectedCategoryId={todo.categoryId}
-                  onCategoryChange={onCategoryChange}
-                  onAddCategory={onAddCategory}
-                />
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Container className='mr-2 h-4 w-4' />
-                Effort
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent sideOffset={8}>
-                {EFFORT_RANGE.map((n) => (
-                  <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
-                    {n}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            <DropdownMenuItem variant='destructive' onClick={() => setDeleteOpen(true)}>
-              <Trash2 className='mr-2 h-4 w-4' />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      </div>
+
+      <div
+        className='mt-2 flex h-5 w-full cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+        onClick={handleBarClick}
+        onKeyDown={handleBarKeyDown}
+        role='slider'
+        tabIndex={0}
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={effort}
+        aria-valuetext={`${progress} of ${effort} steps complete (${progressPercent}%)`}
+        aria-label={`${todo.text} progress`}
+      >
+        {steps.map((n) => {
+          const isFilled = progress >= n;
+          return (
+            <div
+              key={n}
+              className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${
+                isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
+              }`}
+            />
+          );
+        })}
       </div>
 
       <DeleteTodoDialog
@@ -393,6 +343,6 @@ function ProgressTodoItem({
           setDeleteOpen(false);
         }}
       />
-    </Reorder.Item>
+    </div>
   );
 }

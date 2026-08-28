@@ -1,6 +1,7 @@
 /** @jsxImportSource react */
-import { render } from '@react-email/render';
+
 import { Button, Container, Heading, Hr, Link, Text } from '@react-email/components';
+import { render } from '@react-email/render';
 
 export function VerifyEmail({ url }: { url: string }) {
   return (

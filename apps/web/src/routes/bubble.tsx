@@ -21,43 +21,26 @@ export const Route = createFileRoute('/bubble')({
   component: BubblePage,
 });
 
-function readableTextColor(bg: string | undefined): string {
-  if (!bg) return '#171717';
-  const hex = bg.replace('#', '');
-  if (hex.length !== 6) return '#171717';
-  const r = Number.parseInt(hex.slice(0, 2), 16);
-  const g = Number.parseInt(hex.slice(2, 4), 16);
-  const b = Number.parseInt(hex.slice(4, 6), 16);
-  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-  return lum > 0.6 ? '#171717' : '#f5f5f5';
-}
-
 function buildSeries(todos: Task[], categories: Category[]) {
-  const categorySeries = categories.map((category) => {
-    const color = category.color ?? undefined;
-    return {
-      name: category.name,
-      color,
-      dataLabels: { color: readableTextColor(color) },
-      data: todos
-        .filter((t) => t.categoryId === category.id)
-        .map((t) => ({
-          name: t.text,
-          value: t.effort ?? EFFORT_RANGE[0],
-          todoId: t.id,
-        })),
-    };
-  });
+  const categorySeries = categories.map((category) => ({
+    name: category.name,
+    color: category.color ?? undefined,
+    data: todos
+      .filter((t) => t.categoryId === category.id)
+      .map((t) => ({
+        name: t.text,
+        value: t.effort ?? EFFORT_RANGE[0],
+        todoId: t.id,
+      })),
+  }));
 
   const knownIds = new Set(categories.map((c) => c.id));
   const uncategorized = todos.filter((t) => t.categoryId === null || !knownIds.has(t.categoryId));
 
   if (uncategorized.length > 0) {
-    const otherColor = '#6b8abc';
     categorySeries.push({
       name: 'Other',
-      color: otherColor,
-      dataLabels: { color: readableTextColor(otherColor) },
+      color: '#6b8abc',
       data: uncategorized.map((t) => ({
         name: t.text,
         value: t.effort ?? EFFORT_RANGE[0],

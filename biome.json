@@ -18,6 +18,8 @@
       "!**/routeTree.gen.ts",
       "!**/src-tauri",
       "!**/.nuxt",
+      "!**/migrations/meta",
+      "!**/apps/web/src/components/ui",
       "!bts.jsonc",
       "!**/.expo",
       "!**/.wrangler",

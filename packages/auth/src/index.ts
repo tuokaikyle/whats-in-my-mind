@@ -33,8 +33,7 @@ export function createAuth(env: AuthEnv) {
   const facebookClientId = env?.FACEBOOK_CLIENT_ID ?? process.env.FACEBOOK_CLIENT_ID;
   const facebookClientSecret = env?.FACEBOOK_CLIENT_SECRET ?? process.env.FACEBOOK_CLIENT_SECRET;
   const resendApiKey = env?.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
-  const fromEmail =
-    env?.RESEND_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+  const fromEmail = env?.RESEND_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
 
   const db = getDb(databaseUrl);
 
@@ -52,9 +51,9 @@ export function createAuth(env: AuthEnv) {
     baseURL,
     trustedOrigins: corsOrigin
       ? corsOrigin
-        .split(',')
-        .map((o) => o.trim())
-        .filter(Boolean)
+          .split(',')
+          .map((o) => o.trim())
+          .filter(Boolean)
       : [],
     emailAndPassword: {
       enabled: true,

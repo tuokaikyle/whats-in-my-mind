@@ -275,9 +275,7 @@ function ManagePage() {
         </Card>
       )}
 
-      <Card
-        className={`max-sm:rounded-none max-sm:border-0 max-sm:shadow-none ${isGuest ? '' : 'mt-6'}`}
-      >
+      <Card className={`max-sm:rounded-none max-sm:border-0 max-sm:shadow-none ${isGuest ? '' : 'mt-6'}`}>
         <CardHeader>
           <CardTitle>Completed Todos</CardTitle>
           <CardDescription>

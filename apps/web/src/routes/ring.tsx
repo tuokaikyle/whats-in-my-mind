@@ -14,7 +14,6 @@ import { cn } from '@/lib/utils';
 import { EFFORT_RANGE } from '@/utils/enums';
 
 const FALLBACK_COLOR = '#a1a1aa'; // zinc-400 for uncategorized todos
-const BASE_GREY = '#d4d4d8'; // zinc-300 for toggled base arcs
 
 const RING_RADIUS = 300;
 const RING_STROKE_WIDTH = 24;
@@ -210,30 +209,41 @@ function RouteComponent() {
           <div className='flex flex-col items-center gap-6'>
             <div className='flex items-center gap-2'>
               <Button variant='outline' size='sm' onClick={() => setBaseGrey((v) => !v)}>
-                {baseGrey ? 'Show colors' : 'Grey base'}
+                {baseGrey ? 'Show colors' : 'Hide base'}
               </Button>
               <Button variant='outline' size='sm' onClick={() => setReplayKey((k) => k + 1)}>
                 Replay
               </Button>
             </div>
 
-            <div className='flex w-full flex-col items-center gap-6' onMouseLeave={handleHoverLeave}>
+            <div className='flex w-full flex-col items-center gap-6'>
               <div className='relative aspect-square w-full max-w-[40rem]'>
                 <svg
                   viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
                   className='size-full -rotate-90'
+                  role='img'
                   aria-label={`Ring chart: ${activeTodos.length} active todo${
                     activeTodos.length === 1 ? '' : 's'
                   }, ${totalEffort} total effort`}
                 >
+                  {/* biome-ignore lint/a11y/useSemanticElements: SVG <rect> cannot be an HTML <button>; role="button" is the ARIA-correct pattern for interactive SVG */}
                   <rect
                     x={0}
                     y={0}
                     width={viewBoxSize}
                     height={viewBoxSize}
                     fill='transparent'
+                    role='button'
+                    tabIndex={0}
+                    aria-label='Deselect segment'
                     onMouseEnter={clearHighlight}
                     onClick={() => setActiveId(null)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') {
+                        e.preventDefault();
+                        setActiveId(null);
+                      }
+                    }}
                   />
                   {segments.map((seg) => {
                     const isHighlighted = isSegmentHighlighted(seg.id);
@@ -252,7 +262,7 @@ function RouteComponent() {
                           cy={center}
                           r={radius}
                           fill='none'
-                          stroke={baseGrey ? BASE_GREY : seg.color}
+                          stroke={baseGrey ? 'transparent' : seg.color}
                           strokeOpacity={isHighlighted ? 0.45 : 0.2}
                           strokeWidth={strokeWidth}
                           strokeLinecap={segmentStyle.strokeLinecap}
@@ -281,6 +291,7 @@ function RouteComponent() {
                           }
                         />
                         {/* Invisible wider stroke for easier hover targeting */}
+                        {/* biome-ignore lint/a11y/useSemanticElements: SVG <circle> cannot be an HTML <button>; role="button" is the ARIA-correct pattern for interactive SVG */}
                         <circle
                           cx={center}
                           cy={center}
@@ -293,10 +304,18 @@ function RouteComponent() {
                           strokeDashoffset={seg.dashOffset}
                           className='cursor-pointer touch-manipulation'
                           pointerEvents='stroke'
+                          role='button'
+                          tabIndex={0}
                           data-ring-segment-hit={seg.id}
                           onMouseEnter={() => highlightSegment(seg.id)}
                           onMouseLeave={handleHoverLeave}
                           onClick={() => handleSegmentActivate(seg.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleSegmentActivate(seg.id);
+                            }
+                          }}
                           aria-label={`${seg.text}, ${seg.progress} of ${seg.effort} complete`}
                         />
                       </g>
