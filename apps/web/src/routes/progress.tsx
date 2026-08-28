@@ -285,16 +285,18 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
         strokeLinecap='round'
         className='stroke-muted-foreground/20'
       />
-      <path
-        d={arcPath(cx, cy, r, GAUGE_START, GAUGE_END)}
-        fill='none'
-        strokeWidth={stroke}
-        strokeLinecap='round'
-        pathLength={100}
-        strokeDasharray={100}
-        strokeDashoffset={arcOffset}
-        className='stroke-green-500 transition-[stroke-dashoffset] duration-700 ease-out'
-      />
+      {percent > 0 && (
+        <path
+          d={arcPath(cx, cy, r, GAUGE_START, GAUGE_END)}
+          fill='none'
+          strokeWidth={stroke}
+          strokeLinecap='round'
+          pathLength={100}
+          strokeDasharray={100}
+          strokeDashoffset={arcOffset}
+          className='stroke-green-500 transition-[stroke-dashoffset] duration-700 ease-out'
+        />
+      )}
       <line
         x1={cx}
         y1={cy}
