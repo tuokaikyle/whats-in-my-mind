@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TreemapRouteImport } from './routes/treemap'
 import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as RingRouteImport } from './routes/ring'
+import { Route as ReadinessRouteImport } from './routes/readiness'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as MatrixRouteImport } from './routes/matrix'
 import { Route as ManageRouteImport } from './routes/manage'
@@ -35,6 +36,11 @@ const SimpleRoute = SimpleRouteImport.update({
 const RingRoute = RingRouteImport.update({
   id: '/ring',
   path: '/ring',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadinessRoute = ReadinessRouteImport.update({
+  id: '/readiness',
+  path: '/readiness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProgressRoute = ProgressRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
+  '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
+  '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/manage': typeof ManageRoute
   '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
+  '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/manage'
     | '/matrix'
     | '/progress'
+    | '/readiness'
     | '/ring'
     | '/simple'
     | '/treemap'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/manage'
     | '/matrix'
     | '/progress'
+    | '/readiness'
     | '/ring'
     | '/simple'
     | '/treemap'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/manage'
     | '/matrix'
     | '/progress'
+    | '/readiness'
     | '/ring'
     | '/simple'
     | '/treemap'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   ManageRoute: typeof ManageRoute
   MatrixRoute: typeof MatrixRoute
   ProgressRoute: typeof ProgressRoute
+  ReadinessRoute: typeof ReadinessRoute
   RingRoute: typeof RingRoute
   SimpleRoute: typeof SimpleRoute
   TreemapRoute: typeof TreemapRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/ring'
       fullPath: '/ring'
       preLoaderRoute: typeof RingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/readiness': {
+      id: '/readiness'
+      path: '/readiness'
+      fullPath: '/readiness'
+      preLoaderRoute: typeof ReadinessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/progress': {
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   ManageRoute: ManageRoute,
   MatrixRoute: MatrixRoute,
   ProgressRoute: ProgressRoute,
+  ReadinessRoute: ReadinessRoute,
   RingRoute: RingRoute,
   SimpleRoute: SimpleRoute,
   TreemapRoute: TreemapRoute,

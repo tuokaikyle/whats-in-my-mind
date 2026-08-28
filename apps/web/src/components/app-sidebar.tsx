@@ -2,6 +2,7 @@ import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Bubbles,
+  Check,
   CircleDashed,
   Command,
   FileCheck,
@@ -94,6 +95,12 @@ export const sidebarData: {
       title: 'Kpi Gauge',
       url: '/kpigauge',
       icon: Gauge,
+      group: 'Views',
+    },
+    {
+      title: 'Readiness',
+      url: '/readiness',
+      icon: Check,
       group: 'Views',
     },
     // General group
