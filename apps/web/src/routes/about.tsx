@@ -50,10 +50,10 @@ function RouteComponent() {
               — See your tasks as a bubble chart by category and effort.
             </li>
             <li>
-              <Link to='/gauge' className='text-primary hover:underline font-medium'>
-                Gauge
+              <Link to='/treemap' className='text-primary hover:underline font-medium'>
+                Tree Map
               </Link>{' '}
-              — At-a-glance radial gauge showing overall progress.
+              — Explore tasks organized by category in a space-filling layout.
             </li>
             <li>
               <Link to='/ring' className='text-primary hover:underline font-medium'>
@@ -62,16 +62,16 @@ function RouteComponent() {
               — Active tasks as a ring; arc length is effort, fill is progress.
             </li>
             <li>
-              <Link to='/treemap' className='text-primary hover:underline font-medium'>
-                Tree Map
+              <Link to='/kpigauge' className='text-primary hover:underline font-medium'>
+                KPI Gauge
               </Link>{' '}
-              — Explore tasks organized by category in a space-filling layout.
+              — Pin up to three tasks as concentric gauge rings for a focused snapshot.
             </li>
             <li>
-              <Link to='/matrix' className='text-primary hover:underline font-medium'>
-                Matrix
+              <Link to='/readiness' className='text-primary hover:underline font-medium'>
+                Readiness
               </Link>{' '}
-              — Tasks as bouncing dots in an effort grid; color shows category.
+              — Gauge how ready each task is to start; locks to ready once work begins.
             </li>
           </ul>
           <p>Same tasks, different lenses. No duplication, no switching tools.</p>

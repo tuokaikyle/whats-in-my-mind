@@ -3,11 +3,11 @@ import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Bubbles,
   Check,
+  CircleCheck,
   CircleDashed,
   Command,
   FileCheck,
   Gauge,
-  Grid2X2,
   Info,
   LayoutGrid,
   PanelLeft,
@@ -67,12 +67,6 @@ export const sidebarData: {
       icon: Bubbles,
       group: 'Views',
     },
-    // {
-    //   title: 'Gauge',
-    //   url: '/gauge',
-    //   icon: Gauge,
-    //   group: 'Views',
-    // },
     {
       title: 'Tree Map',
       url: '/treemap',
@@ -86,12 +80,6 @@ export const sidebarData: {
       group: 'Views',
     },
     {
-      title: 'Matrix',
-      url: '/matrix',
-      icon: Grid2X2,
-      group: 'Views',
-    },
-    {
       title: 'Kpi Gauge',
       url: '/kpigauge',
       icon: Gauge,
@@ -100,7 +88,7 @@ export const sidebarData: {
     {
       title: 'Readiness',
       url: '/readiness',
-      icon: Check,
+      icon: CircleCheck,
       group: 'Views',
     },
     // General group

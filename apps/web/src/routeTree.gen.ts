@@ -14,10 +14,8 @@ import { Route as SimpleRouteImport } from './routes/simple'
 import { Route as RingRouteImport } from './routes/ring'
 import { Route as ReadinessRouteImport } from './routes/readiness'
 import { Route as ProgressRouteImport } from './routes/progress'
-import { Route as MatrixRouteImport } from './routes/matrix'
 import { Route as ManageRouteImport } from './routes/manage'
 import { Route as KpigaugeRouteImport } from './routes/kpigauge'
-import { Route as GaugeRouteImport } from './routes/gauge'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -48,11 +46,6 @@ const ProgressRoute = ProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MatrixRoute = MatrixRouteImport.update({
-  id: '/matrix',
-  path: '/matrix',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ManageRoute = ManageRouteImport.update({
   id: '/manage',
   path: '/manage',
@@ -61,11 +54,6 @@ const ManageRoute = ManageRouteImport.update({
 const KpigaugeRoute = KpigaugeRouteImport.update({
   id: '/kpigauge',
   path: '/kpigauge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GaugeRoute = GaugeRouteImport.update({
-  id: '/gauge',
-  path: '/gauge',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BubbleRoute = BubbleRouteImport.update({
@@ -93,10 +81,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
-  '/gauge': typeof GaugeRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
-  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
@@ -108,10 +94,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
-  '/gauge': typeof GaugeRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
-  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
@@ -124,10 +108,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
-  '/gauge': typeof GaugeRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
-  '/matrix': typeof MatrixRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
@@ -141,10 +123,8 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
-    | '/gauge'
     | '/kpigauge'
     | '/manage'
-    | '/matrix'
     | '/progress'
     | '/readiness'
     | '/ring'
@@ -156,10 +136,8 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
-    | '/gauge'
     | '/kpigauge'
     | '/manage'
-    | '/matrix'
     | '/progress'
     | '/readiness'
     | '/ring'
@@ -171,10 +149,8 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
-    | '/gauge'
     | '/kpigauge'
     | '/manage'
-    | '/matrix'
     | '/progress'
     | '/readiness'
     | '/ring'
@@ -187,10 +163,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
-  GaugeRoute: typeof GaugeRoute
   KpigaugeRoute: typeof KpigaugeRoute
   ManageRoute: typeof ManageRoute
-  MatrixRoute: typeof MatrixRoute
   ProgressRoute: typeof ProgressRoute
   ReadinessRoute: typeof ReadinessRoute
   RingRoute: typeof RingRoute
@@ -236,13 +210,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/matrix': {
-      id: '/matrix'
-      path: '/matrix'
-      fullPath: '/matrix'
-      preLoaderRoute: typeof MatrixRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/manage': {
       id: '/manage'
       path: '/manage'
@@ -255,13 +222,6 @@ declare module '@tanstack/react-router' {
       path: '/kpigauge'
       fullPath: '/kpigauge'
       preLoaderRoute: typeof KpigaugeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gauge': {
-      id: '/gauge'
-      path: '/gauge'
-      fullPath: '/gauge'
-      preLoaderRoute: typeof GaugeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bubble': {
@@ -299,10 +259,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
-  GaugeRoute: GaugeRoute,
   KpigaugeRoute: KpigaugeRoute,
   ManageRoute: ManageRoute,
-  MatrixRoute: MatrixRoute,
   ProgressRoute: ProgressRoute,
   ReadinessRoute: ReadinessRoute,
   RingRoute: RingRoute,
