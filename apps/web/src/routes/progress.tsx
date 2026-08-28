@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ArrowUpDown, Container, Ellipsis, Loader2, Plus, Tag, Trash2 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CategorySubMenuContent } from '@/components/category-sub-menu-content';
 import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
@@ -23,6 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { cn } from '@/lib/utils';
 import { EFFORT_RANGE } from '@/utils/enums';
 import type { Task } from '@/utils/types';
 
@@ -207,6 +208,89 @@ function ProgressPage() {
   );
 }
 
+const GAUGE_START = -125;
+const GAUGE_END = 125;
+const GAUGE_SWEEP = GAUGE_END - GAUGE_START;
+
+function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
+  const rad = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.sin(rad), y: cy - r * Math.cos(rad) };
+}
+
+function arcPath(cx: number, cy: number, r: number, startAngle: number, endAngle: number) {
+  const start = polarToCartesian(cx, cy, r, startAngle);
+  const end = polarToCartesian(cx, cy, r, endAngle);
+  const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+  return `M ${start.x} ${start.y} A ${r} ${r} 0 ${largeArc} 1 ${end.x} ${end.y}`;
+}
+
+function ProgressGauge({ percent, size = 52, className }: { percent: number; size?: number; className?: string }) {
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2 - 4;
+  const stroke = Math.max(3, size * 0.09);
+  const needleR = r * 0.55;
+  const valueAngle = GAUGE_START + (percent / 100) * GAUGE_SWEEP;
+
+  const [arcOffset, setArcOffset] = useState(100);
+  const [needleAngle, setNeedleAngle] = useState(GAUGE_START);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setArcOffset(100 - percent);
+      setNeedleAngle(valueAngle);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [percent, valueAngle]);
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={cn('shrink-0', className)}>
+      <path
+        d={arcPath(cx, cy, r, GAUGE_START, GAUGE_END)}
+        fill='none'
+        strokeWidth={stroke}
+        strokeLinecap='round'
+        className='stroke-muted-foreground/20'
+      />
+      <path
+        d={arcPath(cx, cy, r, GAUGE_START, GAUGE_END)}
+        fill='none'
+        strokeWidth={stroke}
+        strokeLinecap='round'
+        pathLength={100}
+        strokeDasharray={100}
+        strokeDashoffset={arcOffset}
+        className='stroke-green-500 transition-[stroke-dashoffset] duration-700 ease-out'
+      />
+      <line
+        x1={cx}
+        y1={cy}
+        x2={cx}
+        y2={cy - needleR}
+        strokeWidth={Math.max(1.5, size * 0.04)}
+        strokeLinecap='round'
+        className='stroke-foreground transition-transform duration-700 ease-out'
+        style={{
+          transform: `rotate(${needleAngle}deg)`,
+          transformBox: 'view-box',
+          transformOrigin: `${cx}px ${cy}px`,
+        }}
+      />
+      <circle cx={cx} cy={cy} r={Math.max(2, size * 0.06)} className='fill-foreground' />
+      <text
+        x={cx}
+        y={cy + r}
+        textAnchor='middle'
+        dominantBaseline='central'
+        className='fill-foreground font-semibold'
+        style={{ fontSize: size * 0.19 }}
+      >
+        {percent}%
+      </text>
+    </svg>
+  );
+}
+
 function ProgressTodoItem({
   todo,
   categories,
@@ -255,82 +339,84 @@ function ProgressTodoItem({
   };
 
   return (
-    <div className='relative rounded-md border bg-card p-3'>
-      <div className='flex items-center justify-between gap-2'>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className='truncate text-sm font-medium'>{todo.text}</span>
-          </TooltipTrigger>
-          <TooltipContent side='top'>{todo.text}</TooltipContent>
-        </Tooltip>
-        <div className='flex shrink-0 items-center gap-2'>
-          <span className='text-xs text-muted-foreground'>{formatCreatedAgo(todo.createdAt)}</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='ghost' size='icon' className='h-7 w-7 shrink-0' aria-label='More options'>
-                <Ellipsis className='h-4 w-4' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='start' side='right'>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Tag className='mr-2 h-4 w-4' />
-                  Category
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent sideOffset={8}>
-                  <CategorySubMenuContent
-                    categories={categories}
-                    selectedCategoryId={todo.categoryId}
-                    onCategoryChange={onCategoryChange}
-                    onAddCategory={onAddCategory}
-                  />
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Container className='mr-2 h-4 w-4' />
-                  Effort
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent sideOffset={8}>
-                  {EFFORT_RANGE.map((n) => (
-                    <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
-                      {n}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuItem variant='destructive' onClick={() => setDeleteOpen(true)}>
-                <Trash2 className='mr-2 h-4 w-4' />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+    <div className='relative flex items-stretch gap-3 rounded-md border bg-card p-3'>
+      <ProgressGauge percent={progressPercent} className='self-center' />
+      <div className='flex min-w-0 flex-1 flex-col gap-2'>
+        <div className='flex items-center justify-between gap-2'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className='truncate text-sm font-medium'>{todo.text}</span>
+            </TooltipTrigger>
+            <TooltipContent side='top'>{todo.text}</TooltipContent>
+          </Tooltip>
+          <div className='flex shrink-0 items-center gap-2'>
+            <span className='text-xs text-muted-foreground'>{formatCreatedAgo(todo.createdAt)}</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' size='icon' className='h-7 w-7 shrink-0' aria-label='More options'>
+                  <Ellipsis className='h-4 w-4' />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align='start' side='right'>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Tag className='mr-2 h-4 w-4' />
+                    Category
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent sideOffset={8}>
+                    <CategorySubMenuContent
+                      categories={categories}
+                      selectedCategoryId={todo.categoryId}
+                      onCategoryChange={onCategoryChange}
+                      onAddCategory={onAddCategory}
+                    />
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Container className='mr-2 h-4 w-4' />
+                    Effort
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent sideOffset={8}>
+                    {EFFORT_RANGE.map((n) => (
+                      <DropdownMenuItem key={n} onClick={() => onEffortChange(n)}>
+                        {n}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem variant='destructive' onClick={() => setDeleteOpen(true)}>
+                  <Trash2 className='mr-2 h-4 w-4' />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
 
-      <div
-        className='mt-2 flex h-5 w-full cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-        onClick={handleBarClick}
-        onKeyDown={handleBarKeyDown}
-        role='slider'
-        tabIndex={0}
-        aria-valuenow={progress}
-        aria-valuemin={0}
-        aria-valuemax={effort}
-        aria-valuetext={`${progress} of ${effort} steps complete (${progressPercent}%)`}
-        aria-label={`${todo.text} progress`}
-      >
-        {steps.map((n) => {
-          const isFilled = progress >= n;
-          return (
-            <div
-              key={n}
-              className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${
-                isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
-              }`}
-            />
-          );
-        })}
+        <div
+          className='flex h-5 w-full cursor-pointer gap-0.5 overflow-hidden rounded-full bg-muted outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+          onClick={handleBarClick}
+          onKeyDown={handleBarKeyDown}
+          role='slider'
+          tabIndex={0}
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={effort}
+          aria-valuetext={`${progress} of ${effort} steps complete (${progressPercent}%)`}
+          aria-label={`${todo.text} progress`}
+        >
+          {steps.map((n) => {
+            const isFilled = progress >= n;
+            return (
+              <div
+                key={n}
+                className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
+                  }`}
+              />
+            );
+          })}
+        </div>
       </div>
 
       <DeleteTodoDialog
