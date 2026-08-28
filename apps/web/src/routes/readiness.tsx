@@ -57,7 +57,6 @@ function ReadinessPage() {
         return [...todos].sort(compareByProgress).reverse();
       case 'earliest':
         return [...todos].sort(compareByCreatedAt);
-      case 'low-progress':
       default:
         return [...todos].sort(compareByProgress);
     }
@@ -88,7 +87,7 @@ function ReadinessPage() {
           <div className='flex items-center justify-between gap-2'>
             <div>
               <CardTitle>Readiness</CardTitle>
-              <CardDescription>What's lined up</CardDescription>
+              <CardDescription className='mt-2'>Be ready to start it</CardDescription>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -214,7 +213,7 @@ function ReadinessTodoItem({
             >
               <span
                 className={cn(
-                  'block h-6 w-6 rounded-full transition-colors',
+                  'block h-5 w-5 rounded-full transition-colors',
                   active ? 'bg-green-500' : 'border-2 border-current',
                 )}
               />

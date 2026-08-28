@@ -190,7 +190,9 @@ function BubblePage() {
           open={listPanelOpen}
           onOpenChange={handleListPanelOpenChange}
         >
-          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+          <BaseDrawer.DrawerTrigger
+            render={<Button variant='secondary'>{listPanelOpen ? 'Hide panel' : 'Show panel'}</Button>}
+          />
           <BaseDrawer.DrawerContent>
             <BaseDrawer.DrawerHeader>
               <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>

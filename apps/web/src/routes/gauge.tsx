@@ -142,8 +142,7 @@ function buildGaugeOptions(todo: Task, isDark: boolean, name: string): Highchart
         },
         dataLabels: {
           enabled: true,
-          format:
-            '<span style="font-size:28px;font-weight:700;letter-spacing:-0.03em;color:' + textColor + '">{y}%</span>',
+          format: `<span style="font-size:28px;font-weight:700;letter-spacing:-0.03em;color:${textColor}">{y}%</span>`,
           y: 45, // Position text below the needle hub
           borderWidth: 0,
           useHTML: true,
@@ -243,7 +242,9 @@ function GaugePage() {
               open={listPanelOpen}
               onOpenChange={handleListPanelOpenChange}
             >
-              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+              <BaseDrawer.DrawerTrigger
+                render={<Button variant='secondary'>{listPanelOpen ? 'Hide panel' : 'Show panel'}</Button>}
+              />
               <BaseDrawer.DrawerContent>
                 <BaseDrawer.DrawerHeader>
                   <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>

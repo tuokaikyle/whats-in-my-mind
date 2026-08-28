@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import * as Highcharts from 'highcharts';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { Check } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import 'highcharts/highcharts-more';
 import 'highcharts/modules/solid-gauge';
@@ -10,6 +11,7 @@ import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
+import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
 import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useCategories, useTodos } from '@/hooks/use-todos';
@@ -25,19 +27,6 @@ const RING_COUNT = 3;
 const RING_GAP_PCT = 2;
 const INNER_HOLE_PCT = 30; // reserved blank white center
 const FALLBACK_PALETTE = Object.values(highChartColors);
-
-// Deterministic PRNG so a given `seed` always picks the same 3 todos,
-// keeping the selection stable between renders until the user reshuffles.
-function mulberry32(seed: number): () => number {
-  let a = seed;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 type RingSlice = {
   id: number;
@@ -57,20 +46,16 @@ function pickColor(index: number, categoryColor: string | null | undefined): str
 }
 
 function buildSlices(
-  activeTodos: Task[],
+  selectedTodos: Task[],
   categories: { id: number; name: string; color: string | null }[],
-  seed: number,
 ): RingSlice[] {
-  const rng = mulberry32(seed || 1);
-  const shuffled = [...activeTodos].sort(() => rng() - 0.5);
-  const shown = shuffled.slice(0, RING_COUNT);
-
+  const shown = selectedTodos.slice(0, RING_COUNT);
   const count = shown.length;
   // Distribute rings between 100% and INNER_HOLE_PCT so the innermost ring
   // sits flush against the white center disk.
   const bandWidth = count > 0 ? (100 - INNER_HOLE_PCT + RING_GAP_PCT) / count - RING_GAP_PCT : 0;
 
-  const slices: RingSlice[] = shown.map((todo, index) => {
+  return shown.map((todo, index) => {
     const effort = todo.effort ?? EFFORT_RANGE[0];
     const progress = Math.max(0, Math.min(effort, todo.progress ?? 0));
     const progressPct = effort > 0 ? Math.round((progress / effort) * 100) : 0;
@@ -92,8 +77,6 @@ function buildSlices(
       innerRadius,
     };
   });
-
-  return slices;
 }
 
 function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options {
@@ -118,8 +101,8 @@ function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options 
   return {
     chart: {
       type: 'solidgauge',
-      height: 320,
-      width: 320,
+      height: 440,
+      width: 440,
       backgroundColor: 'transparent',
       style: { fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif' },
       spacing: [0, 0, 0, 0],
@@ -131,6 +114,8 @@ function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options 
       style: { color: textColor, fontSize: '13px' },
       pointFormat: '<b>{point.name}</b><br/>{point.y}% of effort',
       useHTML: true,
+      followPointer: true,
+      hideDelay: 0,
     },
     pane: {
       startAngle: 0,
@@ -172,9 +157,24 @@ function KpiGaugePage() {
   const isDark = resolvedTheme === 'dark';
 
   const activeTodos = useMemo(() => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])), [todos]);
+  const inProgressTodos = useMemo(() => activeTodos.filter((t) => (t.progress ?? 0) > 0), [activeTodos]);
 
-  const [seed, setSeed] = useState(0);
-  const slices = useMemo(() => buildSlices(activeTodos, categories, seed), [activeTodos, categories, seed]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const initializedRef = useRef(false);
+  useEffect(() => {
+    if (initializedRef.current || todosLoading || activeTodos.length === 0) return;
+    // Prefer 3 items whose progress is greater than 0; fill any remaining
+    // slots with other active tasks so the gauge has something to show.
+    const priority = [...inProgressTodos, ...activeTodos.filter((t) => (t.progress ?? 0) === 0)];
+    setSelectedIds(priority.slice(0, RING_COUNT).map((t) => t.id));
+    initializedRef.current = true;
+  }, [todosLoading, activeTodos, inProgressTodos]);
+
+  const selectedTodos = useMemo(
+    () => selectedIds.map((id) => todos.find((t) => t.id === id)).filter((t): t is Task => t !== undefined),
+    [selectedIds, todos],
+  );
+  const slices = useMemo(() => buildSlices(selectedTodos, categories), [selectedTodos, categories]);
 
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [listPanelOpen, setListPanelOpen] = useState(false);
@@ -193,6 +193,14 @@ function KpiGaugePage() {
     if (open) setEditDrawerOpen(false);
   };
 
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= RING_COUNT) return prev;
+      return [...prev, id];
+    });
+  };
+
   const selectedTodo = selectedTodoId != null ? (todos.find((t) => t.id === selectedTodoId) ?? null) : null;
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
@@ -205,11 +213,8 @@ function KpiGaugePage() {
 
       {todosLoading ? (
         <PageLoader size='lg' />
-      ) : activeTodos.length === 0 ? (
-        <EmptyState
-          title={todos.length === 0 ? 'No todos yet' : 'No tasks in progress'}
-          description='Add items in the Simple view to see them here.'
-        />
+      ) : todos.length === 0 ? (
+        <EmptyState title='No todos yet' description='Add items in the Simple view to see them here.' />
       ) : (
         <>
           <div className='mb-6'>
@@ -217,52 +222,92 @@ function KpiGaugePage() {
               KPI Gauge
             </h1>
             <p className='text-sm' style={{ color: mutedColor }}>
-              Three random active tasks, each as a concentric ring.
+              Pick up to {RING_COUNT} tasks to display as concentric rings.
             </p>
           </div>
 
           <div className='flex flex-col items-center gap-6'>
-            <Button variant='outline' size='sm' onClick={() => setSeed((s) => s + 1)}>
-              Shuffle
-            </Button>
-
             <div className='relative'>
               <HighchartsReact highcharts={Highcharts} options={options} />
             </div>
 
-            <div className='flex w-full flex-wrap justify-center gap-x-2 gap-y-2 px-1'>
-              {slices.map((slice) => {
-                const isHighlighted = hoveredId === slice.id;
+            {slices.length > 0 ? (
+              <div className='flex w-full flex-wrap justify-center gap-x-2 gap-y-2 px-1'>
+                {slices.map((slice) => {
+                  const isHighlighted = hoveredId === slice.id;
+                  return (
+                    <button
+                      key={slice.id}
+                      type='button'
+                      className={cn(
+                        'flex items-center gap-1.5 rounded-md text-sm transition-colors touch-manipulation px-2 py-1',
+                        isHighlighted ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/60',
+                      )}
+                      onMouseEnter={() => setHoveredId(slice.id)}
+                      onMouseLeave={() => setHoveredId(null)}
+                      onFocus={() => setHoveredId(slice.id)}
+                      onBlur={() => setHoveredId(null)}
+                      onClick={() => onSliceClickRef.current(slice.id)}
+                    >
+                      <span
+                        className='inline-block h-3 w-3 shrink-0 rounded-full transition-transform'
+                        style={{
+                          backgroundColor: slice.color,
+                          boxShadow: isHighlighted ? `0 0 0 2px ${slice.color}` : undefined,
+                        }}
+                      />
+                      <span className='max-w-[12rem] truncate'>{slice.text}</span>
+                      <span className='tabular-nums text-xs opacity-70'>
+                        {slice.progress}/{slice.effort}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className='text-sm' style={{ color: mutedColor }}>
+                Select up to {RING_COUNT} items below to populate the gauge.
+              </p>
+            )}
+          </div>
+
+          <section className='rounded-lg border bg-card p-4'>
+            <div className='mb-3 flex items-center justify-between'>
+              <h2 className='text-sm font-semibold' style={{ color: textColor }}>
+                Select up to {RING_COUNT} items
+              </h2>
+              <span className='text-xs tabular-nums' style={{ color: mutedColor }}>
+                {selectedIds.length}/{RING_COUNT} selected
+              </span>
+            </div>
+            <div className='flex flex-wrap gap-1.5'>
+              {todos.map((todo, index) => {
+                const isSelected = selectedIds.includes(todo.id);
+                const disabled = !isSelected && selectedIds.length >= RING_COUNT;
+                const category = categories.find((c) => c.id === todo.categoryId);
+                const dotColor = pickColor(index, category?.color);
                 return (
                   <button
-                    key={slice.id}
+                    key={todo.id}
                     type='button'
+                    disabled={disabled}
+                    onClick={() => toggleSelect(todo.id)}
                     className={cn(
-                      'flex items-center gap-1.5 rounded-md text-sm transition-colors touch-manipulation px-2 py-1',
-                      isHighlighted ? 'bg-muted text-foreground' : 'text-muted-foreground hover:bg-muted/60',
+                      'inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-left text-sm transition-colors',
+                      isSelected ? 'border-green-500 bg-green-500/10' : 'border-border hover:bg-muted/50',
+                      disabled && 'cursor-not-allowed opacity-50 hover:bg-transparent',
                     )}
-                    onMouseEnter={() => setHoveredId(slice.id)}
-                    onMouseLeave={() => setHoveredId(null)}
-                    onFocus={() => setHoveredId(slice.id)}
-                    onBlur={() => setHoveredId(null)}
-                    onClick={() => onSliceClickRef.current(slice.id)}
                   >
-                    <span
-                      className='inline-block h-3 w-3 shrink-0 rounded-full transition-transform'
-                      style={{
-                        backgroundColor: slice.color,
-                        boxShadow: isHighlighted ? `0 0 0 2px ${slice.color}` : undefined,
-                      }}
-                    />
-                    <span className='max-w-[12rem] truncate'>{slice.text}</span>
-                    <span className='tabular-nums text-xs opacity-70'>
-                      {slice.progress}/{slice.effort}
+                    <span className='relative flex h-3.5 w-3.5 shrink-0 items-center justify-center'>
+                      <span className='inline-block h-3.5 w-3.5 rounded-full' style={{ backgroundColor: dotColor }} />
+                      {isSelected && <Check className='absolute h-3 w-3 text-white' strokeWidth={3} />}
                     </span>
+                    <span className='truncate'>{todo.text}</span>
                   </button>
                 );
               })}
             </div>
-          </div>
+          </section>
 
           <div className='flex justify-center'>
             <BaseDrawer.Drawer
@@ -271,7 +316,9 @@ function KpiGaugePage() {
               open={listPanelOpen}
               onOpenChange={handleListPanelOpenChange}
             >
-              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+              <BaseDrawer.DrawerTrigger
+                render={<Button variant='secondary'>{listPanelOpen ? 'Hide panel' : 'Show panel'}</Button>}
+              />
               <BaseDrawer.DrawerContent>
                 <BaseDrawer.DrawerHeader>
                   <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>
@@ -279,7 +326,9 @@ function KpiGaugePage() {
                     Click an item&apos;s edit icon to open a nested drawer.
                   </BaseDrawer.DrawerDescription>
                 </BaseDrawer.DrawerHeader>
-                <div className='flex-1 overflow-hidden'>{/* list panel placeholder */}</div>
+                <div className='flex-1 overflow-hidden'>
+                  <TodoListPanelDrawer />
+                </div>
                 <BaseDrawer.DrawerFooter>
                   <BaseDrawer.DrawerClose render={<Button variant='outline'>Close</Button>} />
                 </BaseDrawer.DrawerFooter>

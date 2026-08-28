@@ -212,7 +212,9 @@ function TreemapPage() {
              No standalone edit drawer here — clicking treemap sections
              drills down the treemap instead of opening an editor. */}
         <BaseDrawer.Drawer swipeDirection='right' modal={false} open={listPanelOpen} onOpenChange={setListPanelOpen}>
-          <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+          <BaseDrawer.DrawerTrigger
+            render={<Button variant='secondary'>{listPanelOpen ? 'Hide panel' : 'Show panel'}</Button>}
+          />
           <BaseDrawer.DrawerContent>
             <BaseDrawer.DrawerHeader>
               <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
@@ -56,6 +56,71 @@ function segmentDashLength(effort: number, totalEffort: number, circumference: n
 
 function formatProgressPercent(ratio: number) {
   return `${Math.round(ratio * 100)}%`;
+}
+
+type UseCountUpOptions = {
+  /** Duration for the first count-up (e.g. on load). */
+  durationMs?: number;
+  /** Shorter duration when the target changes during hover/focus transitions. */
+  transitionDurationMs?: number;
+  /** When this changes, restart the count-up from 0 using `durationMs`. */
+  replayKey?: number;
+};
+
+// Count-up animation: tweens the displayed value toward `target` with an ease-out
+// curve. The first change uses `durationMs`; later changes (hover, deselect) use
+// `transitionDurationMs` and start from the current displayed value.
+function useCountUp(
+  target: number,
+  { durationMs = 800, transitionDurationMs = 350, replayKey }: UseCountUpOptions = {},
+) {
+  const [value, setValue] = useState(0);
+  const valueRef = useRef(0);
+  const rafRef = useRef(0);
+  const isFirstAnimationRef = useRef(true);
+  const prevReplayKeyRef = useRef(replayKey);
+
+  useEffect(() => {
+    const replayTriggered = replayKey !== undefined && prevReplayKeyRef.current !== replayKey;
+    if (replayKey !== undefined) prevReplayKeyRef.current = replayKey;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) {
+      cancelAnimationFrame(rafRef.current);
+      valueRef.current = target;
+      setValue(target);
+      return;
+    }
+
+    if (replayTriggered) {
+      valueRef.current = 0;
+      setValue(0);
+    }
+
+    const from = replayTriggered ? 0 : valueRef.current;
+    if (!replayTriggered && from === target) return;
+
+    const duration = isFirstAnimationRef.current || replayTriggered ? durationMs : transitionDurationMs;
+    isFirstAnimationRef.current = false;
+
+    const start = performance.now();
+    const easeOut = (t: number) => 1 - (1 - t) ** 3;
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const next = from + (target - from) * easeOut(t);
+      valueRef.current = next;
+      setValue(next);
+      if (t < 1) rafRef.current = requestAnimationFrame(tick);
+      else valueRef.current = target;
+    };
+
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [target, durationMs, transitionDurationMs, replayKey]);
+
+  return value;
 }
 
 const RING_HOVER_TARGET_SELECTOR = '[data-ring-segment-hit], [data-ring-legend-item]';
@@ -141,7 +206,7 @@ function RouteComponent() {
   }, [segments, totalEffort]);
 
   const [replayKey, setReplayKey] = useState(0);
-  const [baseGrey, setBaseGrey] = useState(false);
+  const [trackHidden, setTrackHidden] = useState(false);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [activeId, setActiveId] = useState<number | null>(null);
 
@@ -180,6 +245,8 @@ function RouteComponent() {
 
   const displayId = hoveredId ?? activeId;
   const displaySegment = displayId != null ? (segments.find((seg) => seg.id === displayId) ?? null) : null;
+  const displayRatio = displaySegment ? displaySegment.progressRatio : ringSummary.overallRatio;
+  const animatedRatio = useCountUp(displayRatio, { replayKey });
 
   const isSegmentHighlighted = (id: number) => hoveredId === id || activeId === id;
   const highlightSegment = (id: number) => setHoveredId(id);
@@ -208,8 +275,8 @@ function RouteComponent() {
 
           <div className='flex flex-col items-center gap-6'>
             <div className='flex items-center gap-2'>
-              <Button variant='outline' size='sm' onClick={() => setBaseGrey((v) => !v)}>
-                {baseGrey ? 'Show colors' : 'Hide base'}
+              <Button variant='outline' size='sm' onClick={() => setTrackHidden((v) => !v)}>
+                {trackHidden ? 'Show track' : 'Hide track'}
               </Button>
               <Button variant='outline' size='sm' onClick={() => setReplayKey((k) => k + 1)}>
                 Replay
@@ -262,7 +329,7 @@ function RouteComponent() {
                           cy={center}
                           r={radius}
                           fill='none'
-                          stroke={baseGrey ? 'transparent' : seg.color}
+                          stroke={trackHidden ? 'transparent' : seg.color}
                           strokeOpacity={isHighlighted ? 0.45 : 0.2}
                           strokeWidth={strokeWidth}
                           strokeLinecap={segmentStyle.strokeLinecap}
@@ -323,29 +390,29 @@ function RouteComponent() {
                   })}
                 </svg>
 
-                <div className='pointer-events-none absolute inset-0 flex items-center justify-center px-6 sm:px-8'>
+                <div className='pointer-events-none absolute inset-0 flex items-center justify-center px-4 sm:px-6'>
                   <div className='max-w-[min(100%,14rem)] text-center'>
                     {displaySegment ? (
                       <>
                         <p className='truncate text-sm font-semibold text-foreground'>{displaySegment.text}</p>
                         <p className='mt-0.5 text-xs text-muted-foreground'>{displaySegment.categoryName}</p>
-                        <p className='mt-2 text-2xl font-bold tabular-nums tracking-tight text-foreground'>
-                          {formatProgressPercent(displaySegment.progressRatio)}
+                        <p className='mt-1.5 text-3xl font-bold tabular-nums tracking-tight text-foreground sm:text-4xl'>
+                          {formatProgressPercent(animatedRatio)}
                         </p>
                         <p className='text-xs text-muted-foreground'>
                           {displaySegment.progress} / {displaySegment.effort} effort
                         </p>
                         {isMobile && activeId === displaySegment.id && (
-                          <p className='mt-2 text-[11px] text-muted-foreground'>Tap again to edit</p>
+                          <p className='mt-1.5 text-[10px] text-muted-foreground'>Tap again to edit</p>
                         )}
                       </>
                     ) : (
                       <>
                         <p className='text-sm font-medium text-muted-foreground'>Overall</p>
-                        <p className='mt-1 text-2xl font-bold tabular-nums tracking-tight text-foreground'>
-                          {formatProgressPercent(ringSummary.overallRatio)}
+                        <p className='mt-0.5 text-3xl font-bold tabular-nums tracking-tight text-foreground sm:text-4xl'>
+                          {formatProgressPercent(animatedRatio)}
                         </p>
-                        <p className='mt-2 text-xs text-muted-foreground'>
+                        <p className='mt-1.5 text-xs text-muted-foreground'>
                           {ringSummary.totalProgress} / {totalEffort} effort
                         </p>
                         <p className='text-xs text-muted-foreground'>
@@ -406,7 +473,9 @@ function RouteComponent() {
               open={listPanelOpen}
               onOpenChange={handleListPanelOpenChange}
             >
-              <BaseDrawer.DrawerTrigger render={<Button variant='secondary'>Show item editor panel</Button>} />
+              <BaseDrawer.DrawerTrigger
+                render={<Button variant='secondary'>{listPanelOpen ? 'Hide panel' : 'Show panel'}</Button>}
+              />
               <BaseDrawer.DrawerContent>
                 <BaseDrawer.DrawerHeader>
                   <BaseDrawer.DrawerTitle>Todos</BaseDrawer.DrawerTitle>

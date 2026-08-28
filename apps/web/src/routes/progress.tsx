@@ -83,7 +83,6 @@ function ProgressPage() {
         return [...todos].sort(compareByEffort).reverse();
       case 'low-effort':
         return [...todos].sort(compareByEffort);
-      case 'earliest':
       default:
         return [...todos].sort(compareByCreatedAt);
     }
@@ -114,7 +113,7 @@ function ProgressPage() {
           <div className='flex items-center justify-between gap-2'>
             <div>
               <CardTitle>Progress</CardTitle>
-              <CardDescription>At least to start it</CardDescription>
+              <CardDescription className='mt-2'>At least to start it</CardDescription>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
