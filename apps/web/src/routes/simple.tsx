@@ -307,7 +307,7 @@ function SimpleTodoItem({
                 <button
                   key={n}
                   type='button'
-                  className={`h-3 w-3 rounded-sm border ${
+                  className={`h-3.5 w-3.5 rounded-sm border sm:h-3 sm:w-3 ${
                     isFilled ? 'border-green-500 bg-green-500' : 'border-muted-foreground/40'
                   }`}
                   onClick={(e) => {
