@@ -15,9 +15,9 @@ export interface AuthEnv {
   CORS_ORIGIN?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
-  FACEBOOK_CLIENT_ID?: string;
-  FACEBOOK_CLIENT_SECRET?: string;
-  RESEND_API_KEY?: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_CLIENT_SECRET?: string;
+  RESEND_API_KEY: string;
   RESEND_FROM_EMAIL?: string;
 }
 
@@ -30,17 +30,21 @@ export function createAuth(env: AuthEnv) {
   const corsOrigin = env?.CORS_ORIGIN ?? process.env.CORS_ORIGIN ?? '';
   const googleClientId = env?.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID;
   const googleClientSecret = env?.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET;
-  const facebookClientId = env?.FACEBOOK_CLIENT_ID ?? process.env.FACEBOOK_CLIENT_ID;
-  const facebookClientSecret = env?.FACEBOOK_CLIENT_SECRET ?? process.env.FACEBOOK_CLIENT_SECRET;
+  const githubClientId = env?.GITHUB_CLIENT_ID ?? process.env.GITHUB_CLIENT_ID;
+  const githubClientSecret = env?.GITHUB_CLIENT_SECRET ?? process.env.GITHUB_CLIENT_SECRET;
   const resendApiKey = env?.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
   const fromEmail = env?.RESEND_FROM_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? 'onboarding@resend.dev';
+
+  if (!resendApiKey?.trim()) {
+    throw new Error('RESEND_API_KEY is required because email verification is enabled');
+  }
 
   const db = getDb(databaseUrl);
 
   // Use secure/sameSite:none only in production (HTTPS). Local dev is HTTP.
   const isProduction = baseURL.startsWith('https://');
 
-  const resend = resendApiKey ? new Resend(resendApiKey) : null;
+  const resend = new Resend(resendApiKey);
 
   const config: BetterAuthOptions = {
     database: drizzleAdapter(db, {
@@ -59,7 +63,6 @@ export function createAuth(env: AuthEnv) {
       enabled: true,
       requireEmailVerification: true,
       sendResetPassword: async ({ user, url }) => {
-        if (!resend) return;
         const html = await renderResetPassword(url);
         await resend.emails.send({
           from: fromEmail,
@@ -72,7 +75,6 @@ export function createAuth(env: AuthEnv) {
     emailVerification: {
       sendOnSignUp: true,
       sendVerificationEmail: async ({ user, url }) => {
-        if (!resend) return;
         const html = await renderVerifyEmail(url);
         await resend.emails.send({
           from: fromEmail,
@@ -102,12 +104,12 @@ export function createAuth(env: AuthEnv) {
     };
   }
 
-  if (facebookClientId && facebookClientSecret) {
+  if (githubClientId && githubClientSecret) {
     config.socialProviders = {
       ...config.socialProviders,
-      facebook: {
-        clientId: facebookClientId,
-        clientSecret: facebookClientSecret,
+      github: {
+        clientId: githubClientId,
+        clientSecret: githubClientSecret,
       },
     };
   }
