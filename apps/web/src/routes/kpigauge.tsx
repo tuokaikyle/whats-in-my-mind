@@ -10,6 +10,7 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
+import { PageInfo } from '@/components/page-info';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -217,8 +218,9 @@ function KpiGaugePage() {
       ) : (
         <>
           <div className='mb-6'>
-            <h1 className='text-lg font-semibold' style={{ color: textColor }}>
+            <h1 className='flex items-center gap-1.5 text-lg font-semibold' style={{ color: textColor }}>
               KPI Gauge
+              <PageInfo page='kpigauge' />
             </h1>
             <p className='text-sm' style={{ color: mutedColor }}>
               Pick up to {RING_COUNT} tasks to display as concentric rings.

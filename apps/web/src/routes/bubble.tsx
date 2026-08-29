@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
+import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
@@ -81,7 +82,6 @@ function BubblePage() {
   const selectedTodo = selectedTodoId != null ? (todos.find((t) => t.id === selectedTodoId) ?? null) : null;
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
-  const mutedColor = isDark ? '#a3a3a3' : '#737373';
   const tooltipBg = isDark ? '#262626' : '#ffffff';
   const tooltipBorder = isDark ? '#404040' : '#e5e5e5';
 
@@ -96,12 +96,10 @@ function BubblePage() {
         },
       },
       title: {
-        text: "What's in my mind",
-        style: { color: textColor, fontWeight: '600', fontSize: isMobile ? '15px' : '18px' },
+        text: undefined,
       },
       subtitle: {
-        text: 'Grouped by category. Bubble size reflects effort.',
-        style: { color: mutedColor, fontSize: isMobile ? '11px' : '12px' },
+        text: undefined,
       },
       tooltip: {
         pointFormat: '<b>{point.name}</b><br/>Effort: {point.value}',
@@ -158,7 +156,7 @@ function BubblePage() {
       series: buildSeries(activeTodos, categories) as Highcharts.SeriesOptionsType[],
       credits: { enabled: false },
     }),
-    [activeTodos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder],
+    [activeTodos, categories, isDark, isMobile, textColor, tooltipBg, tooltipBorder],
   );
 
   return (
@@ -173,13 +171,22 @@ function BubblePage() {
           description='Add items in the Simple view to see them here.'
         />
       ) : (
-        <HighchartsReact
-          highcharts={Highcharts}
-          options={options}
-          containerProps={{
-            className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
-          }}
-        />
+        <>
+          <div>
+            <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
+              Bubble
+              <PageInfo page='bubble' />
+            </h1>
+            <p className='text-sm text-muted-foreground'>Grouped by category. Bubble size reflects effort.</p>
+          </div>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+            containerProps={{
+              className: isMobile ? 'w-full h-[clamp(300px,55vh,600px)]' : 'w-full',
+            }}
+          />
+        </>
       )}
 
       <div className='flex justify-center'>

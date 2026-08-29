@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import 'highcharts/modules/treemap';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
+import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
@@ -84,7 +85,6 @@ function TreemapPage() {
   const activeTodos = useMemo(() => todos.filter((t) => (t.progress ?? 0) < (t.effort ?? EFFORT_RANGE[0])), [todos]);
 
   const textColor = isDark ? '#f5f5f5' : '#171717';
-  const mutedColor = isDark ? '#a3a3a3' : '#737373';
   const tooltipBg = isDark ? '#262626' : '#ffffff';
   const tooltipBorder = isDark ? '#404040' : '#e5e5e5';
 
@@ -150,14 +150,10 @@ function TreemapPage() {
         },
       ],
       title: {
-        text: 'Tree Map',
-        align: 'left',
-        style: { color: textColor, fontWeight: '600' },
+        text: undefined,
       },
       subtitle: {
-        text: 'Grouped by category — rectangle size reflects relative effort',
-        align: 'left',
-        style: { color: mutedColor },
+        text: undefined,
       },
       tooltip: {
         headerFormat: '',
@@ -181,7 +177,7 @@ function TreemapPage() {
       },
       credits: { enabled: false },
     };
-  }, [activeTodos, categories, isDark, textColor, mutedColor, tooltipBg, tooltipBorder]);
+  }, [activeTodos, categories, isDark, textColor, tooltipBg, tooltipBorder]);
 
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
@@ -195,13 +191,24 @@ function TreemapPage() {
           description='Add items in the Simple view to see them here.'
         />
       ) : (
-        <HighchartsReact
-          highcharts={Highcharts}
-          options={options}
-          containerProps={{
-            className: 'h-[clamp(440px,65dvh,600px)] w-full min-w-0',
-          }}
-        />
+        <>
+          <div>
+            <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
+              Tree Map
+              <PageInfo page='treemap' />
+            </h1>
+            <p className='text-sm text-muted-foreground'>
+              Grouped by category — rectangle size reflects relative effort
+            </p>
+          </div>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={options}
+            containerProps={{
+              className: 'h-[clamp(440px,65dvh,600px)] w-full min-w-0',
+            }}
+          />
+        </>
       )}
 
       <div className='flex justify-center'>

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
+import { PageInfo } from '@/components/page-info';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -86,7 +87,10 @@ function ReadinessPage() {
         <CardHeader>
           <div className='flex items-center justify-between gap-2'>
             <div>
-              <CardTitle>Readiness</CardTitle>
+              <CardTitle className='flex items-center gap-1.5'>
+                Readiness
+                <PageInfo page='readiness' />
+              </CardTitle>
               <CardDescription className='mt-2'>Be ready to start it</CardDescription>
             </div>
             <DropdownMenu>
