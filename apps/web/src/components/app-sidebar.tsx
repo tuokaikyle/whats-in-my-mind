@@ -1,5 +1,5 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
-import { Link, useMatchRoute } from '@tanstack/react-router';
+import { Link, useLocation, useMatchRoute } from '@tanstack/react-router';
 import {
   Bubbles,
   Check,
@@ -15,6 +15,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
+import { useEffect } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +29,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ModeToggle } from './mode-toggle';
 
 export const sidebarData: {
   user: {
@@ -109,8 +109,13 @@ export const sidebarData: {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
-  const { toggleSidebar, open } = useSidebar();
+  const location = useLocation();
+  const { toggleSidebar, open, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [location.pathname, setOpenMobile]);
 
   // Group items by their 'group' property
   const groupedNavMain = sidebarData.navMain.reduce(
@@ -169,7 +174,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className='mb-1'>
         <UserButton
-          additionalLinks={[<ModeToggle key='mode-toggle' />]}
           disableDefaultLinks={true}
           size={open ? 'default' : 'icon'}
           side={isMobile ? 'top' : 'right'}

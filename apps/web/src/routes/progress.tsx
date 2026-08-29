@@ -6,6 +6,7 @@ import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
+import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,7 +115,10 @@ function ProgressPage() {
         <CardHeader>
           <div className='flex items-center justify-between gap-2'>
             <div>
-              <CardTitle>Progress</CardTitle>
+              <CardTitle className='flex items-center gap-1.5'>
+                Progress
+                <PageInfo page='progress' />
+              </CardTitle>
               <CardDescription className='mt-2'>At least to start it</CardDescription>
             </div>
             <div className='flex items-center gap-2'>

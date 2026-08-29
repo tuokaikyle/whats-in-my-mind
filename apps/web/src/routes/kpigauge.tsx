@@ -10,6 +10,7 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
+import { PageInfo } from '@/components/page-info';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -101,8 +102,7 @@ function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options 
   return {
     chart: {
       type: 'solidgauge',
-      height: 440,
-      width: 440,
+      height: '100%',
       backgroundColor: 'transparent',
       style: { fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif' },
       spacing: [0, 0, 0, 0],
@@ -218,8 +218,9 @@ function KpiGaugePage() {
       ) : (
         <>
           <div className='mb-6'>
-            <h1 className='text-lg font-semibold' style={{ color: textColor }}>
+            <h1 className='flex items-center gap-1.5 text-lg font-semibold' style={{ color: textColor }}>
               KPI Gauge
+              <PageInfo page='kpigauge' />
             </h1>
             <p className='text-sm' style={{ color: mutedColor }}>
               Pick up to {RING_COUNT} tasks to display as concentric rings.
@@ -227,8 +228,12 @@ function KpiGaugePage() {
           </div>
 
           <div className='flex flex-col items-center gap-6'>
-            <div className='relative'>
-              <HighchartsReact highcharts={Highcharts} options={options} />
+            <div className='relative aspect-square w-full max-w-[440px] min-w-0 overflow-hidden'>
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={options}
+                containerProps={{ className: 'h-full w-full' }}
+              />
             </div>
 
             {slices.length > 0 ? (

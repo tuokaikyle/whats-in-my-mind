@@ -139,29 +139,33 @@ function TodoListItemDrawer({ todo, categories }: { todo: Task; categories: Cate
 
   return (
     <BaseDrawer.Drawer swipeDirection='right' modal={false} open={editOpen} onOpenChange={setEditOpen}>
-      <div className='group flex min-h-8 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50'>
+      <BaseDrawer.DrawerTrigger
+        render={
+          <button
+            type='button'
+            className='group flex min-h-8 w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+            aria-label={`Edit ${todo.text}`}
+          />
+        }
+      >
         {category ? (
-          <div
+          <span
             className='h-2.5 w-2.5 shrink-0 rounded-full'
             style={{ backgroundColor: category.color ?? '#6366f1' }}
             title={category.name}
           />
         ) : (
-          <div className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
+          <span className='h-2.5 w-2.5 shrink-0 rounded-full border border-muted-foreground/40' />
         )}
 
         <span className='min-w-0 flex-1 truncate text-sm'>{todo.text}</span>
 
         <span className='w-10 shrink-0 text-right text-muted-foreground text-xs tabular-nums'>{effort}</span>
 
-        <div className='flex w-6 shrink-0 items-center justify-end opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100'>
-          <BaseDrawer.DrawerTrigger
-            render={<Button variant='ghost' size='icon' className='h-6 w-6' aria-label={`Edit ${todo.text}`} />}
-          >
-            <Pencil className='h-3.5 w-3.5' />
-          </BaseDrawer.DrawerTrigger>
-        </div>
-      </div>
+        <span className='flex w-6 shrink-0 items-center justify-end text-muted-foreground opacity-60 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100'>
+          <Pencil className='h-3.5 w-3.5' aria-hidden='true' />
+        </span>
+      </BaseDrawer.DrawerTrigger>
 
       <BaseDrawer.DrawerContent>
         <BaseDrawer.DrawerHeader>

@@ -33,7 +33,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
       navigate={(href) => navigate({ to: href })}
       replace={(href) => navigate({ to: href, replace: true })}
       Link={({ href, ...props }) => <Link to={href} {...props} />}
-      social={{ providers: ['google', 'facebook'] }}
+      social={{ providers: ['google', 'github'] }}
     >
       {children}
     </AuthUIProvider>

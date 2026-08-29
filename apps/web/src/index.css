@@ -44,8 +44,13 @@ body {
   }
 }
 
-.ring-segment--hovered .ring-progress-arc {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 45%, transparent));
+/* WebKit on iOS can crash when a CSS drop-shadow is applied to an inline SVG.
+   Keep the effect for precise hover devices; touch selection still gets the
+   thicker arc and legend highlight. */
+@media (hover: hover) and (pointer: fine) {
+  .ring-segment--hovered .ring-progress-arc {
+    filter: drop-shadow(0 0 6px color-mix(in srgb, currentColor 45%, transparent));
+  }
 }
 
 :root {

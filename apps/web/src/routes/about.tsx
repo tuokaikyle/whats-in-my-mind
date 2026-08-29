@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { ExternalLink, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { pageIntentions } from '@/utils/page-intentions';
 
 export const Route = createFileRoute('/about')({
   component: RouteComponent,
@@ -35,43 +36,43 @@ function RouteComponent() {
               <Link to='/simple' className='text-primary hover:underline font-medium'>
                 Simple
               </Link>{' '}
-              — A clean, draggable checklist for quick capture and reordering.
+              — {pageIntentions.simple.description}
             </li>
             <li>
               <Link to='/progress' className='text-primary hover:underline font-medium'>
                 Progress
               </Link>{' '}
-              — Track effort and completion with progress bars.
+              — {pageIntentions.progress.description}
             </li>
             <li>
               <Link to='/bubble' className='text-primary hover:underline font-medium'>
                 Bubble
               </Link>{' '}
-              — See your tasks as a bubble chart by category and effort.
+              — {pageIntentions.bubble.description}
             </li>
             <li>
               <Link to='/treemap' className='text-primary hover:underline font-medium'>
                 Tree Map
               </Link>{' '}
-              — Explore tasks organized by category in a space-filling layout.
+              — {pageIntentions.treemap.description}
             </li>
             <li>
               <Link to='/ring' className='text-primary hover:underline font-medium'>
                 Ring
               </Link>{' '}
-              — Active tasks as a ring; arc length is effort, fill is progress.
+              — {pageIntentions.ring.description}
             </li>
             <li>
               <Link to='/kpigauge' className='text-primary hover:underline font-medium'>
                 KPI Gauge
               </Link>{' '}
-              — Pin up to three tasks as concentric gauge rings for a focused snapshot.
+              — {pageIntentions.kpigauge.description}
             </li>
             <li>
               <Link to='/readiness' className='text-primary hover:underline font-medium'>
                 Readiness
               </Link>{' '}
-              — Gauge how ready each task is to start; locks to ready once work begins.
+              — {pageIntentions.readiness.description}
             </li>
           </ul>
           <p>Same tasks, different lenses. No duplication, no switching tools.</p>

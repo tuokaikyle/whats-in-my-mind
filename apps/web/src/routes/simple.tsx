@@ -7,6 +7,7 @@ import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
+import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -171,7 +172,10 @@ function SimplePage() {
     <div className='mx-auto w-full max-w-md py-10'>
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <CardTitle>Simple</CardTitle>
+          <CardTitle className='flex items-center gap-1.5'>
+            Simple
+            <PageInfo page='simple' />
+          </CardTitle>
           <CardDescription>Manage your tasks efficiently</CardDescription>
         </CardHeader>
         <CardContent>
@@ -307,7 +311,7 @@ function SimpleTodoItem({
                 <button
                   key={n}
                   type='button'
-                  className={`h-3 w-3 rounded-sm border ${
+                  className={`h-3.5 w-3.5 rounded-sm border sm:h-3 sm:w-3 ${
                     isFilled ? 'border-green-500 bg-green-500' : 'border-muted-foreground/40'
                   }`}
                   onClick={(e) => {

@@ -5,6 +5,7 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
+import { PageInfo } from '@/components/page-info';
 import { RingChart } from '@/components/ring-chart';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -124,7 +125,10 @@ function RingPage() {
       ) : (
         <>
           <div className='mb-6 w-full'>
-            <h1 className='text-lg font-semibold text-foreground'>Ring</h1>
+            <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
+              Ring
+              <PageInfo page='ring' />
+            </h1>
             <p className='text-sm text-muted-foreground'>Each arc is a task; length is effort, fill is progress.</p>
           </div>
 
