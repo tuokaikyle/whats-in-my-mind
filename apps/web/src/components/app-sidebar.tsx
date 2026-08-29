@@ -29,7 +29,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { ModeToggle } from './mode-toggle';
 
 export const sidebarData: {
   user: {
@@ -175,7 +174,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className='mb-1'>
         <UserButton
-          additionalLinks={[<ModeToggle key='mode-toggle' />]}
           disableDefaultLinks={true}
           size={open ? 'default' : 'icon'}
           side={isMobile ? 'top' : 'right'}
