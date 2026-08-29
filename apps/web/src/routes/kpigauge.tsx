@@ -101,8 +101,7 @@ function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options 
   return {
     chart: {
       type: 'solidgauge',
-      height: 440,
-      width: 440,
+      height: '100%',
       backgroundColor: 'transparent',
       style: { fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif' },
       spacing: [0, 0, 0, 0],
@@ -227,8 +226,12 @@ function KpiGaugePage() {
           </div>
 
           <div className='flex flex-col items-center gap-6'>
-            <div className='relative'>
-              <HighchartsReact highcharts={Highcharts} options={options} />
+            <div className='relative aspect-square w-full max-w-[440px] min-w-0 overflow-hidden'>
+              <HighchartsReact
+                highcharts={Highcharts}
+                options={options}
+                containerProps={{ className: 'h-full w-full' }}
+              />
             </div>
 
             {slices.length > 0 ? (

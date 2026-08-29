@@ -1,5 +1,5 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
-import { Link, useMatchRoute } from '@tanstack/react-router';
+import { Link, useLocation, useMatchRoute } from '@tanstack/react-router';
 import {
   Bubbles,
   Check,
@@ -15,6 +15,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
+import { useEffect } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -109,8 +110,13 @@ export const sidebarData: {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const matchRoute = useMatchRoute();
-  const { toggleSidebar, open } = useSidebar();
+  const location = useLocation();
+  const { toggleSidebar, open, setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [location.pathname, setOpenMobile]);
 
   // Group items by their 'group' property
   const groupedNavMain = sidebarData.navMain.reduce(

@@ -10,7 +10,6 @@ import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
 import * as BaseDrawer from '@/components/ui/drawer-base';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
 import type { Category, Task } from '@/utils/types';
@@ -78,8 +77,6 @@ function TreemapPage() {
   const { categories, isLoading: categoriesLoading } = useCategories();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-  const isMobile = useIsMobile();
-
   const [listPanelOpen, setListPanelOpen] = useState(false);
 
   const loading = todosLoading || categoriesLoading;
@@ -97,7 +94,7 @@ function TreemapPage() {
 
     return {
       chart: {
-        ...(isMobile ? {} : { height: 600 }),
+        height: null,
         backgroundColor: 'transparent',
         style: {
           fontFamily: 'Inter, Geist, ui-sans-serif, system-ui, sans-serif',
@@ -184,7 +181,7 @@ function TreemapPage() {
       },
       credits: { enabled: false },
     };
-  }, [activeTodos, categories, isDark, isMobile, textColor, mutedColor, tooltipBg, tooltipBorder]);
+  }, [activeTodos, categories, isDark, textColor, mutedColor, tooltipBg, tooltipBorder]);
 
   return (
     <div className='mx-auto w-full max-w-4xl space-y-6 px-4 py-10'>
@@ -202,7 +199,7 @@ function TreemapPage() {
           highcharts={Highcharts}
           options={options}
           containerProps={{
-            className: isMobile ? 'w-full h-[clamp(300px,50vh,600px)]' : 'w-full',
+            className: 'h-[clamp(440px,65dvh,600px)] w-full min-w-0',
           }}
         />
       )}
