@@ -16,6 +16,7 @@ import { Route as ReadinessRouteImport } from './routes/readiness'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ManageRouteImport } from './routes/manage'
 import { Route as KpigaugeRouteImport } from './routes/kpigauge'
+import { Route as CompletedRouteImport } from './routes/completed'
 import { Route as BubbleRouteImport } from './routes/bubble'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -56,6 +57,11 @@ const KpigaugeRoute = KpigaugeRouteImport.update({
   path: '/kpigauge',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompletedRoute = CompletedRouteImport.update({
+  id: '/completed',
+  path: '/completed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BubbleRoute = BubbleRouteImport.update({
   id: '/bubble',
   path: '/bubble',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/bubble': typeof BubbleRoute
+  '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
   '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
+    | '/completed'
     | '/kpigauge'
     | '/manage'
     | '/progress'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
+    | '/completed'
     | '/kpigauge'
     | '/manage'
     | '/progress'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/bubble'
+    | '/completed'
     | '/kpigauge'
     | '/manage'
     | '/progress'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   BubbleRoute: typeof BubbleRoute
+  CompletedRoute: typeof CompletedRoute
   KpigaugeRoute: typeof KpigaugeRoute
   ManageRoute: typeof ManageRoute
   ProgressRoute: typeof ProgressRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KpigaugeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/completed': {
+      id: '/completed'
+      path: '/completed'
+      fullPath: '/completed'
+      preLoaderRoute: typeof CompletedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bubble': {
       id: '/bubble'
       path: '/bubble'
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   BubbleRoute: BubbleRoute,
+  CompletedRoute: CompletedRoute,
   KpigaugeRoute: KpigaugeRoute,
   ManageRoute: ManageRoute,
   ProgressRoute: ProgressRoute,

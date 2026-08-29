@@ -1,9 +1,13 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useLocation, useMatchRoute } from '@tanstack/react-router';
 import {
+  ArrowBigRight,
+  ArrowBigRightDash,
+  BatteryFull,
   Bubbles,
   Check,
   CircleCheck,
+  CircleCheckIcon,
   CircleDashed,
   Command,
   FileCheck,
@@ -11,7 +15,9 @@ import {
   Info,
   LayoutGrid,
   PanelLeft,
+  PlugZap,
   Settings2,
+  SquareCheck,
   TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
@@ -49,6 +55,7 @@ export const sidebarData: {
     avatar: '/avatars/shadcn.jpg',
   },
   navMain: [
+    // Views group
     {
       title: 'Simple',
       url: '/simple',
@@ -85,12 +92,21 @@ export const sidebarData: {
       icon: Gauge,
       group: 'Views',
     },
+
+    // Stages group
     {
       title: 'Readiness',
       url: '/readiness',
-      icon: CircleCheck,
-      group: 'Views',
+      icon: ArrowBigRight,
+      group: 'Stages',
     },
+    {
+      title: 'Completed',
+      url: '/completed',
+      icon: SquareCheck,
+      group: 'Stages',
+    },
+
     // General group
     {
       title: 'Manage',
