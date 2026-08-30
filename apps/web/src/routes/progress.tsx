@@ -117,9 +117,7 @@ function ProgressPage() {
         <CardHeader>
           <div>
             <div className='flex items-center justify-between gap-2'>
-              <CardTitle className='flex items-center gap-1.5'>
-                {pageMetadata.progress.title}
-              </CardTitle>
+              <CardTitle className='flex items-center gap-1.5'>{pageMetadata.progress.title}</CardTitle>
               <div className='flex items-center gap-2'>
                 <Button
                   variant='outline'
@@ -273,7 +271,7 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
     let raf = 0;
     const tick = (now: number) => {
       const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
+      const eased = 1 - (1 - t) ** 3;
       const val = from + (to - from) * eased;
       displayedRef.current = val;
       setDisplayed(val);
@@ -285,6 +283,7 @@ function ProgressGauge({ percent, size = 52, className }: { percent: number; siz
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={cn('shrink-0', className)}>
+      <title>{`${percent}% complete`}</title>
       <path
         d={arcPath(cx, cy, r, GAUGE_START, GAUGE_END)}
         fill='none'
@@ -455,8 +454,9 @@ function ProgressTodoItem({
             return (
               <div
                 key={n}
-                className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
-                  }`}
+                className={`h-full flex-1 first:rounded-l-full last:rounded-r-full transition-colors duration-200 ${
+                  isFilled ? 'bg-green-500' : 'bg-muted-foreground/15'
+                }`}
               />
             );
           })}

@@ -174,9 +174,7 @@ function SimplePage() {
 
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-1.5'>
-            {pageMetadata.simple.title}
-          </CardTitle>
+          <CardTitle className='flex items-center gap-1.5'>{pageMetadata.simple.title}</CardTitle>
           <CardDescription>{pageMetadata.simple.description}</CardDescription>
         </CardHeader>
         <CardContent>

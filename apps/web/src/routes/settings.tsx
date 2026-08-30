@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
+import { ModeToggle } from '@/components/mode-toggle';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,11 +30,11 @@ import { highChartColors } from '@/utils/enums';
 import { trpc } from '@/utils/trpc';
 import type { Category } from '@/utils/types';
 
-export const Route = createFileRoute('/manage')({
-  component: ManagePage,
+export const Route = createFileRoute('/settings')({
+  component: SettingsPage,
 });
 
-function ManagePage() {
+function SettingsPage() {
   const { categories, isLoading, deleteMutation, createMutation, isGuest } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
@@ -117,58 +118,58 @@ function ManagePage() {
             ) : (
               <>
                 <div className='hidden rounded-md border sm:block'>
-                <table className='w-full'>
-                  <thead>
-                    <tr className='border-b bg-muted/50'>
-                      <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Name</th>
-                      <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Color</th>
-                      <th className='w-20 px-4 py-3' />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categories.map((category) => (
-                      <tr key={category.id} className='border-b last:border-b-0'>
-                        <td className='px-4 py-3 text-sm'>{category.name}</td>
-                        <td className='px-4 py-3'>
-                          <div
-                            className='h-5 w-5 rounded-full border'
-                            style={{
-                              backgroundColor: category.color ?? '#6366f1',
-                            }}
-                          />
-                        </td>
-                        <td className='px-4 py-3'>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='h-8 w-8'
-                                aria-label={`Actions for ${category.name}`}
-                              >
-                                <Ellipsis className='h-4 w-4' />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent side='right' align='start'>
-                              <DropdownMenuItem onClick={() => openEdit(category)}>
-                                <Pencil className='h-4 w-4' />
-                                Edit Category
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                variant='destructive'
-                                disabled={deleteMutation.isPending}
-                                onClick={() => setDeleteTarget(category)}
-                              >
-                                <Trash2 className='h-4 w-4' />
-                                Delete Category
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </td>
+                  <table className='w-full'>
+                    <thead>
+                      <tr className='border-b bg-muted/50'>
+                        <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Name</th>
+                        <th className='text-left px-4 py-3 text-sm font-medium text-muted-foreground'>Color</th>
+                        <th className='w-20 px-4 py-3' />
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {categories.map((category) => (
+                        <tr key={category.id} className='border-b last:border-b-0'>
+                          <td className='px-4 py-3 text-sm'>{category.name}</td>
+                          <td className='px-4 py-3'>
+                            <div
+                              className='h-5 w-5 rounded-full border'
+                              style={{
+                                backgroundColor: category.color ?? '#6366f1',
+                              }}
+                            />
+                          </td>
+                          <td className='px-4 py-3'>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  className='h-8 w-8'
+                                  aria-label={`Actions for ${category.name}`}
+                                >
+                                  <Ellipsis className='h-4 w-4' />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent side='right' align='start'>
+                                <DropdownMenuItem onClick={() => openEdit(category)}>
+                                  <Pencil className='h-4 w-4' />
+                                  Edit Category
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant='destructive'
+                                  disabled={deleteMutation.isPending}
+                                  onClick={() => setDeleteTarget(category)}
+                                >
+                                  <Trash2 className='h-4 w-4' />
+                                  Delete Category
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
                 <div className='divide-y border-y sm:hidden'>
                   {categories.map((category) => (
@@ -230,9 +231,8 @@ function ManagePage() {
                       <button
                         key={name}
                         type='button'
-                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${
-                          newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
-                        }`}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
+                          }`}
                         style={{ backgroundColor: hex }}
                         aria-label={name}
                         aria-pressed={newColor === hex}
@@ -248,10 +248,7 @@ function ManagePage() {
                     <X className='h-4 w-4' />
                     Cancel
                   </Button>
-                  <Button
-                    disabled={!newName.trim() || createMutation.isPending}
-                    onClick={handleCreateCategory}
-                  >
+                  <Button disabled={!newName.trim() || createMutation.isPending} onClick={handleCreateCategory}>
                     <Check className='h-4 w-4' />
                     {createMutation.isPending ? 'Adding...' : 'Add Category'}
                   </Button>
@@ -277,6 +274,16 @@ function ManagePage() {
       )}
 
       <Card className={`max-sm:rounded-none max-sm:border-0 max-sm:shadow-none ${isGuest ? '' : 'mt-6'}`}>
+        <CardHeader className='flex flex-row items-center justify-between gap-4'>
+          <div className='space-y-1.5'>
+            <CardTitle>Theme</CardTitle>
+            <CardDescription>Choose a light, dark, or system theme.</CardDescription>
+          </div>
+          <ModeToggle />
+        </CardHeader>
+      </Card>
+
+      <Card className='mt-6 max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
           <CardTitle>Network Status</CardTitle>
           <CardDescription>Application health check</CardDescription>
@@ -318,7 +325,6 @@ function ManagePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

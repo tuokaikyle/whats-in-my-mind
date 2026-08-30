@@ -11,10 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TreemapRouteImport } from './routes/treemap'
 import { Route as SimpleRouteImport } from './routes/simple'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RingRouteImport } from './routes/ring'
 import { Route as ReadinessRouteImport } from './routes/readiness'
 import { Route as ProgressRouteImport } from './routes/progress'
-import { Route as ManageRouteImport } from './routes/manage'
 import { Route as KpigaugeRouteImport } from './routes/kpigauge'
 import { Route as CompletedRouteImport } from './routes/completed'
 import { Route as BubbleRouteImport } from './routes/bubble'
@@ -32,6 +32,11 @@ const SimpleRoute = SimpleRouteImport.update({
   path: '/simple',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RingRoute = RingRouteImport.update({
   id: '/ring',
   path: '/ring',
@@ -45,11 +50,6 @@ const ReadinessRoute = ReadinessRouteImport.update({
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ManageRoute = ManageRouteImport.update({
-  id: '/manage',
-  path: '/manage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KpigaugeRoute = KpigaugeRouteImport.update({
@@ -89,10 +89,10 @@ export interface FileRoutesByFullPath {
   '/bubble': typeof BubbleRoute
   '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
-  '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
+  '/settings': typeof SettingsRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -103,10 +103,10 @@ export interface FileRoutesByTo {
   '/bubble': typeof BubbleRoute
   '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
-  '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
+  '/settings': typeof SettingsRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -118,10 +118,10 @@ export interface FileRoutesById {
   '/bubble': typeof BubbleRoute
   '/completed': typeof CompletedRoute
   '/kpigauge': typeof KpigaugeRoute
-  '/manage': typeof ManageRoute
   '/progress': typeof ProgressRoute
   '/readiness': typeof ReadinessRoute
   '/ring': typeof RingRoute
+  '/settings': typeof SettingsRoute
   '/simple': typeof SimpleRoute
   '/treemap': typeof TreemapRoute
   '/auth/$path': typeof AuthPathRoute
@@ -134,10 +134,10 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/completed'
     | '/kpigauge'
-    | '/manage'
     | '/progress'
     | '/readiness'
     | '/ring'
+    | '/settings'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -148,10 +148,10 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/completed'
     | '/kpigauge'
-    | '/manage'
     | '/progress'
     | '/readiness'
     | '/ring'
+    | '/settings'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -162,10 +162,10 @@ export interface FileRouteTypes {
     | '/bubble'
     | '/completed'
     | '/kpigauge'
-    | '/manage'
     | '/progress'
     | '/readiness'
     | '/ring'
+    | '/settings'
     | '/simple'
     | '/treemap'
     | '/auth/$path'
@@ -177,10 +177,10 @@ export interface RootRouteChildren {
   BubbleRoute: typeof BubbleRoute
   CompletedRoute: typeof CompletedRoute
   KpigaugeRoute: typeof KpigaugeRoute
-  ManageRoute: typeof ManageRoute
   ProgressRoute: typeof ProgressRoute
   ReadinessRoute: typeof ReadinessRoute
   RingRoute: typeof RingRoute
+  SettingsRoute: typeof SettingsRoute
   SimpleRoute: typeof SimpleRoute
   TreemapRoute: typeof TreemapRoute
   AuthPathRoute: typeof AuthPathRoute
@@ -202,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SimpleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ring': {
       id: '/ring'
       path: '/ring'
@@ -221,13 +228,6 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof ProgressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/manage': {
-      id: '/manage'
-      path: '/manage'
-      fullPath: '/manage'
-      preLoaderRoute: typeof ManageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kpigauge': {
@@ -281,10 +281,10 @@ const rootRouteChildren: RootRouteChildren = {
   BubbleRoute: BubbleRoute,
   CompletedRoute: CompletedRoute,
   KpigaugeRoute: KpigaugeRoute,
-  ManageRoute: ManageRoute,
   ProgressRoute: ProgressRoute,
   ReadinessRoute: ReadinessRoute,
   RingRoute: RingRoute,
+  SettingsRoute: SettingsRoute,
   SimpleRoute: SimpleRoute,
   TreemapRoute: TreemapRoute,
   AuthPathRoute: AuthPathRoute,

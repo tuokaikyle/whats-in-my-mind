@@ -91,9 +91,7 @@ function ReadinessPage() {
         <CardHeader>
           <div>
             <div className='flex items-center justify-between gap-2'>
-              <CardTitle className='flex items-center gap-1.5'>
-                {pageMetadata.readiness.title}
-              </CardTitle>
+              <CardTitle className='flex items-center gap-1.5'>{pageMetadata.readiness.title}</CardTitle>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button

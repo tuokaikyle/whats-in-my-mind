@@ -2,12 +2,7 @@ import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useLocation, useMatchRoute } from '@tanstack/react-router';
 import {
   ArrowBigRight,
-  ArrowBigRightDash,
-  BatteryFull,
   Bubbles,
-  Check,
-  CircleCheck,
-  CircleCheckIcon,
   CircleDashed,
   Command,
   FileCheck,
@@ -15,7 +10,6 @@ import {
   Info,
   LayoutGrid,
   PanelLeft,
-  PlugZap,
   Settings2,
   SquareCheck,
   TrendingUp,
@@ -110,8 +104,8 @@ export const sidebarData: {
 
     // General group
     {
-      title: 'Manage',
-      url: '/manage',
+      title: 'Settings',
+      url: '/settings',
       icon: Settings2,
       group: 'General',
     },
@@ -131,7 +125,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    setOpenMobile(false);
+    if (location.pathname) setOpenMobile(false);
   }, [location.pathname, setOpenMobile]);
 
   // Group items by their 'group' property

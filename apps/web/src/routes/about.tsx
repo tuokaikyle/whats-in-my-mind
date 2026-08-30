@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowBigRight,
   Bubbles,
@@ -8,14 +9,14 @@ import {
   FileCheck,
   Gauge,
   LayoutGrid,
+  Settings2,
   SquareCheck,
   TrendingUp,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { TrackedField, ViewFeature, pageMetadata } from '@/utils/page-metadata';
+import { pageMetadata, TrackedField, ViewFeature } from '@/utils/page-metadata';
 
 export const Route = createFileRoute('/about')({
   component: RouteComponent,
@@ -172,14 +173,8 @@ function ViewCard({ path, icon: Icon, title, description, keepsTrackOf, features
           <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <MetadataRow
-            label='Tracks'
-            values={keepsTrackOf.map((field) => trackedFieldLabels[field])}
-          />
-          <MetadataRow
-            label='Features'
-            values={features.map((feature) => viewFeatureLabels[feature])}
-          />
+          <MetadataRow label='Tracks' values={keepsTrackOf.map((field) => trackedFieldLabels[field])} />
+          <MetadataRow label='Features' values={features.map((feature) => viewFeatureLabels[feature])} />
         </CardContent>
       </Card>
     </Link>
@@ -215,32 +210,62 @@ function RouteComponent() {
         </div>
       ))}
 
-      <Card className={cardClassName}>
-        <CardHeader>
-          <CardTitle>Open source</CardTitle>
-          <CardDescription>
-            Built by{' '}
-            <a
-              href='https://github.com/tuokaikyle'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='inline-flex items-center gap-0.5 underline underline-offset-2'
-            >
-              tuokaikyle
-              <ExternalLink className='h-3 w-3' />
-            </a>
-            . Found a bug or have an idea? Open an issue on GitHub.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button asChild variant='outline'>
-            <a href={REPO_URL} target='_blank' rel='noopener noreferrer'>
-              <ExternalLink className='h-4 w-4' />
-              View on GitHub
-            </a>
-          </Button>
-        </CardContent>
-      </Card>
+      <Separator />
+
+      <div className='space-y-3'>
+        <div className='space-y-1 px-1'>
+          <h3 className='text-sm font-semibold uppercase tracking-wide text-muted-foreground'>Settings</h3>
+          <p className='text-sm text-muted-foreground'>Organize your tasks and personalize the application.</p>
+        </div>
+        <Link to='/settings' className='group block'>
+          <Card className={`transition-colors hover:bg-muted/40 ${cardClassName}`}>
+            <CardHeader>
+              <CardTitle className='flex items-center justify-between gap-3 text-base'>
+                <span className='flex items-center gap-2'>
+                  <Settings2 className='h-4 w-4 text-muted-foreground' />
+                  What you can configure
+                </span>
+                <ChevronRight className='h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100' />
+              </CardTitle>
+              <CardDescription>
+                Signed-in users can manage categories. Theme and connection status are available to everyone.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className='list-disc space-y-2 pl-5 text-sm text-muted-foreground'>
+                <li>Create categories, rename or recolor them, and delete categories you no longer need.</li>
+                <li>Choose a light, dark, or system theme.</li>
+                <li>Check whether the application is connected to its server.</li>
+              </ul>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      <Separator />
+
+      <div className='space-y-3 px-1'>
+        <h3 className='text-sm font-semibold uppercase tracking-wide text-muted-foreground'>Project page</h3>
+        <p className='text-sm text-muted-foreground'>
+          Built by{' '}
+          <a
+            href='https://github.com/tuokaikyle'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='inline-flex items-center gap-0.5 underline underline-offset-2'
+          >
+            tuokaikyle
+            <ExternalLink className='h-3 w-3' />
+          </a>
+          . Found a bug or have an idea? Open an issue on GitHub.
+        </p>
+        <Button asChild variant='outline'>
+          <a href={REPO_URL} target='_blank' rel='noopener noreferrer'>
+            <ExternalLink className='h-4 w-4' />
+            View on GitHub
+          </a>
+        </Button>
+      </div>
     </div>
   );
 }
