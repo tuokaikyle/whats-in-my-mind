@@ -31,6 +31,7 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     <AuthUIProvider
       authClient={authClient}
       baseURL={window.location.origin}
+      deleteUser={true}
       redirectTo='/simple'
       navigate={(href) => navigate({ to: href })}
       replace={(href) => navigate({ to: href, replace: true })}
