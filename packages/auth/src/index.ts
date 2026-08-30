@@ -84,6 +84,11 @@ export function createAuth(env: AuthEnv) {
         });
       },
     },
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+    },
     advanced: {
       defaultCookieAttributes: {
         sameSite: isProduction ? 'none' : 'lax',

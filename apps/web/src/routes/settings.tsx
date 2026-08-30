@@ -1,3 +1,4 @@
+import { DeleteAccountCard } from '@daveyplate/better-auth-ui';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Check, Ellipsis, Pencil, Trash2, X } from 'lucide-react';
@@ -231,8 +232,9 @@ function SettingsPage() {
                       <button
                         key={name}
                         type='button'
-                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
-                          }`}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${
+                          newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
+                        }`}
                         style={{ backgroundColor: hex }}
                         aria-label={name}
                         aria-pressed={newColor === hex}
@@ -297,6 +299,19 @@ function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {!isGuest && (
+        <section className='mt-6' aria-label='Danger zone'>
+          <DeleteAccountCard
+            className='border-border max-sm:rounded-none max-sm:shadow-none'
+            classNames={{
+              title: '!text-base md:!text-base',
+              footer: 'border-border bg-muted/30',
+              destructiveButton: 'border border-border !bg-transparent !text-destructive shadow-none hover:!bg-muted',
+            }}
+          />
+        </section>
+      )}
 
       {!isGuest && (
         <ManageCategory
