@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import 'highcharts/modules/treemap';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
-import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
@@ -13,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/treemap')({
@@ -20,6 +20,11 @@ export const Route = createFileRoute('/treemap')({
 });
 
 const UNCATEGORIZED_COLOR = '#6b8abc';
+const TREEMAP_FILL_OPACITY = 0.75;
+
+function colorWithOpacity(color: string, opacity: number): string {
+  return Highcharts.color(color).setOpacity(opacity).get('rgba') as string;
+}
 
 function buildTreemapData(todos: Task[], categories: Category[]) {
   const categoryMap = new Map<number, Category>();
@@ -36,7 +41,7 @@ function buildTreemapData(todos: Task[], categories: Category[]) {
       const cat = catId != null ? categoryMap.get(catId) : undefined;
       grouped.set(key, {
         todos: [],
-        color: cat?.color || UNCATEGORIZED_COLOR,
+        color: colorWithOpacity(cat?.color || UNCATEGORIZED_COLOR, TREEMAP_FILL_OPACITY),
       });
     }
     const group = grouped.get(key);
@@ -194,12 +199,9 @@ function TreemapPage() {
         <>
           <div>
             <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
-              Tree Map
-              <PageInfo page='treemap' />
+              {pageMetadata.treemap.title}
             </h1>
-            <p className='text-sm text-muted-foreground'>
-              Grouped by category — rectangle size reflects relative effort
-            </p>
+            <p className='text-sm text-muted-foreground'>{pageMetadata.treemap.description}</p>
           </div>
           <HighchartsReact
             highcharts={Highcharts}

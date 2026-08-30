@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
-import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
@@ -16,6 +15,7 @@ import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Category, Task } from '@/utils/types';
 
 export const Route = createFileRoute('/bubble')({
@@ -174,10 +174,9 @@ function BubblePage() {
         <>
           <div>
             <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
-              Bubble
-              <PageInfo page='bubble' />
+              {pageMetadata.bubble.title}
             </h1>
-            <p className='text-sm text-muted-foreground'>Grouped by category. Bubble size reflects effort.</p>
+            <p className='text-sm text-muted-foreground'>{pageMetadata.bubble.description}</p>
           </div>
           <HighchartsReact
             highcharts={Highcharts}

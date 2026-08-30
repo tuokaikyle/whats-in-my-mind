@@ -1,9 +1,8 @@
 import { UserButton } from '@daveyplate/better-auth-ui';
 import { Link, useLocation, useMatchRoute } from '@tanstack/react-router';
 import {
+  ArrowBigRight,
   Bubbles,
-  Check,
-  CircleCheck,
   CircleDashed,
   Command,
   FileCheck,
@@ -12,6 +11,7 @@ import {
   LayoutGrid,
   PanelLeft,
   Settings2,
+  SquareCheck,
   TrendingUp,
 } from 'lucide-react';
 import type * as React from 'react';
@@ -29,6 +29,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { pageMetadata } from '@/utils/page-metadata';
 
 export const sidebarData: {
   user: {
@@ -49,52 +50,62 @@ export const sidebarData: {
     avatar: '/avatars/shadcn.jpg',
   },
   navMain: [
+    // Views group
     {
-      title: 'Simple',
+      title: pageMetadata.simple.title,
       url: '/simple',
       icon: FileCheck,
       group: 'Views',
     },
     {
-      title: 'Progress',
+      title: pageMetadata.progress.title,
       url: '/progress',
       icon: TrendingUp,
       group: 'Views',
     },
     {
-      title: 'Bubble',
+      title: pageMetadata.bubble.title,
       url: '/bubble',
       icon: Bubbles,
       group: 'Views',
     },
     {
-      title: 'Tree Map',
+      title: pageMetadata.treemap.title,
       url: '/treemap',
       icon: LayoutGrid,
       group: 'Views',
     },
     {
-      title: 'Ring',
+      title: pageMetadata.ring.title,
       url: '/ring',
       icon: CircleDashed,
       group: 'Views',
     },
     {
-      title: 'Kpi Gauge',
+      title: pageMetadata.kpigauge.title,
       url: '/kpigauge',
       icon: Gauge,
       group: 'Views',
     },
+
+    // Stages group
     {
-      title: 'Readiness',
+      title: pageMetadata.readiness.title,
       url: '/readiness',
-      icon: CircleCheck,
-      group: 'Views',
+      icon: ArrowBigRight,
+      group: 'Stages',
     },
+    {
+      title: pageMetadata.completed.title,
+      url: '/completed',
+      icon: SquareCheck,
+      group: 'Stages',
+    },
+
     // General group
     {
-      title: 'Manage',
-      url: '/manage',
+      title: 'Settings',
+      url: '/settings',
       icon: Settings2,
       group: 'General',
     },
@@ -114,7 +125,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    setOpenMobile(false);
+    if (location.pathname) setOpenMobile(false);
   }, [location.pathname, setOpenMobile]);
 
   // Group items by their 'group' property
@@ -140,7 +151,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-medium'>What's in my mind</span>
-                  <span className='truncate text-xs'>Present ideas differently</span>
+                  <span className='truncate text-xs'>Multiple views on one task</span>
+                  {/* <span className='truncate text-xs'>A multi-view todo app</span> */}
                 </div>
                 <PanelLeft className='size-4' />
               </div>

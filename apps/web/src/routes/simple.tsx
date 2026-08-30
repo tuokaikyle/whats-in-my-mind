@@ -7,7 +7,6 @@ import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
-import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/simple')({
@@ -169,18 +169,15 @@ function SimplePage() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-md py-10'>
+    <div className='mx-auto w-full max-w-md px-4 py-10'>
+      {isGuest && <GuestBanner />}
+
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <CardTitle className='flex items-center gap-1.5'>
-            Simple
-            <PageInfo page='simple' />
-          </CardTitle>
-          <CardDescription>Manage your tasks efficiently</CardDescription>
+          <CardTitle className='flex items-center gap-1.5'>{pageMetadata.simple.title}</CardTitle>
+          <CardDescription>{pageMetadata.simple.description}</CardDescription>
         </CardHeader>
         <CardContent>
-          {isGuest && <GuestBanner className='mb-4' />}
-
           {todosLoading ? (
             <PageLoader />
           ) : todos.length === 0 ? (

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
-import { PageInfo } from '@/components/page-info';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -17,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useTodos } from '@/hooks/use-todos';
 import { cn } from '@/lib/utils';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/readiness')({
@@ -51,15 +51,17 @@ function ReadinessPage() {
   const [sortMode, setSortMode] = useState<SortMode>('low-progress');
 
   const sortedTodos = useMemo(() => {
+    const unstartedTodos = todos.filter((todo) => (todo.progress ?? 0) === 0);
+
     switch (sortMode) {
       case 'latest':
-        return [...todos].sort(compareByCreatedAt).reverse();
+        return [...unstartedTodos].sort(compareByCreatedAt).reverse();
       case 'high-progress':
-        return [...todos].sort(compareByProgress).reverse();
+        return [...unstartedTodos].sort(compareByProgress).reverse();
       case 'earliest':
-        return [...todos].sort(compareByCreatedAt);
+        return [...unstartedTodos].sort(compareByCreatedAt);
       default:
-        return [...todos].sort(compareByProgress);
+        return [...unstartedTodos].sort(compareByProgress);
     }
   }, [todos, sortMode]);
 
@@ -82,42 +84,49 @@ function ReadinessPage() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-md py-10'>
+    <div className='mx-auto w-full max-w-md px-4 py-10'>
+      {isGuest && <GuestBanner />}
+
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <div className='flex items-center justify-between gap-2'>
-            <div>
-              <CardTitle className='flex items-center gap-1.5'>
-                Readiness
-                <PageInfo page='readiness' />
-              </CardTitle>
-              <CardDescription className='mt-2'>Be ready to start it</CardDescription>
+          <div>
+            <div className='flex items-center justify-between gap-2'>
+              <CardTitle className='flex items-center gap-1.5'>{pageMetadata.readiness.title}</CardTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    className='h-7 w-7 shrink-0'
+                    aria-label={`Sort by ${SORT_LABELS[sortMode]}`}
+                  >
+                    <ArrowUpDown className='h-4 w-4' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end'>
+                  <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+                    <DropdownMenuRadioItem value='low-progress'>Low progress</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='high-progress'>High progress</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='outline' size='sm' className='shrink-0'>
-                  <ArrowUpDown className='mr-1 h-4 w-4' />
-                  Sort: {SORT_LABELS[sortMode]}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align='end'>
-                <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-                  <DropdownMenuRadioItem value='low-progress'>Low progress</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='high-progress'>High progress</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <CardDescription className='mt-2'>{pageMetadata.readiness.description}</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          {isGuest && <GuestBanner className='mb-4' />}
-
           {todosLoading ? (
             <PageLoader />
-          ) : todos.length === 0 ? (
-            <EmptyState title='No todos yet' description='Use the + button below to add one.' size='sm' />
+          ) : sortedTodos.length === 0 ? (
+            <EmptyState
+              title={todos.length === 0 ? 'No todos yet' : 'No unstarted todos'}
+              description={
+                todos.length === 0 ? 'Use the + button below to add one.' : 'Todos with progress are hidden here.'
+              }
+              size='sm'
+            />
           ) : (
             <div className='space-y-2'>
               {sortedTodos.map((todo) => (

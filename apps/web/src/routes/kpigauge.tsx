@@ -10,7 +10,6 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
-import { PageInfo } from '@/components/page-info';
 import { useTheme } from '@/components/theme-provider';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { cn } from '@/lib/utils';
 import { EFFORT_RANGE, highChartColors } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/kpigauge')({
@@ -46,12 +46,30 @@ function pickColor(index: number, categoryColor: string | null | undefined): str
   return FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
 }
 
+function pickDistinctColor(index: number, categoryColor: string | null | undefined, usedColors: Set<string>): string {
+  const candidates = categoryColor ? [categoryColor, ...FALLBACK_PALETTE] : FALLBACK_PALETTE;
+  const color =
+    candidates.find((candidate) => !usedColors.has(candidate)) ?? FALLBACK_PALETTE[index % FALLBACK_PALETTE.length];
+  usedColors.add(color);
+  return color;
+}
+
+function shuffled<T>(items: readonly T[]): T[] {
+  const result = [...items];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
 function buildSlices(
   selectedTodos: Task[],
   categories: { id: number; name: string; color: string | null }[],
 ): RingSlice[] {
   const shown = selectedTodos.slice(0, RING_COUNT);
   const count = shown.length;
+  const usedColors = new Set<string>();
   // Distribute rings between 100% and INNER_HOLE_PCT so the innermost ring
   // sits flush against the white center disk.
   const bandWidth = count > 0 ? (100 - INNER_HOLE_PCT + RING_GAP_PCT) / count - RING_GAP_PCT : 0;
@@ -61,7 +79,7 @@ function buildSlices(
     const progress = Math.max(0, Math.min(effort, todo.progress ?? 0));
     const progressPct = effort > 0 ? Math.round((progress / effort) * 100) : 0;
     const category = categories.find((c) => c.id === todo.categoryId);
-    const color = pickColor(index, category?.color);
+    const color = pickDistinctColor(index, category?.color, usedColors);
 
     const outerRadius = Math.round((100 - index * (bandWidth + RING_GAP_PCT)) * 10) / 10;
     const innerRadius = Math.round((outerRadius - bandWidth) * 10) / 10;
@@ -135,6 +153,7 @@ function buildOptions(slices: RingSlice[], isDark: boolean): Highcharts.Options 
     series: slices.map((slice) => ({
       name: slice.text,
       type: 'solidgauge',
+      color: slice.color,
       data: [
         {
           name: slice.text,
@@ -165,10 +184,13 @@ function KpiGaugePage() {
     if (initializedRef.current || todosLoading || activeTodos.length === 0) return;
     // Prefer 3 items whose progress is greater than 0; fill any remaining
     // slots with other active tasks so the gauge has something to show.
-    const priority = [...inProgressTodos, ...activeTodos.filter((t) => (t.progress ?? 0) === 0)];
+    const unstartedTodos = activeTodos.filter((t) => (t.progress ?? 0) === 0);
+    const priority = isGuest
+      ? [...shuffled(inProgressTodos), ...shuffled(unstartedTodos)]
+      : [...inProgressTodos, ...unstartedTodos];
     setSelectedIds(priority.slice(0, RING_COUNT).map((t) => t.id));
     initializedRef.current = true;
-  }, [todosLoading, activeTodos, inProgressTodos]);
+  }, [todosLoading, activeTodos, inProgressTodos, isGuest]);
 
   const selectedTodos = useMemo(
     () => selectedIds.map((id) => todos.find((t) => t.id === id)).filter((t): t is Task => t !== undefined),
@@ -219,11 +241,10 @@ function KpiGaugePage() {
         <>
           <div className='mb-6'>
             <h1 className='flex items-center gap-1.5 text-lg font-semibold' style={{ color: textColor }}>
-              KPI Gauge
-              <PageInfo page='kpigauge' />
+              {pageMetadata.kpigauge.title}
             </h1>
             <p className='text-sm' style={{ color: mutedColor }}>
-              Pick up to {RING_COUNT} tasks to display as concentric rings.
+              {pageMetadata.kpigauge.description}
             </p>
           </div>
 
