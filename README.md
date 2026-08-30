@@ -17,6 +17,23 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Biome** - Linting and formatting
 - **Turborepo** - Optimized monorepo build system
 
+## Task Views
+
+The same task data can be explored through several focused views:
+
+| View | Purpose | Tracks | Key interactions |
+| --- | --- | --- | --- |
+| **Simple** | A clean checklist for quick capture and reordering | Progress, effort | Drag items, click progress dots, quick edit |
+| **Progress** | Track task progress and effort with progress bars | Progress, effort, creation time | Click progress bars, sort tasks, quick edit, replay animation |
+| **Bubble** | Display tasks as bubbles grouped by category and sized by effort | Effort, category | Click and drag bubbles, edit from the side panel |
+| **Tree Map** | Organize tasks by category in a space-filling layout | Effort, category | Drill into categories and edit from the side panel |
+| **Ring** | Represent each active task as an arc whose length is effort and fill is progress | Progress, effort, category | Select arcs, edit from the side panel, replay animation |
+| **KPI Gauge** | Compare up to three selected tasks as concentric progress rings | Progress, effort, category | Pick tasks, select rings, edit from the side panel |
+| **Readiness** | Assess how ready unstarted tasks are to begin | Readiness | Set readiness and sort tasks; tasks with progress are hidden |
+| **Completed** | Browse completed tasks from newest to oldest | Progress, category | Quick edit completed tasks |
+
+View names, descriptions, tracked fields, and features are maintained in [`apps/web/src/utils/page-metadata.ts`](apps/web/src/utils/page-metadata.ts).
+
 ## Getting Started
 
 First, install the dependencies:
@@ -73,17 +90,3 @@ whats-in-my-mind/
 - `bun run deploy:server`: Deploy backend to Cloudflare Workers
 - `bun run deploy:web`: Deploy frontend to Cloudflare Pages
 - `bun run deploy`: Build and deploy backend
-
-
-## dev log
-main is technically v1
-original
-
-v2
-use better t
-
-v3
-more better-t, polished
-
-v4
-more polishing

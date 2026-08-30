@@ -35,6 +35,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { pageMetadata } from '@/utils/page-metadata';
 
 export const sidebarData: {
   user: {
@@ -57,37 +58,37 @@ export const sidebarData: {
   navMain: [
     // Views group
     {
-      title: 'Simple',
+      title: pageMetadata.simple.title,
       url: '/simple',
       icon: FileCheck,
       group: 'Views',
     },
     {
-      title: 'Progress',
+      title: pageMetadata.progress.title,
       url: '/progress',
       icon: TrendingUp,
       group: 'Views',
     },
     {
-      title: 'Bubble',
+      title: pageMetadata.bubble.title,
       url: '/bubble',
       icon: Bubbles,
       group: 'Views',
     },
     {
-      title: 'Tree Map',
+      title: pageMetadata.treemap.title,
       url: '/treemap',
       icon: LayoutGrid,
       group: 'Views',
     },
     {
-      title: 'Ring',
+      title: pageMetadata.ring.title,
       url: '/ring',
       icon: CircleDashed,
       group: 'Views',
     },
     {
-      title: 'Kpi Gauge',
+      title: pageMetadata.kpigauge.title,
       url: '/kpigauge',
       icon: Gauge,
       group: 'Views',
@@ -95,13 +96,13 @@ export const sidebarData: {
 
     // Stages group
     {
-      title: 'Readiness',
+      title: pageMetadata.readiness.title,
       url: '/readiness',
       icon: ArrowBigRight,
       group: 'Stages',
     },
     {
-      title: 'Completed',
+      title: pageMetadata.completed.title,
       url: '/completed',
       icon: SquareCheck,
       group: 'Stages',
@@ -156,7 +157,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-medium'>What's in my mind</span>
-                  <span className='truncate text-xs'>Present ideas differently</span>
+                  <span className='truncate text-xs'>Multiple views on one task</span>
+                  {/* <span className='truncate text-xs'>A multi-view todo app</span> */}
                 </div>
                 <PanelLeft className='size-4' />
               </div>

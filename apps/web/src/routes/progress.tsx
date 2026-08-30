@@ -6,7 +6,6 @@ import { DeleteTodoDialog } from '@/components/delete-todo-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { ManageCategory } from '@/components/manage-category';
-import { PageInfo } from '@/components/page-info';
 import { PageLoader } from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +25,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { cn } from '@/lib/utils';
 import { EFFORT_RANGE } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import type { Task } from '@/utils/types';
 
 export const Route = createFileRoute('/progress')({
@@ -110,49 +110,52 @@ function ProgressPage() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-md py-10'>
+    <div className='mx-auto w-full max-w-md px-4 py-10'>
+      {isGuest && <GuestBanner />}
+
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <div className='flex items-center justify-between gap-2'>
-            <div>
+          <div>
+            <div className='flex items-center justify-between gap-2'>
               <CardTitle className='flex items-center gap-1.5'>
-                Progress
-                <PageInfo page='progress' />
+                {pageMetadata.progress.title}
               </CardTitle>
-              <CardDescription className='mt-2'>At least to start it</CardDescription>
+              <div className='flex items-center gap-2'>
+                <Button
+                  variant='outline'
+                  size='icon'
+                  className='h-7 w-7 shrink-0'
+                  aria-label='Replay gauge animation'
+                  onClick={() => setReplayKey((k) => k + 1)}
+                >
+                  <Gauge className='h-4 w-4' />
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant='outline'
+                      size='icon'
+                      className='h-7 w-7 shrink-0'
+                      aria-label={`Sort by ${SORT_LABELS[sortMode]}`}
+                    >
+                      <ArrowUpDown className='h-4 w-4' />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align='end'>
+                    <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
+                      <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value='high-effort'>High effort</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value='low-effort'>Low effort</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-            <div className='flex items-center gap-2'>
-              <Button
-                variant='outline'
-                size='icon'
-                className='shrink-0'
-                aria-label='Replay gauge animation'
-                onClick={() => setReplayKey((k) => k + 1)}
-              >
-                <Gauge className='h-4 w-4' />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='outline' size='sm' className='shrink-0'>
-                    <ArrowUpDown className='mr-1 h-4 w-4' />
-                    Sort: {SORT_LABELS[sortMode]}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align='end'>
-                  <DropdownMenuRadioGroup value={sortMode} onValueChange={(v) => setSortMode(v as SortMode)}>
-                    <DropdownMenuRadioItem value='earliest'>Earliest</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value='latest'>Latest</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value='high-effort'>High effort</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value='low-effort'>Low effort</DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <CardDescription className='mt-2'>{pageMetadata.progress.description}</CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          {isGuest && <GuestBanner className='mb-4' />}
-
           {todosLoading ? (
             <PageLoader />
           ) : todos.length === 0 ? (

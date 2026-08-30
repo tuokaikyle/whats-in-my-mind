@@ -5,7 +5,6 @@ import { EditTodoForm } from '@/components/edit-todo-form';
 import { EmptyState } from '@/components/empty-state';
 import { GuestBanner } from '@/components/guest-banner';
 import { PageLoader } from '@/components/page-loader';
-import { PageInfo } from '@/components/page-info';
 import { RingChart } from '@/components/ring-chart';
 import { TodoListPanelDrawer } from '@/components/todo-list-panel-drawer';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCategories, useTodos } from '@/hooks/use-todos';
 import { EFFORT_RANGE } from '@/utils/enums';
+import { pageMetadata } from '@/utils/page-metadata';
 import {
   buildSegments,
   getRingSegmentStyle,
@@ -126,10 +126,9 @@ function RingPage() {
         <>
           <div className='mb-6 w-full'>
             <h1 className='flex items-center gap-1.5 text-lg font-semibold text-foreground'>
-              Ring
-              <PageInfo page='ring' />
+              {pageMetadata.ring.title}
             </h1>
-            <p className='text-sm text-muted-foreground'>Each arc is a task; length is effort, fill is progress.</p>
+            <p className='text-sm text-muted-foreground'>{pageMetadata.ring.description}</p>
           </div>
 
           <div className='flex flex-col items-center gap-6'>

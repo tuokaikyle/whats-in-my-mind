@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import * as BaseDrawer from '@/components/ui/drawer-base';
 import { useCategories, useTodos } from '@/hooks/use-todos';
+import { pageMetadata } from '@/utils/page-metadata';
 
 export const Route = createFileRoute('/completed')({
   component: CompletedPage,
@@ -45,15 +46,15 @@ function CompletedPage() {
   };
 
   return (
-    <div className='mx-auto w-full max-w-2xl py-10'>
+    <div className='mx-auto w-full max-w-2xl px-4 py-10'>
       {isGuest && <GuestBanner />}
 
       <Card className='max-sm:rounded-none max-sm:border-0 max-sm:shadow-none'>
         <CardHeader>
-          <CardTitle>Completed Todos</CardTitle>
+          <CardTitle className='flex items-center gap-1.5'>{pageMetadata.completed.title}</CardTitle>
           <CardDescription>
-            {completedTodos.length === 0
-              ? 'Finished tasks will appear here.'
+            {todosLoading
+              ? pageMetadata.completed.description
               : `${completedTodos.length} completed ${completedTodos.length === 1 ? 'task' : 'tasks'}.`}
           </CardDescription>
         </CardHeader>
