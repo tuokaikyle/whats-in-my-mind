@@ -1,8 +1,9 @@
 import { TRPCError } from '@trpc/server';
-import { and, asc, eq, sql } from '@whats-in-my-mind/db';
+import { and, asc, count, eq, sql } from '@whats-in-my-mind/db';
 import { category } from '@whats-in-my-mind/db/schema/category';
 import { todo } from '@whats-in-my-mind/db/schema/todo';
 import z from 'zod';
+import { MAX_TODOS_PER_USER, TODO_LIMIT_MESSAGE } from '../constants';
 import { protectedProcedure, router } from '../index';
 
 const metadataSchema = z.record(z.string(), z.unknown());
@@ -56,6 +57,22 @@ export const todoRouter = router({
           });
         }
       }
+
+      // Not race-free: the count and insert are separate statements, so concurrent creates can
+      // each read the same count and overshoot by the number of requests in flight. The overshoot
+      // is bounded and does not compound, which is acceptable for a growth guardrail. An exact cap
+      // would need a per-user advisory lock plus a conditional insert inside a db.batch().
+      const [existingCount] = await ctx.db
+        .select({ value: count() })
+        .from(todo)
+        .where(eq(todo.userId, ctx.session.user.id));
+      if ((existingCount?.value ?? 0) >= MAX_TODOS_PER_USER) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: TODO_LIMIT_MESSAGE,
+        });
+      }
+
       return await ctx.db.insert(todo).values({
         text: input.text,
         categoryId: input.categoryId,

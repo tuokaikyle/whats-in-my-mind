@@ -1,7 +1,9 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import type { inferRouterInputs } from '@trpc/server';
+import { MAX_TODOS_PER_USER, TODO_LIMIT_MESSAGE } from '@whats-in-my-mind/api/constants';
 import type { AppRouter } from '@whats-in-my-mind/api/routers/index';
 import { useMemo } from 'react';
+import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { EFFORT_RANGE, MAX_EFFORT } from '@/utils/enums';
 import { sampleCategories, sampleData } from '@/utils/sampleData';
@@ -85,6 +87,9 @@ export function useTodos() {
   const createMutation = useMutation<Task | unknown, Error, CreateInput>({
     mutationFn: isGuest
       ? async (input) => {
+          if ((snapshot() ?? []).length >= MAX_TODOS_PER_USER) {
+            throw new Error(TODO_LIMIT_MESSAGE);
+          }
           const now = new Date().toISOString();
           const effort = input.effort ?? null;
           const progress = input.progress ?? 0;
@@ -105,6 +110,7 @@ export function useTodos() {
       if (isGuest) setCache((prev) => [...prev, result as Task]);
       else invalidate();
     },
+    onError: (error) => toast.error(error instanceof Error ? error.message : 'Failed to create todo'),
   });
 
   const updateMutation = useMutation<unknown, Error, UpdateInput, { prev: Task[] | undefined }>({
@@ -165,6 +171,8 @@ export function useTodos() {
   return {
     todos,
     todosLoading,
+    todoLimit: MAX_TODOS_PER_USER,
+    atTodoLimit: todos.length >= MAX_TODOS_PER_USER,
     createMutation,
     updateMutation,
     deleteMutation,

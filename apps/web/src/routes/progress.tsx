@@ -72,7 +72,8 @@ function formatCreatedAgo(createdAt: string) {
 function ProgressPage() {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const { todos, todosLoading, createMutation, updateMutation, deleteMutation, isGuest } = useTodos();
+  const { todos, todosLoading, todoLimit, atTodoLimit, createMutation, updateMutation, deleteMutation, isGuest } =
+    useTodos();
   const { categories } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [sortMode, setSortMode] = useState<SortMode>('earliest');
@@ -213,10 +214,23 @@ function ProgressPage() {
               </Button>
             </div>
           ) : (
-            <Button variant='ghost' size='sm' className='mt-2 w-full' onClick={() => setIsAdding(true)}>
-              <Plus className='mr-1 h-4 w-4' />
-              Add item
-            </Button>
+            <>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='mt-2 w-full'
+                onClick={() => setIsAdding(true)}
+                disabled={atTodoLimit}
+              >
+                <Plus className='mr-1 h-4 w-4' />
+                Add item
+              </Button>
+              {atTodoLimit && (
+                <p className='mt-1 text-center text-muted-foreground text-xs'>
+                  Limit of {todoLimit} todos reached. Delete one to add another.
+                </p>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

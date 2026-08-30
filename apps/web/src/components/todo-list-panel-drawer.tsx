@@ -13,7 +13,7 @@ import type { Category, Task } from '@/utils/types';
 export function TodoListPanelDrawer() {
   const [newText, setNewText] = useState('');
   const [isAdding, setIsAdding] = useState(false);
-  const { todos, todosLoading, createMutation, isGuest } = useTodos();
+  const { todos, todosLoading, todoLimit, atTodoLimit, createMutation, isGuest } = useTodos();
   const { categories } = useCategories();
 
   const sortedTodos = useMemo(
@@ -118,10 +118,23 @@ export function TodoListPanelDrawer() {
                   </Button>
                 </div>
               ) : (
-                <Button variant='outline' size='sm' className='w-full' onClick={() => setIsAdding(true)}>
-                  <Plus className='mr-1 h-4 w-4' />
-                  Add item
-                </Button>
+                <>
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='w-full'
+                    onClick={() => setIsAdding(true)}
+                    disabled={atTodoLimit}
+                  >
+                    <Plus className='mr-1 h-4 w-4' />
+                    Add item
+                  </Button>
+                  {atTodoLimit && (
+                    <p className='mt-1 text-center text-muted-foreground text-xs'>
+                      Limit of {todoLimit} todos reached. Delete one to add another.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </>
