@@ -51,4 +51,4 @@ export const db = new Proxy({} as NeonHttpDatabase, {
 });
 
 // Re-export common drizzle-orm functions to ensure same instance
-export { and, asc, desc, eq, not, or, sql } from 'drizzle-orm';
+export { and, asc, count, desc, eq, not, or, sql } from 'drizzle-orm';
