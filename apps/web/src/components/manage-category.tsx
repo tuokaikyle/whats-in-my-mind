@@ -14,9 +14,10 @@ interface ManageCategoryProps {
   onOpenChange: (open: boolean) => void;
   category?: Category;
   categories: Category[];
+  onCreated?: (category: Category) => void;
 }
 
-export function ManageCategory({ open, onOpenChange, category, categories }: ManageCategoryProps) {
+export function ManageCategory({ open, onOpenChange, category, categories, onCreated }: ManageCategoryProps) {
   const isEditing = !!category;
 
   // Available colors: all except SteelBlue (reserved for uncategorized)
@@ -76,9 +77,10 @@ export function ManageCategory({ open, onOpenChange, category, categories }: Man
       createMutation.mutate(
         { name: name.trim(), color },
         {
-          onSuccess: () => {
+          onSuccess: (created) => {
             toast.success('Category created successfully!');
             onOpenChange(false);
+            onCreated?.(created);
           },
           onError: (error) => {
             toast.error(error instanceof Error ? error.message : 'Failed to create category');
