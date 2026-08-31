@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import {
   formatProgressPercent,
@@ -33,6 +34,33 @@ function RingSegment({
   onActivate,
 }: RingSegmentProps) {
   const { radius, strokeWidth, hitStrokeWidth, circumference, center } = geometry;
+  const [progressLength, setProgressLength] = useState(0);
+  const [isResetting, setIsResetting] = useState(false);
+  const previousReplayKey = useRef(replayKey);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const replayTriggered = previousReplayKey.current !== replayKey;
+    previousReplayKey.current = replayKey;
+
+    if (reducedMotion) {
+      setIsResetting(true);
+      setProgressLength(seg.progressLength);
+      return;
+    }
+
+    if (replayTriggered) {
+      setIsResetting(true);
+      setProgressLength(0);
+    }
+
+    const frame = requestAnimationFrame(() => {
+      if (replayTriggered) setIsResetting(false);
+      setProgressLength(seg.progressLength);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [replayKey, seg.progressLength]);
 
   return (
     <g
@@ -54,7 +82,6 @@ function RingSegment({
       />
       {/* Progress arc: animated fill, stronger */}
       <circle
-        key={`${seg.id}-${replayKey}`}
         cx={center}
         cy={center}
         r={radius}
@@ -67,8 +94,8 @@ function RingSegment({
         style={
           {
             color: seg.color,
-            '--ring-circumference': circumference,
-            '--ring-progress': seg.progressLength,
+            strokeDasharray: `${progressLength} ${circumference}`,
+            transition: isResetting ? 'none' : 'stroke-dasharray 450ms ease-out',
           } as React.CSSProperties
         }
       />
@@ -259,7 +286,7 @@ export function RingChart({
 
   return (
     <div className='flex w-full flex-col items-center gap-6'>
-      <div className='relative aspect-square w-full max-w-[40rem]'>
+      <div className='relative aspect-square w-full max-w-xl'>
         <svg
           viewBox={`0 0 ${geometry.viewBoxSize} ${geometry.viewBoxSize}`}
           className='size-full -rotate-90'

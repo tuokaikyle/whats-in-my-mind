@@ -185,7 +185,7 @@ function RouteComponent() {
   return (
     <div className='mx-auto w-full max-w-2xl space-y-6 px-4 py-10'>
       <header className='space-y-3'>
-        <h1 className='text-3xl font-bold tracking-tight'>What&apos;s in my mind</h1>
+        <h1 className='text-3xl font-bold tracking-tight'>My mind</h1>
         <p className='text-lg text-muted-foreground'>One set of tasks, many ways to see them.</p>
         <div className='space-y-3 text-muted-foreground'>
           <p>

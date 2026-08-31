@@ -36,7 +36,7 @@ export const Route = createFileRoute('/settings')({
 });
 
 function SettingsPage() {
-  const { categories, isLoading, deleteMutation, createMutation, isGuest } = useCategories();
+  const { categories, isLoading, sessionLoading, deleteMutation, createMutation, isGuest } = useCategories();
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
@@ -49,6 +49,10 @@ function SettingsPage() {
     const usedColors = new Set(categories.map((c) => c.color).filter((c): c is string => c != null));
     return Object.entries(highChartColors).filter(([name, hex]) => name !== 'SteelBlue' && !usedColors.has(hex));
   }, [categories]);
+
+  if (sessionLoading) {
+    return <PageLoader size='lg' className='py-10' />;
+  }
 
   const handleDelete = () => {
     if (!deleteTarget) return;
@@ -232,9 +236,8 @@ function SettingsPage() {
                       <button
                         key={name}
                         type='button'
-                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${
-                          newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
-                        }`}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full border-2 transition-transform sm:h-8 sm:w-8 ${newColor === hex ? 'scale-105 border-foreground' : 'border-transparent hover:scale-105'
+                          }`}
                         style={{ backgroundColor: hex }}
                         aria-label={name}
                         aria-pressed={newColor === hex}
@@ -307,7 +310,8 @@ function SettingsPage() {
             classNames={{
               title: '!text-base md:!text-base',
               footer: 'border-border bg-muted/30',
-              destructiveButton: 'border border-border !bg-transparent !text-destructive shadow-none hover:!bg-muted',
+              destructiveButton:
+                'border border-border !bg-transparent !text-destructive shadow-none hover:!bg-muted md:!ms-0',
             }}
           />
         </section>

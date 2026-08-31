@@ -184,7 +184,12 @@ export function EditTodoForm({ todo, categories, onUpdate, onDelete, onClose, is
 
       <DeleteTodoDialog open={deleteOpen} onOpenChange={setDeleteOpen} todoText={todo.text} onDelete={handleDelete} />
 
-      <ManageCategory open={categoryOpen} onOpenChange={setCategoryOpen} categories={categories} />
+      <ManageCategory
+        open={categoryOpen}
+        onOpenChange={setCategoryOpen}
+        categories={categories}
+        onCreated={(created) => setEditCategoryId(created.id.toString())}
+      />
     </>
   );
 }

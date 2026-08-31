@@ -132,15 +132,6 @@ function RingPage() {
           </div>
 
           <div className='flex flex-col items-center gap-6'>
-            <div className='flex items-center gap-2'>
-              <Button variant='outline' size='sm' onClick={() => setTrackHidden((v) => !v)}>
-                {trackHidden ? 'Show track' : 'Hide track'}
-              </Button>
-              <Button variant='outline' size='sm' onClick={() => setReplayKey((k) => k + 1)}>
-                Replay
-              </Button>
-            </div>
-
             <RingChart
               segments={segments}
               geometry={geometry}
@@ -159,6 +150,15 @@ function RingPage() {
               onActivate={handleSegmentActivate}
               onDeselect={() => setActiveId(null)}
             />
+
+            <div className='flex items-center gap-2'>
+              <Button variant='outline' size='sm' onClick={() => setTrackHidden((v) => !v)}>
+                {trackHidden ? 'Show track' : 'Hide track'}
+              </Button>
+              <Button variant='outline' size='sm' onClick={() => setReplayKey((k) => k + 1)}>
+                Replay
+              </Button>
+            </div>
           </div>
 
           <div className='flex justify-center'>

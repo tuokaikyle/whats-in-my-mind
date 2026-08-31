@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { and, eq } from '@whats-in-my-mind/db';
 import { category } from '@whats-in-my-mind/db/schema/category';
 import z from 'zod';
@@ -15,11 +16,27 @@ export const categoryRouter = router({
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1), color: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.insert(category).values({
-        name: input.name,
-        color: input.color,
-        userId: ctx.session.user.id,
-      });
+      const [created] = await ctx.db
+        .insert(category)
+        .values({
+          name: input.name,
+          color: input.color,
+          userId: ctx.session.user.id,
+        })
+        .returning({
+          id: category.id,
+          name: category.name,
+          color: category.color,
+        });
+
+      if (!created) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to create category',
+        });
+      }
+
+      return created;
     }),
 
   delete: protectedProcedure.input(z.object({ id: z.number() })).mutation(async ({ input, ctx }) => {

@@ -202,7 +202,7 @@ export function useCategories() {
   });
   const query = sessionLoading ? authQuery : isGuest ? guestQuery : authQuery;
 
-  const createMutation = useMutation<Category | unknown, Error, CreateCategoryInput>({
+  const createMutation = useMutation<Category, Error, CreateCategoryInput>({
     mutationFn: isGuest
       ? async (input) => ({
           id: Date.now(),
@@ -211,9 +211,12 @@ export function useCategories() {
         })
       : (input) => trpcClient.category.create.mutate(input),
     onSuccess: (result) => {
-      if (isGuest) {
-        queryClient.setQueryData<Category[]>(categoryQueryKey, (prev) => [...(prev ?? []), result as Category]);
-      } else {
+      queryClient.setQueryData<Category[]>(categoryQueryKey, (prev) => {
+        const list = prev ?? [];
+        if (list.some((c) => c.id === result.id)) return list;
+        return [...list, result];
+      });
+      if (!isGuest) {
         queryClient.invalidateQueries({ queryKey: categoryQueryKey });
       }
     },
@@ -258,6 +261,7 @@ export function useCategories() {
   return {
     categories,
     isLoading: query.isLoading,
+    sessionLoading,
     createMutation,
     deleteMutation,
     updateMutation,
